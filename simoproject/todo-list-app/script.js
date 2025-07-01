@@ -1,4 +1,3 @@
-// Variabili DOM
 const taskText = document.getElementById('task-text');
 const taskDate = document.getElementById('task-date');
 const taskTime = document.getElementById('task-time');
@@ -12,14 +11,16 @@ const toggleNotifiche = document.getElementById('toggle-notifiche');
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let notificheAttive = JSON.parse(localStorage.getItem('notificheAttive')) ?? true;
 
+const ICON_PATH = '/todo-list-app/icons/icon-192.png';
+const BADGE_PATH = '/todo-list-app/icons/icon-192.png';
+
 // Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(() => {
+  navigator.serviceWorker.register('/todo-list-app/sw.js').then(() => {
     console.log('✅ Service Worker registrato');
   });
 }
 
-// Richiedi permesso notifiche
 if ('Notification' in window) {
   Notification.requestPermission().then(permission => {
     if (permission === 'granted') {
@@ -44,7 +45,7 @@ function renderTasks() {
 
     const dateSpan = document.createElement('span');
     dateSpan.className = 'task-date';
-    dateSpan.textContent = formatDateDisplay(task.date);
+    dateSpan.textContent = formatDate(task.date);
 
     const timeSpan = document.createElement('span');
     timeSpan.className = 'task-time';
@@ -87,13 +88,10 @@ function renderTasks() {
   });
 }
 
-// Formatta la data in gg/mm/aaaa
-function formatDateDisplay(dateISO) {
-  const d = new Date(dateISO);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const year = d.getFullYear();
-  return `${day}/${month}/${year}`;
+function formatDate(dateStr) {
+  // dateStr è formato yyyy-mm-dd, lo trasforma in dd/mm/yyyy
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 // Doppia notifica: 5h prima e 1h prima
@@ -114,8 +112,8 @@ function scheduleNotification(task) {
       navigator.serviceWorker.ready.then(registration => {
         registration.showNotification('🕔 Promemoria attività', {
           body: `Tra 5 ore: ${task.description}`,
-          icon: 'icons/icon-192.png',
-          badge: 'icons/icon-192.png',
+          icon: ICON_PATH,
+          badge: BADGE_PATH,
           tag: `reminder5-${task.date}-${task.time}`
         });
       });
@@ -127,8 +125,8 @@ function scheduleNotification(task) {
       navigator.serviceWorker.ready.then(registration => {
         registration.showNotification('⏰ Promemoria attività', {
           body: `Tra 1 ora: ${task.description}`,
-          icon: 'icons/icon-192.png',
-          badge: 'icons/icon-192.png',
+          icon: ICON_PATH,
+          badge: BADGE_PATH,
           tag: `reminder1-${task.date}-${task.time}`
         });
       });
@@ -189,7 +187,7 @@ function startEditTask(index) {
   };
 }
 
-// Impostazioni toggle
+// Toggle impostazioni notifiche
 settingsBtn.onclick = () => {
   settingsMenu.classList.toggle('show');
 };
