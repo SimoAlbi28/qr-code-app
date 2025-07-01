@@ -15,7 +15,6 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* imposta un font base fluido */
   font-size: clamp(14px, 1.2vw + 0.5rem, 18px);
 }
 
@@ -36,10 +35,9 @@ h1 {
   max-width: 700px;
 }
 
-#task-time {
+#task-time, #task-date, #task-text {
   padding: 0.7rem 1rem;
   font-size: 1rem;
-  border: 2px solid #00796b;
   border-radius: 7px;
   flex-grow: 1;
   min-width: 120px;
@@ -47,32 +45,18 @@ h1 {
   outline-offset: 2px;
   outline-color: #00796b;
   transition: outline-color 0.3s ease;
+}
+
+#task-time {
+  border: 2px solid #00796b;
 }
 
 #task-date {
-  padding: 0.7rem 1rem;
-  font-size: 1rem;
   border: 2px solid orange;
-  border-radius: 7px;
-  flex-grow: 1;
-  min-width: 120px;
-  max-width: 250px;
-  outline-offset: 2px;
-  outline-color: #00796b;
-  transition: outline-color 0.3s ease;
 }
 
 #task-text {
-  padding: 0.7rem 1rem;
-  font-size: 1rem;
-  border: 2px solid #000000;
-  border-radius: 7px;
-  flex-grow: 1;
-  min-width: 120px;
-  max-width: 250px;
-  outline-offset: 2px;
-  outline-color: #00796b;
-  transition: outline-color 0.3s ease;
+  border: 2px solid #000;
 }
 
 #task-text:focus, #task-date:focus, #task-time:focus {
@@ -139,9 +123,8 @@ h1 {
 }
 
 .task-time {
-    
   background: #00796b;
-  color: #ffffff;
+  color: #fff;
   padding: 0.4rem 0.9rem;
   border-radius: 5px;
   min-width: 70px;
@@ -151,7 +134,7 @@ h1 {
 
 .task-desc {
   font-size: 1.15rem;
-  color: #000000;
+  color: #000;
   margin-left: 0.2rem;
   white-space: pre-wrap;
 }
@@ -195,52 +178,6 @@ h1 {
 .task-btn.delete:hover,
 .task-btn.delete:focus {
   background-color: #b71c1c;
-}
-
-/* Media Query Tablet (768px ~ 1024px) */
-@media (min-width: 768px) and (max-width: 1024px) {
-  #input-container {
-    max-width: 600px;
-  }
-  #task-text, #task-date, #task-time {
-    max-width: 180px;
-  }
-  #add-task {
-    max-width: 180px;
-  }
-}
-
-/* Media Query Desktop (1025px+) */
-@media (min-width: 1025px) {
-  body {
-    padding: 3rem 2rem;
-  }
-  #input-container {
-    max-width: 700px;
-    gap: 1.5rem;
-  }
-  #task-text, #task-date, #task-time {
-    max-width: 220px;
-    font-size: 1.2rem;
-  }
-  #add-task {
-    max-width: 220px;
-    font-size: 1.3rem;
-  }
-  .task-card {
-    padding: 1.6rem 1.4rem;
-    margin-bottom: 1.6rem;
-  }
-  .task-datetime {
-    font-size: 1.3rem;
-  }
-  .task-desc {
-    font-size: 1.25rem;
-  }
-  .task-btn {
-    font-size: 1.4rem;
-    min-width: 90px;
-  }
 }
 
 #settings {
@@ -288,4 +225,50 @@ h1 {
 
 #settings-menu.show {
   display: block;
+}
+
+/* Media Query Tablet (768px ~ 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  #input-container {
+    max-width: 600px;
+  }
+  #task-text, #task-date, #task-time {
+    max-width: 180px;
+  }
+  #add-task {
+    max-width: 180px;
+  }
+}
+
+/* Media Query Desktop (1025px+) */
+@media (min-width: 1025px) {
+  body {
+    padding: 3rem 2rem;
+  }
+  #input-container {
+    max-width: 700px;
+    gap: 1.5rem;
+  }
+  #task-text, #task-date, #task-time {
+    max-width: 220px;
+    font-size: 1.2rem;
+  }
+  #add-task {
+    max-width: 220px;
+    font-size: 1.3rem;
+  }
+  .task-card {
+    padding: 1.6rem 1.4rem;
+    margin-bottom: 1.6rem;
+  }
+  .task-datetime {
+    font-size: 1.3rem;
+  }
+  .task-desc {
+    font-size: 1.25rem;
+  }
+  .task-btn {
+    font-size: 1.4rem;
+    min-width: 90px;
+  }
 }
