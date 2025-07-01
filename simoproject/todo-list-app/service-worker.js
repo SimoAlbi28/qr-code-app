@@ -10,28 +10,26 @@ const FILES_TO_CACHE = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting(); // forza aggiornamento SW
+  console.log('Service Worker installato');
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim()); // prende controllo subito
+  console.log('Service Worker attivato');
+  return self.clients.claim();
 });
 
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Promemoria Attività';
+  const options = {
+    body: data.body || 'Hai un’attività programmata!',
+    icon: 'icon.png',
+    badge: 'badge.png',
+    tag: data.tag || 'todo-reminder'
+  };
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      for (const client of clientList) {
-        if (client.url === '/' && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow('/');
-      }
-    })
+    self.registration.showNotification(title, options)
   );
 });
-
 

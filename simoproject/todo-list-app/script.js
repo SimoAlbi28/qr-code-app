@@ -5,25 +5,31 @@ const taskTime = document.getElementById('task-time');
 const addTaskBtn = document.getElementById('add-task');
 const tasksContainer = document.getElementById('tasks-container');
 
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+const settingsBtn = document.getElementById('settings-btn');
+const settingsMenu = document.getElementById('settings-menu');
+const toggleNotifiche = document.getElementById('toggle-notifiche');
 
-// Registra SW e richiedi permesso notifiche
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let notificheAttive = JSON.parse(localStorage.getItem('notificheAttive')) ?? true;
+
+// Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => {
-    console.log('Service Worker registrato');
+    console.log('✅ Service Worker registrato');
   });
 }
 
 if ('Notification' in window) {
   Notification.requestPermission().then(permission => {
     if (permission === 'granted') {
-      console.log('Permesso notifiche concesso');
+      console.log('✅ Notifiche abilitate');
     }
   });
 }
 
 function salva() {
   localStorage.setItem('tasks', JSON.stringify(tasks));
+  localStorage.setItem('notificheAttive', JSON.stringify(notificheAttive));
 }
 
 function renderTasks() {
@@ -53,13 +59,11 @@ function renderTasks() {
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'task-buttons';
 
-    // Modifica
     const editBtn = document.createElement('button');
     editBtn.className = 'task-btn edit';
     editBtn.textContent = '✏️ Modifica';
     editBtn.onclick = () => startEditTask(index);
 
-    // Elimina
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'task-btn delete';
     deleteBtn.textContent = '🗑️ Elimina';
@@ -82,85 +86,44 @@ function renderTasks() {
   });
 }
 
-// Funzione per schedulare notifiche 1h prima
+// Doppia notifica: 5h prima e 1h prima
 function scheduleNotification(task) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!notificheAttive || !('Notification' in window) || Notification.permission !== 'granted') return;
 
-  const eventDate = new Date(task.date + 'T' + task.time);
-  const notifyTime = new Date(eventDate.getTime() - 60 * 60 * 1000); // 1h prima
+  const eventDate = new Date(`${task.date}T${task.time}`);
   const now = new Date();
-  const diffMs = notifyTime - now;
 
-  if (diffMs > 0) {
+  const notifica1h = new Date(eventDate.getTime() - 60 * 60 * 1000);
+  const notifica5h = new Date(eventDate.getTime() - 5 * 60 * 60 * 1000);
+
+  const msTo1h = notifica1h - now;
+  const msTo5h = notifica5h - now;
+
+  if (msTo5h > 0) {
     setTimeout(() => {
       navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification('Promemoria Attività', {
+        registration.showNotification('🕔 Promemoria attività', {
+          body: `Tra 5 ore: ${task.description}`,
+          icon: 'icon.png',
+          badge: 'badge.png',
+          tag: `reminder5-${task.date}-${task.time}`
+        });
+      });
+    }, msTo5h);
+  }
+
+  if (msTo1h > 0) {
+    setTimeout(() => {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification('⏰ Promemoria attività', {
           body: `Tra 1 ora: ${task.description}`,
           icon: 'icon.png',
           badge: 'badge.png',
-          tag: 'reminder-' + task.date + task.time
+          tag: `reminder1-${task.date}-${task.time}`
         });
       });
-    }, diffMs);
+    }, msTo1h);
   }
-}
-
-// Aggiungi attività
-addTaskBtn.onclick = () => {
-  const description = taskText.value.trim();
-  const date = taskDate.value;
-  const time = taskTime.value;
-
-  if (!description || !date || !time) {
-    alert('Completa tutti i campi!');
-    return;
-  }
-
-  const newTask = { description, date, time };
-  tasks.push(newTask);
-  salva();
-  renderTasks();
-  scheduleNotification(newTask);
-
-  // Reset form
-  taskText.value = '';
-  taskDate.value = '';
-  taskTime.value = '';
-};
-
-// Modifica attività
-function startEditTask(index) {
-  const task = tasks[index];
-  taskText.value = task.description;
-  taskDate.value = task.date;
-  taskTime.value = task.time;
-
-  addTaskBtn.textContent = 'Salva Modifica';
-
-  addTaskBtn.onclick = () => {
-    const description = taskText.value.trim();
-    const date = taskDate.value;
-    const time = taskTime.value;
-
-    if (!description || !date || !time) {
-      alert('Completa tutti i campi!');
-      return;
-    }
-
-    tasks[index] = { description, date, time };
-    salva();
-    renderTasks();
-    scheduleNotification(tasks[index]);
-
-    // Reset form
-    taskText.value = '';
-    taskDate.value = '';
-    taskTime.value = '';
-    addTaskBtn.textContent = 'Aggiungi';
-
-    // Ripristina evento click aggiungi normale
-    addTaskBtn.onclick = addTaskHandler;
-  };
 }
 
 function addTaskHandler() {
@@ -185,5 +148,46 @@ function addTaskHandler() {
 }
 
 addTaskBtn.onclick = addTaskHandler;
+
+function startEditTask(index) {
+  const task = tasks[index];
+  taskText.value = task.description;
+  taskDate.value = task.date;
+  taskTime.value = task.time;
+  addTaskBtn.textContent = 'Salva Modifica';
+
+  addTaskBtn.onclick = () => {
+    const description = taskText.value.trim();
+    const date = taskDate.value;
+    const time = taskTime.value;
+
+    if (!description || !date || !time) {
+      alert('Completa tutti i campi!');
+      return;
+    }
+
+    tasks[index] = { description, date, time };
+    salva();
+    renderTasks();
+    scheduleNotification(tasks[index]);
+
+    taskText.value = '';
+    taskDate.value = '';
+    taskTime.value = '';
+    addTaskBtn.textContent = 'Aggiungi';
+    addTaskBtn.onclick = addTaskHandler;
+  };
+}
+
+// Impostazioni toggle
+settingsBtn.onclick = () => {
+  settingsMenu.classList.toggle('show');
+};
+
+toggleNotifiche.checked = notificheAttive;
+toggleNotifiche.onchange = () => {
+  notificheAttive = toggleNotifiche.checked;
+  salva();
+};
 
 renderTasks();
