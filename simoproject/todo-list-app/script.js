@@ -1,3 +1,5 @@
+const BASE_PATH = '/simoproject/todo-list-app/'; // modifica qui se serve
+
 const taskText = document.getElementById('task-text');
 const taskDate = document.getElementById('task-date');
 const taskTime = document.getElementById('task-time');
@@ -11,12 +13,9 @@ const toggleNotifiche = document.getElementById('toggle-notifiche');
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let notificheAttive = JSON.parse(localStorage.getItem('notificheAttive')) ?? true;
 
-const ICON_PATH = '/todo-list-app/icons/icon-192.png';
-const BADGE_PATH = '/todo-list-app/icons/icon-192.png';
-
 // Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/todo-list-app/sw.js').then(() => {
+  navigator.serviceWorker.register(BASE_PATH + 'service-worker.js').then(() => {
     console.log('✅ Service Worker registrato');
   });
 }
@@ -45,7 +44,7 @@ function renderTasks() {
 
     const dateSpan = document.createElement('span');
     dateSpan.className = 'task-date';
-    dateSpan.textContent = formatDate(task.date);
+    dateSpan.textContent = task.date;
 
     const timeSpan = document.createElement('span');
     timeSpan.className = 'task-time';
@@ -88,13 +87,6 @@ function renderTasks() {
   });
 }
 
-function formatDate(dateStr) {
-  // dateStr è formato yyyy-mm-dd, lo trasforma in dd/mm/yyyy
-  const [y, m, d] = dateStr.split('-');
-  return `${d}/${m}/${y}`;
-}
-
-// Doppia notifica: 5h prima e 1h prima
 function scheduleNotification(task) {
   if (!notificheAttive || !('Notification' in window) || Notification.permission !== 'granted') return;
 
@@ -112,8 +104,8 @@ function scheduleNotification(task) {
       navigator.serviceWorker.ready.then(registration => {
         registration.showNotification('🕔 Promemoria attività', {
           body: `Tra 5 ore: ${task.description}`,
-          icon: ICON_PATH,
-          badge: BADGE_PATH,
+          icon: BASE_PATH + 'icons/icon-192.png',
+          badge: BASE_PATH + 'icons/icon-192.png',
           tag: `reminder5-${task.date}-${task.time}`
         });
       });
@@ -125,8 +117,8 @@ function scheduleNotification(task) {
       navigator.serviceWorker.ready.then(registration => {
         registration.showNotification('⏰ Promemoria attività', {
           body: `Tra 1 ora: ${task.description}`,
-          icon: ICON_PATH,
-          badge: BADGE_PATH,
+          icon: BASE_PATH + 'icons/icon-192.png',
+          badge: BASE_PATH + 'icons/icon-192.png',
           tag: `reminder1-${task.date}-${task.time}`
         });
       });
