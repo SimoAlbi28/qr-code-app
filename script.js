@@ -11,7 +11,7 @@ let currentCameraId = null;
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 
-// Funzione per caricare le fotocamere disponibili e popolare la select
+// Carica e popola fotocamere
 function loadCameras() {
   Html5Qrcode.getCameras()
     .then((devices) => {
@@ -30,7 +30,7 @@ function loadCameras() {
       }
     })
     .catch((err) => {
-      scanStatus.textContent = "Errore nell'accesso alle fotocamere.";
+      scanStatus.textContent = "Errore accesso fotocamere.";
       console.error(err);
     });
 }
@@ -49,8 +49,7 @@ function startScanner(cameraId) {
   html5QrcodeScanner.render(
     onScanSuccess,
     (error) => {
-      // errori scansione (opzionale)
-      // scanStatus.textContent = `Errore scansione: ${error}`;
+      // errori scansione opzionali
     },
     cameraId
   );
@@ -71,20 +70,7 @@ restartBtn.addEventListener("click", () => {
   startScanner(currentCameraId);
 });
 
-function onScanSuccess(qr) {
-  html5QrcodeScanner.clear().then(() => {
-    reader.classList.add("hidden");
-    scanStatus.textContent = "QR rilevato!";
-    if (!savedMacchinari[qr]) {
-      const nome = prompt("Inserisci il nome del macchinario:");
-      if (nome && nome.trim() !== "") {
-        salvaMacchinario(qr, nome.trim());
-      }
-    } else {
-      renderMacchinari(qr);
-    }
-  });
-}
+// Funzioni per gestione macchinari e note
 
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
@@ -173,54 +159,129 @@ function eliminaMacchinario(id) {
   }
 }
 
-function modificaMacchinario(id) {
-  const nuovoNome = prompt("Inserisci nuovo nome:", savedMacchinari[id].nome);
-  if (nuovoNome && nuovoNome.trim() !== "") {
-    salvaMacchinario(id, nuovoNome.trim());
-  }
-}
-
 function toggleExpand(id) {
-  const expandedId = document.querySelector(".macchinario.expanded")?.querySelector("h3")?.textContent === savedMacchinari[id].nome ? id : null;
-  renderMacchinari(expandedId === id ? null : id);
+  const expanded = document.querySelector(".macchinario.expanded");
+  if (expanded && expanded.querySelector("h3").textContent !== savedMacchinari[id].nome) {
+    renderMacchinari(id);
+  } else {
+    renderMacchinari();
+  }
 }
 
 function aggiungiNota(event, id) {
   event.preventDefault();
   const form = event.target;
-  const data = form.data.value;
-  const desc = form.desc.value.trim();
-  if (data && desc) {
-    savedMacchinari[id].note = savedMacchinari[id].note || [];
-    savedMacchinari[id].note.push({ data, desc });
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(id);
-    form.reset();
+  const dataInput = form.elements["data"];
+  const descInput = form.elements["desc"];
+  const dataVal = dataInput.value;
+  const descVal = descInput.value.trim();
+
+  if (!dataVal || !descVal || descVal.length > 50) {
+    alert("Inserisci una data valida e una descrizione di massimo 50 caratteri.");
+    return;
   }
+
+  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
+
+  savedMacchinari[id].note.push({ data: dataVal, desc: descVal });
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari(id);
 }
 
-function eliminaNota(id, index) {
+function eliminaNota(id, notaIndex) {
   if (confirm("Sei sicuro di voler eliminare questa nota?")) {
-    savedMacchinari[id].note.splice(index, 1);
+    savedMacchinari[id].note.splice(notaIndex, 1);
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
     renderMacchinari(id);
   }
 }
 
-function modificaNota(id, index) {
-  const nota = savedMacchinari[id].note[index];
-  const nuovaData = prompt("Modifica data:", nota.data);
-  const nuovaDesc = prompt("Modifica descrizione:", nota.desc);
-  if (
-    nuovaData &&
-    nuovaDesc &&
-    nuovaData.trim() !== "" &&
-    nuovaDesc.trim() !== ""
-  ) {
-    savedMacchinari[id].note[index] = { data: nuovaData.trim(), desc: nuovaDesc.trim() };
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(id);
+function modificaNota(id, notaIndex) {
+  const nota = savedMacchinari[id].note[notaIndex];
+  if (!nota) return;
+
+  const nuovaData = prompt("Modifica data (YYYY-MM-DD):", nota.data);
+  if (!nuovaData) return;
+
+  const nuovaDesc = prompt("Modifica descrizione (max 50 caratteri):", nota.desc);
+  if (!nuovaDesc || nuovaDesc.length > 50) {
+    alert("Descrizione non valida o troppo lunga.");
+    return;
   }
+
+  nota.data = nuovaData;
+  nota.desc = nuovaDesc.trim();
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari(id);
 }
 
+function onScanSuccess(decodedText) {
+  html5QrcodeScanner.clear().then(() => {
+    reader.classList.add("hidden");
+    scanStatus.textContent = "";
+
+    if (!savedMacchinari[decodedText]) {
+      const nome = prompt("Inserisci il nome del macchinario:");
+      if (nome && nome.trim().length > 0) {
+        salvaMacchinario(decodedText, nome.trim());
+      }
+    } else {
+      renderMacchinari(decodedText);
+    }
+  });
+}
+
+// Avvio scanner
+function startScanning(cameraId) {
+  if (html5QrcodeScanner) {
+    html5QrcodeScanner.clear().catch(() => {});
+  }
+  reader.classList.remove("hidden");
+  scanStatus.textContent = "Scansione in corso...";
+  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+  html5QrcodeScanner.render(onScanSuccess, (error) => {}, cameraId);
+}
+
+// Carica fotocamere
+function loadCameras() {
+  Html5Qrcode.getCameras()
+    .then((devices) => {
+      if (devices && devices.length) {
+        cameraSelect.innerHTML = "";
+        devices.forEach((device, i) => {
+          const option = document.createElement("option");
+          option.value = device.id;
+          option.text = device.label || `Fotocamera ${i + 1}`;
+          cameraSelect.appendChild(option);
+        });
+        cameraSelection.classList.remove("hidden");
+        currentCameraId = devices[0].id;
+      } else {
+        scanStatus.textContent = "Nessuna fotocamera trovata.";
+      }
+    })
+    .catch((err) => {
+      scanStatus.textContent = "Errore accesso fotocamere.";
+      console.error(err);
+    });
+}
+
+// Event listeners
+
+startBtn.addEventListener("click", () => {
+  scanStatus.textContent = "";
+  loadCameras();
+  startScanning(currentCameraId);
+});
+
+cameraSelect.addEventListener("change", (e) => {
+  currentCameraId = e.target.value;
+  startScanning(currentCameraId);
+});
+
+restartBtn.addEventListener("click", () => {
+  startScanning(currentCameraId);
+});
+
+// Render iniziale
 renderMacchinari();
