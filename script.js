@@ -17,7 +17,6 @@ function renderMacchinari(expandedId = null) {
     const box = document.createElement("div");
     box.className = "macchinario" + (expanded ? " expanded" : "");
 
-    // nome con onclick per modifica, e tasto elimina
     let innerHTML = `
       <div class="macchinario-header">
         <h3 class="clickable" onclick="modificaMacchinario('${id}')">${data.nome}</h3>
@@ -46,8 +45,8 @@ function renderMacchinari(expandedId = null) {
             }
           </ul>
           <form onsubmit="aggiungiNota(event, '${id}')">
-            <input type="date" name="data" required />
-            <input type="text" name="desc" placeholder="Descrizione" required />
+            <input type="date" name="data" required aria-label="Data nota" />
+            <input type="text" name="desc" placeholder="Descrizione" required aria-label="Descrizione nota" />
             <button type="submit">➕ Aggiungi nota</button>
           </form>
           <button onclick="toggleExpand('${id}')">🔽 Chiudi</button>
@@ -55,7 +54,7 @@ function renderMacchinari(expandedId = null) {
       `;
     } else {
       innerHTML += `
-        <button onclick="toggleExpand('${id}')" title="Mostra note">🔼 Dettagli</button>
+        <button onclick="toggleExpand('${id}')" title="Mostra dettagli macchinario">🔼 Dettagli</button>
       `;
     }
 
@@ -66,7 +65,7 @@ function renderMacchinari(expandedId = null) {
 
 function salvaMacchinario(id, nome) {
   if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [] };
+    savedMacchinari[id] = { nome: nome, note: [] };
   } else {
     savedMacchinari[id].nome = nome;
   }
@@ -75,7 +74,7 @@ function salvaMacchinario(id, nome) {
 }
 
 function eliminaMacchinario(id) {
-  if (confirm("Sei sicuro di eliminare questo macchinario?")) {
+  if (confirm("Sei sicuro di voler eliminare questo macchinario?")) {
     delete savedMacchinari[id];
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
     renderMacchinari();
@@ -83,53 +82,50 @@ function eliminaMacchinario(id) {
 }
 
 function modificaMacchinario(id) {
-  const nuovoNome = prompt("Modifica nome macchinario:", savedMacchinari[id].nome);
-  if (nuovoNome === null) return;
-  if (nuovoNome.trim()) {
-    savedMacchinari[id].nome = nuovoNome.trim();
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  } else {
-    alert("Il nome non può essere vuoto!");
+  const nuovoNome = prompt("Inserisci nuovo nome:", savedMacchinari[id].nome);
+  if (nuovoNome && nuovoNome.trim() !== "") {
+    salvaMacchinario(id, nuovoNome.trim());
   }
 }
 
 function toggleExpand(id) {
-  const expandedId = document.querySelector(".macchinario.expanded")?.querySelector("h3")?.textContent === savedMacchinari[id].nome
-    ? null
-    : id;
-  renderMacchinari(expandedId);
+  const expandedId = document.querySelector(".macchinario.expanded")?.querySelector("h3")?.textContent === savedMacchinari[id].nome ? id : null;
+  renderMacchinari(expandedId === id ? null : id);
 }
 
 function aggiungiNota(event, id) {
   event.preventDefault();
   const form = event.target;
-  const dataVal = form.data.value;
-  const descVal = form.desc.value.trim();
-  if (!dataVal || !descVal) return alert("Compila data e descrizione");
+  const data = form.data.value;
+  const desc = form.desc.value.trim();
+  if (data && desc) {
+    savedMacchinari[id].note = savedMacchinari[id].note || [];
+    savedMacchinari[id].note.push({ data, desc });
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+    renderMacchinari(id);
+    form.reset();
+  }
+}
 
-  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
-  savedMacchinari[id].note.push({ data: dataVal, desc: descVal });
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(id);
+function eliminaNota(id, index) {
+  if (confirm("Sei sicuro di voler eliminare questa nota?")) {
+    savedMacchinari[id].note.splice(index, 1);
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+    renderMacchinari(id);
+  }
 }
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  if (!nota) return;
   const nuovaData = prompt("Modifica data:", nota.data);
-  if (nuovaData === null || nuovaData.trim() === "") return;
   const nuovaDesc = prompt("Modifica descrizione:", nota.desc);
-  if (nuovaDesc === null || nuovaDesc.trim() === "") return;
-
-  savedMacchinari[id].note[index] = { data: nuovaData.trim(), desc: nuovaDesc.trim() };
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(id);
-}
-
-function eliminaNota(id, index) {
-  if (confirm("Eliminare questa nota?")) {
-    savedMacchinari[id].note.splice(index, 1);
+  if (
+    nuovaData &&
+    nuovaDesc &&
+    nuovaData.trim() !== "" &&
+    nuovaDesc.trim() !== ""
+  ) {
+    savedMacchinari[id].note[index] = { data: nuovaData.trim(), desc: nuovaDesc.trim() };
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
     renderMacchinari(id);
   }
@@ -139,11 +135,9 @@ function onScanSuccess(qr) {
   html5QrcodeScanner.clear().then(() => {
     reader.classList.add("hidden");
     if (!savedMacchinari[qr]) {
-      const nome = prompt("Nome del macchinario:");
-      if (nome && nome.trim()) {
+      const nome = prompt("Inserisci il nome del macchinario:");
+      if (nome && nome.trim() !== "") {
         salvaMacchinario(qr, nome.trim());
-      } else {
-        renderMacchinari();
       }
     } else {
       renderMacchinari(qr);
@@ -155,7 +149,7 @@ let html5QrcodeScanner;
 
 startBtn.addEventListener("click", () => {
   reader.classList.remove("hidden");
-  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 280 });
+  html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
   html5QrcodeScanner.render(onScanSuccess);
 });
 
