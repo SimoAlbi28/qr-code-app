@@ -1,6 +1,6 @@
 {
-  "name": "Gestione Macchinari",
-  "short_name": "Macchinari",
+  "name": "Scannerizzazione QR Macchinari",
+  "short_name": "Scan-QR-Macchinari",
   "description": "App per scansionare e gestire macchinari via QR code",
   "start_url": ".",
   "display": "standalone",
