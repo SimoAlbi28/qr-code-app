@@ -3,17 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR Macchinari</title>
+  <title>🔧 Gestione Macchinari 🔧</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
   <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script src="script.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registrato'))
+        .catch(() => console.warn('Service Worker fallito'));
+    }
+  </script>
 </head>
 <body>
-  <h1>🔧 Gestione Macchinari 🔧</h1>
-  <button id="start-scan">📷</button>
-  <div id="reader" class="hidden"></div>
+  <main>
+    <h1>🔧 Gestione Macchinari 🔧</h1>
 
-  <h2>📋 Macchinari</h2>
-  <div id="macchinari-list"></div>
+    <button id="start-scan" aria-label="Avvia scansione QR" title="Scansiona QR Code">📷 Scansiona Macchinario</button>
+
+    <section id="reader" class="hidden" aria-live="polite"></section>
+
+    <h2>📋 Macchinari Salvati</h2>
+    <div id="macchinari-list" aria-live="polite" aria-relevant="additions removals"></div>
+  </main>
 </body>
 </html>
