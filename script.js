@@ -171,15 +171,29 @@ function startScanning(cameraId) {
   reader.classList.remove("hidden");
   scanStatus.textContent = "Scansione attiva...";
   html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-  html5QrcodeScanner.render(onScanSuccess, onScanError);
-  if (cameraId) {
-    html5QrcodeScanner.setCamera(cameraId).catch(console.error);
-  }
-}
-
-function onScanError(errorMessage) {
-  // Optional: display scan errors in scanStatus or ignore
-  // scanStatus.textContent = errorMessage;
+  html5QrcodeScanner.render(onScanSuccess);
+  // set camera (workaround, Html5QrcodeScanner has no setCamera method)
+  // So we reinitialize the scanner with cameraId:
+  html5QrcodeScanner.clear().then(() => {
+    Html5Qrcode.getCameras().then((devices) => {
+      if (devices && devices.length) {
+        const camId = cameraId || devices[0].id;
+        const html5Qrcode = new Html5Qrcode("reader");
+        html5Qrcode
+          .start(
+            camId,
+            { fps: 10, qrbox: 250 },
+            onScanSuccess,
+            (error) => {
+              // ignore scan errors
+            }
+          )
+          .catch((err) => {
+            scanStatus.textContent = "Errore avvio scansione: " + err;
+          });
+      }
+    });
+  });
 }
 
 function loadCameras() {
