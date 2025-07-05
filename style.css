@@ -80,6 +80,58 @@ button:focus {
   display: none !important;
 }
 
+#camera-selection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+#camera-selection label {
+  font-weight: 600;
+  color: #004080;
+}
+
+#camera-select {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1.7px solid #a0b9db;
+  cursor: pointer;
+  min-width: 180px;
+  transition: border-color 0.3s ease;
+}
+
+#camera-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 6px #80b9ff88;
+}
+
+#restart-scan {
+  background: #0056b3;
+  padding: 10px 18px;
+  font-size: 1rem;
+  min-width: auto;
+  border-radius: 12px;
+  box-shadow: 0 5px 14px rgba(0, 86, 179, 0.6);
+}
+
+#restart-scan:hover,
+#restart-scan:focus {
+  background: #003d80;
+  box-shadow: 0 7px 18px rgba(0, 50, 110, 0.7);
+  outline: none;
+}
+
+#scan-status {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #007bff;
+  min-height: 1.5em;
+}
+
 .macchinario {
   background: #e6f0ff;
   border-radius: 16px;
@@ -168,36 +220,65 @@ button:focus {
 
 .note-list li {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #fff8c4;
+  border: 1.8px solid #f1c40f;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #5a4e00;
   font-size: 1rem;
-  color: #123060;
-  padding: 8px 12px;
-  background: #e3efff;
-  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(241, 196, 15, 0.25);
+  position: relative;
+  max-width: 100%;
+  word-wrap: break-word;
+  gap: 4px;
 }
 
 .note-list li strong {
-  min-width: 85px;
-  user-select: none;
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.note-list li span.desc {
+  max-width: 100%;
+  display: block;
+  font-weight: 400;
+  color: #3a2f00;
+  font-size: 0.95rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.note-list li .btns {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
 }
 
 .note-list li button {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  color: #0056b3;
+  font-size: 1.4rem;
+  color: #555500;
   transition: color 0.3s;
-  padding: 6px;
+  padding: 4px 8px;
   border-radius: 8px;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .note-list li button:hover {
-  color: #003f7f;
-  background: rgba(0, 63, 127, 0.15);
+  color: #f1c40f;
+  background: rgba(241, 196, 15, 0.15);
 }
 
 .note-section form {
@@ -222,58 +303,76 @@ button:focus {
 .note-section form input[type="date"]:focus,
 .note-section form input[type="text"]:focus {
   outline: none;
-  border-color: #0056b3;
-  box-shadow: 0 0 8px rgba(0, 86, 179, 0.4);
+  border-color: #007bff;
+  box-shadow: 0 0 6px #80b9ff88;
 }
 
-.note-section form button {
+.note-section form input[type="text"] {
+  max-width: 300px;
+}
+
+.note-section form input::placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+.note-section form button[type="submit"] {
   background: #007bff;
   color: white;
   font-weight: 700;
-  border-radius: 14px;
-  padding: 11px 22px;
   font-size: 1.1rem;
+  padding: 10px 26px;
   border: none;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 5px 14px rgba(0, 123, 255, 0.5);
+  box-shadow: 0 5px 14px rgba(0, 123, 255, 0.4);
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   user-select: none;
-  min-width: 140px;
 }
 
-.note-section form button:hover,
-.note-section form button:focus {
+.note-section form button[type="submit"]:hover,
+.note-section form button[type="submit"]:focus {
   background: #0056b3;
-  box-shadow: 0 7px 18px rgba(0, 86, 179, 0.8);
+  box-shadow: 0 7px 18px rgba(0, 86, 179, 0.6);
   outline: none;
 }
 
-@media (max-width: 460px) {
-  main {
-    max-width: 100%;
-    padding: 25px 15px 35px;
-  }
+/* Scrollbar personalizzata per note */
+.note-list::-webkit-scrollbar {
+  width: 8px;
+}
 
-  button {
-    min-width: unset;
-    width: 100%;
+.note-list::-webkit-scrollbar-track {
+  background: #e2e7f3;
+  border-radius: 10px;
+}
+
+.note-list::-webkit-scrollbar-thumb {
+  background: #a8caff;
+  border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  main {
+    padding: 25px 15px 35px;
   }
 
   .note-section form {
     flex-direction: column;
-    gap: 15px;
+    align-items: stretch;
   }
 
   .note-section form input[type="date"],
   .note-section form input[type="text"],
-  .note-section form button {
+  .note-section form button[type="submit"] {
+    max-width: 100%;
     width: 100%;
-    min-width: unset;
   }
 
-  .note-list li {
-    font-size: 0.95rem;
-    flex-wrap: wrap;
-    gap: 10px;
+  button {
+    min-width: auto;
+    padding: 12px 18px;
+    font-size: 1rem;
   }
 }
