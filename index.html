@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gestione Macchinari</title>
+  <title>🔧 Gestione Macchinari 🔧</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script src="script.js" defer></script>
@@ -14,7 +14,7 @@
 
     <button id="start-scan" aria-label="Avvia scansione QR" title="Scansiona codice QR">📷 Scansiona macchinario</button>
 
-    <div id="camera-selection" class="hidden">
+    <div id="camera-selection" class="hidden" aria-live="polite" aria-label="Seleziona la fotocamera per la scansione">
       <label for="camera-select">Seleziona fotocamera:</label>
       <select id="camera-select" aria-label="Seleziona fotocamera"></select>
       <button id="restart-scan" aria-label="Riavvia scansione">🔄 Riavvia scansione</button>
