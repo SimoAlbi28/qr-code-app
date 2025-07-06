@@ -152,47 +152,54 @@ h2 {
 }
 
 .note-list li {
-  border-left: 4px solid #ffeb3b;
+  border: 1.5px solid #ffeb3b;
   background: #fffde7;
-  padding: 6px 10px;
-  margin-bottom: 10px;
-  word-wrap: break-word;
+  padding: 10px 15px 35px 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
   position: relative;
+  word-wrap: break-word;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Data evidenziata gialla a sinistra */
 .nota-data {
   color: #b58900;
   font-weight: 700;
-  display: block;
+  margin-bottom: 6px;
   text-align: left;
-  margin-bottom: 4px;
+  display: block;
 }
 
-/* Descrizione sotto data */
 .nota-desc {
   font-size: 15px;
   text-align: left;
   white-space: normal;
-  max-width: 100%;
   word-wrap: break-word;
+  margin-bottom: 10px;
 }
 
-/* Bottoni nota */
+/* Bottoni nota posizionati in basso a destra */
 .btns-note {
   position: absolute;
-  top: 6px;
-  right: 8px;
+  bottom: 8px;
+  right: 12px;
   display: flex;
   gap: 8px;
 }
 
 .btns-note button {
-  font-size: 16px;
-  background: transparent;
+  font-size: 14px;
+  padding: 4px 8px;
+  background: #007bff;
+  border-radius: 6px;
+  color: white;
   border: none;
   cursor: pointer;
-  color: #555;
+  transition: background 0.3s ease;
+}
+
+.btns-note button:hover {
+  background: #0056b3;
 }
 
 /* Form aggiunta nota */
