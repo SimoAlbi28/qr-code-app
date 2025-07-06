@@ -6,7 +6,9 @@ const stopBtn = document.getElementById("stop-scan");
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
 
-function renderMacchinari(highlightId = null) {
+let notaInModifica = { macchinarioId: null, notaIndex: null };
+
+function renderMacchinari() {
   listContainer.innerHTML = "";
 
   const entries = Object.entries(savedMacchinari).sort((a, b) =>
@@ -17,6 +19,39 @@ function renderMacchinari(highlightId = null) {
     const expanded = data.expanded || false;
     const box = document.createElement("div");
     box.className = "macchinario";
+
+    let noteHtml = "";
+    if (expanded) {
+      noteHtml = `
+      <ul class="note-list">
+        ${(data.note || [])
+          .sort((a, b) => b.data.localeCompare(a.data))
+          .map((nota, index) => `
+            <li>
+              <p class="nota-data">${formatDate(nota.data)}</p>
+              <div class="btns-note">
+                <button class="btn-blue" onclick="preparaModificaNota('${id}', ${index})">✏️</button>
+                <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+              </div>
+              <p class="nota-desc">${nota.desc}</p>
+            </li>
+          `).join("")}
+      </ul>
+      <form class="note-form" onsubmit="salvaNota(event, '${id}')">
+        <label for="data-${id}">Data:</label>
+        <input type="date" id="data-${id}" required />
+        <label for="desc-${id}">Descrizione (max 50 caratteri):</label>
+        <input type="text" id="desc-${id}" maxlength="50" required />
+        <button type="submit" class="btn-green">${notaInModifica.macchinarioId === id ? "Modifica Nota" : "Aggiungi Nota"}</button>
+        ${notaInModifica.macchinarioId === id ? `<button type="button" class="btn-red" onclick="annullaModifica()">Annulla</button>` : ""}
+      </form>
+      <div class="btns-macchinario">
+        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
+        <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
+      </div>
+      `;
+    }
+
     box.innerHTML = `
       <div class="nome-e-btn">
         <h3>${data.nome}</h3>
@@ -24,41 +59,28 @@ function renderMacchinari(highlightId = null) {
           ${expanded ? "🔽" : "🔼"}
         </button>
       </div>
-      ${expanded ? `
-        <ul class="note-list">
-          ${(data.note || [])
-            .sort((a, b) => b.data.localeCompare(a.data))
-            .map((nota, index) => `
-              <li>
-                <p class="nota-data">${formatDate(nota.data)}</p>
-                <div class="btns-note">
-                  <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-                  <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-                </div>
-                <p class="nota-desc">${nota.desc}</p>
-              </li>
-            `).join("")}
-        </ul>
-        <form class="note-form" onsubmit="aggiungiNota(event, '${id}')">
-          <label for="data-${id}">Data:</label>
-          <input type="date" id="data-${id}" required />
-          <label for="desc-${id}">Descrizione (max 50 caratteri):</label>
-          <input type="text" id="desc-${id}" maxlength="50" required />
-          <button type="submit" class="btn-green">Aggiungi Nota</button>
-        </form>
-        <div class="btns-macchinario">
-          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
-          <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
-        </div>
-      ` : ""}
+      ${noteHtml}
     `;
     listContainer.appendChild(box);
+
+    // Se stiamo modificando una nota di questo macchinario, carico i valori nei campi
+    if (notaInModifica.macchinarioId === id) {
+      const dataInput = document.getElementById(`data-${id}`);
+      const descInput = document.getElementById(`desc-${id}`);
+      if (dataInput && descInput) {
+        const nota = savedMacchinari[id].note[notaInModifica.notaIndex];
+        dataInput.value = nota.data;
+        descInput.value = nota.desc;
+        dataInput.focus();
+      }
+    }
   });
 }
 
 function toggleMacchinario(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  notaInModifica = { macchinarioId: null, notaIndex: null };
   renderMacchinari();
 }
 
@@ -87,7 +109,7 @@ function rinominaMacchinario(id) {
   }
 }
 
-function aggiungiNota(e, id) {
+function salvaNota(e, id) {
   e.preventDefault();
   const dataInput = document.getElementById(`data-${id}`);
   const descInput = document.getElementById(`desc-${id}`);
@@ -96,21 +118,27 @@ function aggiungiNota(e, id) {
 
   if (!data || !desc) return;
 
-  savedMacchinari[id].note.push({ data, desc });
+  if (notaInModifica.macchinarioId === id) {
+    // modifica nota esistente
+    savedMacchinari[id].note[notaInModifica.notaIndex] = { data, desc };
+    notaInModifica = { macchinarioId: null, notaIndex: null };
+  } else {
+    // nuova nota
+    savedMacchinari[id].note.push({ data, desc });
+  }
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
 }
 
-function modificaNota(id, index) {
-  const nota = savedMacchinari[id].note[index];
-  const nuovaData = prompt("Nuova data (aaaa-mm-gg):", nota.data);
-  const nuovaDesc = prompt("Nuova descrizione (max 50 caratteri):", nota.desc);
+function preparaModificaNota(id, index) {
+  notaInModifica = { macchinarioId: id, notaIndex: index };
+  savedMacchinari[id].expanded = true;
+  renderMacchinari();
+}
 
-  if (nuovaData && nuovaDesc && nuovaDesc.length <= 50) {
-    savedMacchinari[id].note[index] = { data: nuovaData, desc: nuovaDesc };
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
+function annullaModifica() {
+  notaInModifica = { macchinarioId: null, notaIndex: null };
+  renderMacchinari();
 }
 
 function eliminaNota(id, index) {
@@ -120,8 +148,10 @@ function eliminaNota(id, index) {
 }
 
 function formatDate(dateStr) {
-  const [y, m, d] = dateStr.split("-");
-  return `${d}/${m}/${y}`;
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if(parts.length !== 3) return dateStr; // fallback
+  return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`; // gg/mm/aa
 }
 
 function onScanSuccess(decodedText) {
