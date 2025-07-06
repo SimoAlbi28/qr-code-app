@@ -113,25 +113,27 @@ button {
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px; /* per spazio bottoni in basso */
 }
 
 .macchinario h3 {
-  margin: 0 0 15px;
+  margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
-  color: black;             /* scritta nera */
-  background-color: cyan;   /* sfondo ciano */
-  padding: 8px 0;
-  border-radius: 6px;
+  color: cyan;
+  background-color: black;
   text-transform: uppercase;
-  text-align: center;
+  padding: 6px 0;
+  border-radius: 5px;
+  user-select: none;
 }
 
 .nome-e-btn {
   gap: 15px;
   align-items: center;
-  margin-top: 25px; /* sposta bottoni più in basso */
-  justify-content: center;
 }
 
 .toggle-btn {
@@ -196,12 +198,14 @@ button {
 }
 
 .note-form {
+  margin-top: 15px;
+  max-width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 350px;
-  margin: 0 auto 10px;
-  text-align: left;
 }
 
 .note-form label {
@@ -219,16 +223,25 @@ button {
   box-sizing: border-box;
 }
 
+.btns-note {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
 .btns-macchinario {
+  margin-top: 15px;
+  display: flex;
   justify-content: center;
   gap: 15px;
-  margin-top: 12px;
 }
 
 .btns-macchinario button {
   padding: 8px 14px;
   font-size: 15px;
   border-radius: 7px;
+  cursor: pointer;
 }
 
 @media (max-width: 400px) {
