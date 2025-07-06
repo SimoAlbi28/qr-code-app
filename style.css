@@ -277,3 +277,11 @@ button {
   border-color: #00ffff;
   transition: box-shadow 0.3s ease;
 }
+
+.macchinario .btns-macchinario button,
+.macchinario .btns-note button {
+  padding: 4px 7px !important;
+  font-size: 12px !important;
+  min-width: auto !important;
+  max-width: none !important;
+}
