@@ -1,4 +1,3 @@
-/* Body centrato e max width per mobile */
 body {
   font-family: 'Segoe UI', sans-serif;
   padding: 20px;
@@ -13,7 +12,6 @@ body {
   align-items: center;
 }
 
-/* Titoli centrati con margini */
 h1, h2 {
   font-weight: 700;
   margin: 20px 0 15px;
@@ -21,7 +19,6 @@ h1, h2 {
   user-select: none;
 }
 
-/* Container bottoni */
 #buttons-container {
   display: flex;
   gap: 15px;
@@ -32,20 +29,33 @@ h1, h2 {
   max-width: 400px;
 }
 
-/* Bottoni belli grandi e centrati */
+/* Bottoni generali piccoli e uniformi */
 button {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13px;
+  border-radius: 5px;
   border: none;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
-  flex: 1 1 140px;
-  max-width: 140px;
-  transition: background-color 0.3s ease;
   user-select: none;
+  flex: none;
+  min-width: 60px;
+  max-width: 130px;
+  transition: background-color 0.3s ease;
 }
 
+/* Bottoni specifici ancora più piccoli */
+.toggle-btn,
+.btns-note button,
+.note-form button,
+#start-scan,
+#stop-scan {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 50px;
+  max-width: 110px;
+}
+
+/* Colori pulsanti */
 .btn-red {
   background-color: #e74c3c;
   color: white;
@@ -73,21 +83,18 @@ button {
   background-color: #2980b9;
 }
 
-/* Reader container centrato e con max width */
 #reader {
   width: 100%;
   max-width: 350px;
   margin: 0 auto 30px;
 }
 
-/* Lista macchinari centrata */
 #macchinari-list {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 30px;
 }
 
-/* Singolo macchinario box */
 .macchinario {
   margin: 10px auto;
   max-width: 400px;
@@ -99,14 +106,12 @@ button {
   text-align: center;
 }
 
-/* Nome macchinario */
 .macchinario h3 {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
 }
 
-/* Nome + toggle btn container */
 .nome-e-btn {
   display: flex;
   justify-content: center;
@@ -114,10 +119,9 @@ button {
   gap: 15px;
 }
 
-/* Toggle bottone */
 .toggle-btn {
-  font-size: 22px;
-  padding: 6px 10px;
+  font-size: 16px;
+  padding: 4px 8px;
   cursor: pointer;
   border: none;
   background: #007bff;
@@ -131,7 +135,6 @@ button {
   background: #0056b3;
 }
 
-/* Lista note */
 .note-list {
   list-style: none;
   padding: 0;
@@ -139,20 +142,18 @@ button {
   text-align: left;
 }
 
-/* Nota singola */
 .note-list li {
   position: relative;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
   margin-bottom: 12px;
-  padding: 12px 12px 40px 12px; /* spazio per bottoni in basso */
+  padding: 12px 12px 40px 12px;
   word-wrap: break-word;
 }
 
-/* Data in giallo a sinistra */
 .nota-data {
-  background: #fff176; /* giallo chiaro */
+  background: #fff176;
   font-weight: bold;
   padding: 3px 8px;
   border-radius: 6px;
@@ -160,13 +161,11 @@ button {
   margin-bottom: 6px;
 }
 
-/* Descrizione nota sotto la data */
 .nota-desc {
   margin-top: 6px;
-  white-space: pre-wrap; /* va a capo se troppo lunga */
+  white-space: pre-wrap;
 }
 
-/* Container bottoni modifica/elimina note */
 .btns-note {
   position: absolute;
   bottom: 8px;
@@ -175,14 +174,12 @@ button {
   gap: 6px;
 }
 
-/* Bottoni modifica/elimina note più piccoli */
 .btns-note button {
   padding: 4px 7px;
-  font-size: 14px;
+  font-size: 12px;
   border-radius: 5px;
 }
 
-/* Form note */
 .note-form {
   display: flex;
   flex-direction: column;
@@ -207,7 +204,6 @@ button {
   box-sizing: border-box;
 }
 
-/* Container bottoni rinomina/elimina macchinario */
 .btns-macchinario {
   display: flex;
   justify-content: center;
@@ -215,14 +211,13 @@ button {
   margin-top: 12px;
 }
 
-/* Pulsanti più piccoli */
 .btns-macchinario button {
   padding: 8px 14px;
   font-size: 15px;
   border-radius: 7px;
 }
 
-/* Responsive */
+/* Responsive per telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
