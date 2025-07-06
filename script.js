@@ -4,9 +4,9 @@ const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
+
 let currentExpanded = null;
 let editingNoteId = null;
-
 let html5QrcodeScanner = null;
 let cameraId = null;
 
@@ -14,68 +14,63 @@ function renderMacchinari() {
   listContainer.innerHTML = "";
 
   Object.entries(savedMacchinari).forEach(([id, data]) => {
-    const expanded = id === currentExpanded;
-
-    const noteListHtml = expanded ? renderNoteListHtml(id) : "";
-    const noteFormHtml = expanded ? renderNoteFormHtml(id) : "";
-
+    const isExpanded = currentExpanded === id;
     const macchinarioDiv = document.createElement("div");
     macchinarioDiv.className = "macchinario";
 
     macchinarioDiv.innerHTML = `
-      <h3>${data.nome}</h3>
-      ${noteListHtml}
-      ${noteFormHtml}
-      ${expanded ? `
-      <div class="btns-macchinario">
-        <button class="btn-blue" onclick="toggleDettagli('${id}')">Chiudi Dettagli</button>
-        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
-        <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
-      </div>
-      ` : `
-      <div class="btns-macchinario" style="justify-content:center;">
-        <button class="toggle-btn" onclick="toggleDettagli('${id}')">Apri Dettagli</button>
-      </div>
-      `}
+      <h3>${escapeHtml(data.nome)}</h3>
+      ${isExpanded ? renderDettagli(id, data) : ""}
     `;
 
     listContainer.appendChild(macchinarioDiv);
   });
 }
 
-function renderNoteListHtml(id) {
-  const notes = savedMacchinari[id].note || [];
-  // ordina per data discendente (più recente sopra)
-  notes.sort((a,b) => b.data.localeCompare(a.data));
+function renderDettagli(id, data) {
+  let notesHtml = "";
 
-  if (notes.length === 0) return "<p>Nessuna nota</p>";
+  if (data.note && data.note.length) {
+    // Ordino le note per data decrescente (più recenti in alto)
+    const sortedNotes = data.note.slice().sort((a, b) => b.data.localeCompare(a.data));
 
-  return `<ul class="note-list">
-    ${notes.map((nota, i) => `
-      <li>
-        <span class="nota-data">${formatDate(nota.data)}</span>
-        <p class="nota-desc">${escapeHtml(nota.descrizione)}</p>
-        <div class="btns-note">
-          <button class="btn-blue" onclick="modificaNota('${id}', ${i})">Modifica</button>
-          <button class="btn-red" onclick="eliminaNota('${id}', ${i})">Elimina</button>
-        </div>
-      </li>`).join("")}
-  </ul>`;
-}
+    sortedNotes.forEach((nota, i) => {
+      notesHtml += `
+        <li>
+          <div class="nota-data">${formatDate(nota.data)}</div>
+          <div class="nota-desc">${escapeHtml(nota.descrizione)}</div>
+          <div class="btns-note">
+            <button class="btn-blue" onclick="modificaNota('${id}', ${i})">Modifica</button>
+            <button class="btn-red" onclick="eliminaNota('${id}', ${i})">Elimina</button>
+          </div>
+        </li>
+      `;
+    });
+  }
 
-function renderNoteFormHtml(id) {
-  const editingNote = editingNoteId !== null ? savedMacchinari[id].note[editingNoteId] : null;
+  const dataValue = editingNoteId !== null && savedMacchinari[id].note[editingNoteId]
+    ? savedMacchinari[id].note[editingNoteId].data
+    : "";
+
+  const descValue = editingNoteId !== null && savedMacchinari[id].note[editingNoteId]
+    ? savedMacchinari[id].note[editingNoteId].descrizione
+    : "";
+
   return `
+    <ul class="note-list">${notesHtml}</ul>
     <form class="note-form" onsubmit="event.preventDefault(); salvaNota('${id}')">
-      <label for="data-nota">Data:</label>
-      <input type="date" id="data-nota" name="data-nota" value="${editingNote ? editingNote.data : ''}" required />
+      <label for="data-nota">Data (gg/mm/aaaa):</label>
+      <input type="date" id="data-nota" name="data-nota" required value="${dataValue}" />
       
       <label for="desc-nota">Descrizione (max 100 caratteri):</label>
-      <input type="text" id="desc-nota" name="desc-nota" maxlength="100" value="${editingNote ? escapeHtml(editingNote.descrizione) : ''}" required />
+      <input type="text" id="desc-nota" name="desc-nota" maxlength="100" required value="${descValue}" />
       
-      <div class="btns-note">
-        <button type="submit" class="btn-green">Salva Nota</button>
+      <div class="btns-macchinario">
+        <button type="submit" class="btn-green">${editingNoteId !== null ? "Salva Modifica" : "Aggiungi Nota"}</button>
         <button type="button" class="btn-red" onclick="annullaModificaNota()">Annulla</button>
+        <button type="button" class="btn-red" onclick="toggleDettagli('${id}')">Chiudi Dettagli</button>
+        <button type="button" class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
+        <button type="button" class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
       </div>
     </form>
   `;
@@ -258,7 +253,7 @@ async function qrCodeSuccessCallback(decodedText, decodedResult) {
 }
 
 function qrCodeErrorCallback(errorMessage) {
-  // Puoi gestire errori di lettura QR se vuoi, per ora ignoriamo.
+  // Ignoriamo errori lettura QR
 }
 
 renderMacchinari();
