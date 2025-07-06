@@ -117,14 +117,19 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  const nuovaData = prompt("Modifica data (AAAA-MM-GG):", nota.data);
-  const nuovaDesc = prompt("Modifica descrizione:", nota.desc);
-  if (nuovaData && nuovaDesc) {
-    savedMacchinari[id].note[index] = { data: nuovaData, desc: nuovaDesc };
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
+  // Metti i dati della nota negli input
+  document.getElementById(`data-${id}`).value = nota.data;
+  document.getElementById(`desc-${id}`).value = nota.desc;
+
+  // Togli la nota vecchia per evitare duplicati dopo modifica
+  savedMacchinari[id].note.splice(index, 1);
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+
+  // Apri la sezione dettagli se chiusa
+  savedMacchinari[id].expanded = true;
+  renderMacchinari();
 }
+
 
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
