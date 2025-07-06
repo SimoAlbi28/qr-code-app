@@ -1,156 +1,245 @@
+/* Body centrato e max width per mobile */
 body {
   font-family: 'Segoe UI', sans-serif;
   padding: 20px;
+  margin: 0 auto;
+  max-width: 480px;
   background: #f2f2f2;
   text-align: center;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: flex-start;
+  align-items: center;
 }
 
+/* Titoli centrati con margini */
 h1, h2 {
-  margin: 20px 0 10px;
+  font-weight: 700;
+  margin: 20px 0 15px;
+  color: #007bff;
+  user-select: none;
 }
 
-#reader {
+/* Container bottoni */
+#buttons-container {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
   width: 100%;
-  max-width: 350px;
-  margin: 20px auto;
+  max-width: 400px;
 }
 
-.hidden {
-  display: none;
-}
-
+/* Bottoni belli grandi e centrati */
 button {
-  padding: 10px 16px;
+  padding: 12px 20px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  flex: 1 1 150px;
+  max-width: 180px;
+  transition: background-color 0.3s ease;
+  user-select: none;
 }
 
 .btn-red {
-  background: #e74c3c;
+  background-color: #e74c3c;
   color: white;
 }
 
 .btn-red:hover {
-  background: #c0392b;
+  background-color: #c0392b;
 }
 
 .btn-green {
-  background: #2ecc71;
+  background-color: #2ecc71;
   color: white;
 }
 
 .btn-green:hover {
-  background: #27ae60;
+  background-color: #27ae60;
 }
 
 .btn-blue {
-  background: #3498db;
+  background-color: #3498db;
   color: white;
 }
 
 .btn-blue:hover {
-  background: #2980b9;
+  background-color: #2980b9;
 }
 
-#buttons-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+/* Reader container centrato e con max width */
+#reader {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto 30px;
 }
 
-.macchinario {
-  background: white;
-  border: 2px solid #ccc;
-  padding: 15px;
-  margin: 10px auto;
+/* Lista macchinari centrata */
+#macchinari-list {
   width: 100%;
   max-width: 400px;
+  margin: 0 auto 30px;
+}
+
+/* Singolo macchinario box */
+.macchinario {
+  margin: 10px auto;
+  max-width: 400px;
+  background: white;
+  border: 1px solid #ccc;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  text-align: left;
-}
-
-.macchinario h3 {
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
-  margin: 0;
-  font-size: 18px;
 }
 
+/* Nome macchinario */
+.macchinario h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Nome + toggle btn container */
 .nome-e-btn {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 15px;
 }
 
-.note-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
+/* Toggle bottone */
+.toggle-btn {
+  font-size: 22px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  user-select: none;
+  transition: background-color 0.2s ease;
 }
 
-.note-form input,
-.note-form button {
-  padding: 8px;
-  font-size: 14px;
+.toggle-btn:hover {
+  background: #0056b3;
 }
 
+/* Lista note */
 .note-list {
   list-style: none;
   padding: 0;
-  margin-top: 10px;
+  margin: 0 0 15px;
+  text-align: left;
 }
 
+/* Nota singola */
 .note-list li {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 8px;
-  background: #fff;
   position: relative;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 12px 12px 40px 12px; /* spazio per bottoni in basso */
+  word-wrap: break-word;
 }
 
+/* Data in giallo a sinistra */
 .nota-data {
-  color: #000;
+  background: #fff176; /* giallo chiaro */
   font-weight: bold;
-  background: yellow;
+  padding: 3px 8px;
+  border-radius: 6px;
   display: inline-block;
+  margin-bottom: 6px;
+}
+
+/* Descrizione nota sotto la data */
+.nota-desc {
+  margin-top: 6px;
+  white-space: pre-wrap; /* va a capo se troppo lunga */
+}
+
+/* Container bottoni modifica/elimina note */
+.btns-note {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+/* Bottoni modifica/elimina note più piccoli */
+.btns-note button {
+  padding: 4px 7px;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+/* Form note */
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+  margin: 0 auto 10px;
+  text-align: left;
+}
+
+.note-form label {
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
-.nota-desc {
-  margin: 0;
-  word-break: break-word;
+.note-form input[type="date"],
+.note-form input[type="text"] {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.btns-note {
-  display: flex;
-  gap: 5px;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-
+/* Container bottoni rinomina/elimina macchinario */
 .btns-macchinario {
-  margin-top: 10px;
   display: flex;
-  gap: 10px;
   justify-content: center;
-  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
 }
 
-@media (max-width: 500px) {
+/* Pulsanti più piccoli */
+.btns-macchinario button {
+  padding: 8px 14px;
+  font-size: 15px;
+  border-radius: 7px;
+}
+
+/* Responsive */
+@media (max-width: 400px) {
+  #buttons-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  button {
+    max-width: 100%;
+  }
   .macchinario {
-    width: 95%;
+    max-width: 95%;
+    padding: 10px;
   }
-
+  .note-form {
+    max-width: 100%;
+  }
   #reader {
-    width: 100% !important;
+    max-width: 100%;
   }
 }
+
