@@ -96,6 +96,14 @@ button {
   width: 100%;
   max-width: 350px;
   margin: 0 auto 30px;
+  aspect-ratio: 1 / 1; /* quadrato */
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  display: none;
+}
+
+#reader.visible {
+  display: block;
 }
 
 #macchinari-list {
@@ -122,6 +130,10 @@ button {
   color: cyan;
   text-transform: uppercase;
   text-align: center;
+  background-color: #00bcd4;
+  padding: 5px 10px;
+  border-radius: 6px;
+  user-select: none;
 }
 
 .nome-e-btn {
@@ -160,6 +172,7 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .nota-data {
@@ -169,11 +182,12 @@ button {
   border-radius: 6px;
   display: inline-block;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .nota-desc {
   margin-top: 6px;
-  white-space: pre-wrap;
+  text-align: left;
 }
 
 .btns-note {
@@ -233,7 +247,39 @@ button {
   user-select: none;
 }
 
-/* Responsive per telefoni */
+/* Pulsanti chiudi, rinomina, elimina su stessa riga in basso */
+.macchinario-details-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.macchinario-details-btns button {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  flex: 1;
+  max-width: 100px;
+}
+
+/* Pulsanti aggiungi e annulla dentro il form note */
+.note-form .form-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.note-form .form-btns button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  flex: 1;
+  max-width: 120px;
+}
+
+/* Responsive telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
