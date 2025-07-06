@@ -117,19 +117,38 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  // Metti i dati della nota negli input
+  // Metti i dati della nota negli input per modificarli
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
 
-  // Togli la nota vecchia per evitare duplicati dopo modifica
-  savedMacchinari[id].note.splice(index, 1);
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  // Salva l'indice della nota da modificare per aggiornarla dopo
+  savedMacchinari[id].modificaIndex = index;
 
-  // Apri la sezione dettagli se chiusa
+  // Assicura che i dettagli siano aperti
   savedMacchinari[id].expanded = true;
   renderMacchinari();
 }
 
+function aggiungiNota(id) {
+  const data = document.getElementById(`data-${id}`).value;
+  const desc = document.getElementById(`desc-${id}`).value.trim();
+
+  if (data && desc) {
+    savedMacchinari[id].note = savedMacchinari[id].note || [];
+
+    if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
+      // Modifica nota esistente
+      savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
+      delete savedMacchinari[id].modificaIndex;
+    } else {
+      // Aggiungi nuova nota
+      savedMacchinari[id].note.push({ data, desc });
+    }
+
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+    renderMacchinari();
+  }
+}
 
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
