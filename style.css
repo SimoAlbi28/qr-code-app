@@ -271,3 +271,9 @@ button {
     max-width: 100%;
   }
 }
+
+.macchinario.highlight {
+  box-shadow: 0 0 15px 4px #00ffffaa;
+  border-color: #00ffff;
+  transition: box-shadow 0.3s ease;
+}

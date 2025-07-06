@@ -125,11 +125,9 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
 
     if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
-      // Modifica nota esistente
       savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
       delete savedMacchinari[id].modificaIndex;
     } else {
-      // Aggiungi nuova nota
       savedMacchinari[id].note.push({ data, desc });
     }
 
@@ -140,14 +138,10 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  // Carica i dati negli input per modificarli
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
 
-  // Salva indice nota da modificare
   savedMacchinari[id].modificaIndex = index;
-
-  // Apri dettagli senza fare render per non resettare input
   savedMacchinari[id].expanded = true;
 }
 
@@ -162,7 +156,6 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// QR CAM
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -192,11 +185,14 @@ function startScan() {
         savedMacchinari[qrCodeMessage].expanded = true;
         renderMacchinari();
 
-        // Scrolla verso il macchinario scansionato
         setTimeout(() => {
           const elem = document.querySelector(`.macchinario[data-id="${qrCodeMessage}"]`);
           if (elem) {
             elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            elem.classList.add('highlight');
+            setTimeout(() => {
+              elem.classList.remove('highlight');
+            }, 2000);
           }
         }, 100);
       }
