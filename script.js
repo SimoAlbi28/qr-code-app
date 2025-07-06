@@ -4,215 +4,167 @@ const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-let html5QrCode;
-let notaInModifica = { macchinarioId: null, notaIndex: null };
+let html5Qr;
+
+function salvaMacchinari() {
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+}
 
 function renderMacchinari() {
   listContainer.innerHTML = "";
 
-  const entries = Object.entries(savedMacchinari).sort((a, b) =>
-    a[1].nome.localeCompare(b[1].nome)
-  );
-
-  entries.forEach(([id, data]) => {
-    const expanded = data.expanded || false;
+  Object.entries(savedMacchinari).forEach(([id, data]) => {
     const box = document.createElement("div");
     box.className = "macchinario";
 
-    let noteHtml = "";
-    if (expanded) {
-      noteHtml = `
-      <ul class="note-list">
-        ${(data.note || [])
-          .sort((a, b) => b.data.localeCompare(a.data))
-          .map((nota, index) => `
-            <li>
-              <p class="nota-data">${formatDate(nota.data)}</p>
-              <div class="btns-note">
-                <button class="btn-blue" onclick="preparaModificaNota('${id}', ${index})">✏️</button>
-                <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-              </div>
-              <p class="nota-desc">${nota.desc}</p>
-            </li>
-          `).join("")}
-      </ul>
-      <form class="note-form" onsubmit="salvaNota(event, '${id}')">
-        <label for="data-${id}">Data:</label>
-        <input type="date" id="data-${id}" required />
-        <label for="desc-${id}">Descrizione (max 50 caratteri):</label>
-        <input type="text" id="desc-${id}" maxlength="50" required />
-        <button type="submit" class="btn-green">${notaInModifica.macchinarioId === id ? "Modifica Nota" : "Aggiungi Nota"}</button>
-        ${notaInModifica.macchinarioId === id ? `<button type="button" class="btn-red" onclick="annullaModifica()">Annulla</button>` : ""}
-      </form>
-      <div class="btns-macchinario">
-        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
-        <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
-      </div>
-      `;
+    const nome = document.createElement("h3");
+    nome.textContent = data.nome.toUpperCase();
+
+    const toggle = document.createElement("button");
+    toggle.textContent = data.espanso ? "➖" : "➕";
+    toggle.className = "toggle-btn";
+    toggle.onclick = () => {
+      data.espanso = !data.espanso;
+      salvaMacchinari();
+      renderMacchinari();
+    };
+
+    const nomeContainer = document.createElement("div");
+    nomeContainer.className = "nome-e-btn";
+    nomeContainer.appendChild(nome);
+    nomeContainer.appendChild(toggle);
+    box.appendChild(nomeContainer);
+
+    if (data.espanso) {
+      const form = document.createElement("div");
+      form.className = "note-form";
+
+      const inputData = document.createElement("input");
+      inputData.type = "date";
+      inputData.required = true;
+
+      const inputDesc = document.createElement("input");
+      inputDesc.type = "text";
+      inputDesc.maxLength = 100;
+      inputDesc.placeholder = "Descrizione (max 100 caratteri)";
+
+      const btnAggiungi = document.createElement("button");
+      btnAggiungi.textContent = "➕ Aggiungi Nota";
+      btnAggiungi.className = "btn-green";
+      btnAggiungi.onclick = () => {
+        const dataVal = inputData.value;
+        const descVal = inputDesc.value.trim();
+        if (dataVal && descVal) {
+          data.note.push({ data: dataVal, desc: descVal });
+          data.note.sort((a, b) => new Date(b.data) - new Date(a.data));
+          salvaMacchinari();
+          renderMacchinari();
+        }
+      };
+
+      form.appendChild(inputData);
+      form.appendChild(inputDesc);
+      form.appendChild(btnAggiungi);
+      box.appendChild(form);
+
+      const ul = document.createElement("ul");
+      ul.className = "note-list";
+      data.note.forEach((nota, index) => {
+        const li = document.createElement("li");
+
+        const spanData = document.createElement("div");
+        spanData.className = "nota-data";
+        const [y, m, d] = nota.data.split("-");
+        spanData.textContent = `${d}/${m}/${y}`;
+
+        const spanDesc = document.createElement("div");
+        spanDesc.className = "nota-desc";
+        spanDesc.textContent = nota.desc;
+
+        const btns = document.createElement("div");
+        btns.className = "btns-note";
+
+        const btnModifica = document.createElement("button");
+        btnModifica.textContent = "✏️";
+        btnModifica.className = "btn-blue";
+        btnModifica.onclick = () => {
+          inputData.value = nota.data;
+          inputDesc.value = nota.desc;
+          data.note.splice(index, 1);
+          salvaMacchinari();
+          renderMacchinari();
+        };
+
+        const btnElimina = document.createElement("button");
+        btnElimina.textContent = "🗑️";
+        btnElimina.className = "btn-red";
+        btnElimina.onclick = () => {
+          data.note.splice(index, 1);
+          salvaMacchinari();
+          renderMacchinari();
+        };
+
+        btns.appendChild(btnModifica);
+        btns.appendChild(btnElimina);
+
+        li.appendChild(btns);
+        li.appendChild(spanData);
+        li.appendChild(spanDesc);
+
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
     }
 
-    box.innerHTML = `
-      <div class="nome-e-btn">
-        <h3>${data.nome}</h3>
-        <button class="toggle-btn" onclick="toggleMacchinario('${id}')">
-          ${expanded ? "🔽" : "🔼"}
-        </button>
-      </div>
-      ${noteHtml}
-    `;
     listContainer.appendChild(box);
-
-    if (notaInModifica.macchinarioId === id) {
-      const dataInput = document.getElementById(`data-${id}`);
-      const descInput = document.getElementById(`desc-${id}`);
-      if (dataInput && descInput) {
-        const nota = savedMacchinari[id].note[notaInModifica.notaIndex];
-        dataInput.value = nota.data;
-        descInput.value = nota.desc;
-        dataInput.focus();
-      }
-    }
   });
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  const gg = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const aa = String(d.getFullYear()).slice(-2);
-  return `${gg}/${mm}/${aa}`;
-}
-
-function salvaMacchinario(id, nome) {
-  if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: false };
-  } else {
-    savedMacchinari[id].nome = nome;
-  }
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function eliminaMacchinario(id) {
-  delete savedMacchinari[id];
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function rinominaMacchinario(id) {
-  const nuovoNome = prompt("Inserisci nuovo nome:", savedMacchinari[id].nome);
-  if (nuovoNome && nuovoNome.trim() !== "") {
-    salvaMacchinario(id, nuovoNome.trim());
-  }
-}
-
-function toggleMacchinario(id) {
-  savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function onScanSuccess(qr) {
-  stopScanner();
-
-  if (!savedMacchinari[qr]) {
-    const nome = prompt("Nome del macchinario:");
-    if (nome && nome.trim() !== "") {
-      salvaMacchinario(qr, nome.trim());
-    }
-  } else {
-    savedMacchinari[qr].expanded = true;
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  }
-  renderMacchinari();
-}
-
-function salvaNota(event, macchinarioId) {
-  event.preventDefault();
-  const dataInput = document.getElementById(`data-${macchinarioId}`);
-  const descInput = document.getElementById(`desc-${macchinarioId}`);
-  const data = dataInput.value;
-  const desc = descInput.value.trim();
-
-  if (!data || !desc || desc.length > 50) {
-    alert("Inserisci data valida e descrizione max 50 caratteri.");
-    return;
-  }
-
-  if (!savedMacchinari[macchinarioId].note) {
-    savedMacchinari[macchinarioId].note = [];
-  }
-
-  if (notaInModifica.macchinarioId === macchinarioId && notaInModifica.notaIndex !== null) {
-    // Modifica nota esistente
-    savedMacchinari[macchinarioId].note[notaInModifica.notaIndex] = { data, desc };
-    notaInModifica = { macchinarioId: null, notaIndex: null };
-  } else {
-    // Aggiungi nuova nota
-    savedMacchinari[macchinarioId].note.push({ data, desc });
-  }
-
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function eliminaNota(macchinarioId, notaIndex) {
-  savedMacchinari[macchinarioId].note.splice(notaIndex, 1);
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function preparaModificaNota(macchinarioId, notaIndex) {
-  notaInModifica = { macchinarioId, notaIndex };
-  renderMacchinari();
-}
-
-function annullaModifica() {
-  notaInModifica = { macchinarioId: null, notaIndex: null };
-  renderMacchinari();
-}
-
-function startScanner() {
+startBtn.addEventListener("click", () => {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
   stopBtn.disabled = false;
 
-  html5QrCode = new Html5Qrcode("reader");
-
-  html5QrCode
-    .start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      (decodedText) => {
-        onScanSuccess(decodedText);
-        stopScanner();
-      }
-    )
-    .catch((err) => {
-      alert("Errore fotocamera: " + err);
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      reader.classList.add("hidden");
-    });
-}
-
-function stopScanner() {
-  if (html5QrCode) {
-    html5QrCode
-      .stop()
-      .then(() => {
+  html5Qr = new Html5Qrcode("reader");
+  html5Qr.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    (decodedText) => {
+      html5Qr.stop().then(() => {
         reader.classList.add("hidden");
         startBtn.disabled = false;
         stopBtn.disabled = true;
-      })
-      .catch((err) => {
-        console.error("Errore stop cam:", err);
-      });
-  }
-}
 
-startBtn.addEventListener("click", startScanner);
-stopBtn.addEventListener("click", stopScanner);
+        if (!savedMacchinari[decodedText]) {
+          const nome = prompt("Nome del macchinario:");
+          if (nome) {
+            savedMacchinari[decodedText] = {
+              nome,
+              note: [],
+              espanso: false,
+            };
+            salvaMacchinari();
+          }
+        } else {
+          savedMacchinari[decodedText].espanso = true;
+          salvaMacchinari();
+        }
+
+        renderMacchinari();
+      });
+    },
+    (err) => {}
+  );
+});
+
+stopBtn.addEventListener("click", () => {
+  if (html5Qr) {
+    html5Qr.stop().then(() => {
+      reader.classList.add("hidden");
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+  }
+});
 
 renderMacchinari();
