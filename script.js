@@ -9,29 +9,40 @@ const scanStatus = document.getElementById("scan-status");
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrcodeInstance = null;
 let currentCameraId = null;
-let expandedId = null; // quale macchinario è aperto
+let expandedId = null;
 
+// Formatta data da yyyy-mm-dd a gg/mm/aaaa
+function formatDateIt(dateStr) {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+// Render macchinari con note e form aggiunta
 function renderMacchinari() {
   listContainer.innerHTML = "";
 
-  const entriesOrdinate = Object.entries(savedMacchinari).sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+  const entriesOrdinate = Object.entries(savedMacchinari).sort((a, b) =>
+    a[1].nome.localeCompare(b[1].nome)
+  );
 
   entriesOrdinate.forEach(([id, data]) => {
     const isExpanded = id === expandedId;
 
-    const noteListHtml = (data.note || [])
-      .map(
-        (n, i) => `
+    const noteListHtml =
+      (data.note || [])
+        .map(
+          (n, i) => `
       <li>
-        <strong class="nota-data">${n.data}</strong>
-        <div class="nota-desc">${n.desc.length > 50 ? n.desc.slice(0, 47) + "..." : n.desc}</div>
+        <strong class="nota-data">${formatDateIt(n.data)}</strong>
+        <div class="nota-desc">${n.desc}</div>
         <div class="btns-note">
           <button title="Modifica nota" onclick="modificaNota('${id}', ${i})">✏️</button>
           <button title="Elimina nota" onclick="eliminaNota('${id}', ${i})">🗑️</button>
         </div>
       </li>`
-      )
-      .join("");
+        )
+        .join("") || '<li><em>Nessuna nota aggiunta</em></li>';
 
     listContainer.insertAdjacentHTML(
       "beforeend",
@@ -44,9 +55,11 @@ function renderMacchinari() {
           </button>
         </div>
 
-        ${isExpanded ? `
+        ${
+          isExpanded
+            ? `
           <ul class="note-list" aria-label="Note del macchinario">
-            ${noteListHtml || '<li><em>Nessuna nota aggiunta</em></li>'}
+            ${noteListHtml}
           </ul>
 
           <form class="note-form" onsubmit="aggiungiNota(event, '${id}')">
@@ -63,17 +76,21 @@ function renderMacchinari() {
             <button title="Rinomina macchinario" onclick="modificaMacchinario('${id}')">✏️ Rinomina</button>
             <button title="Elimina macchinario" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
           </div>
-        ` : ""}
+        `
+            : ""
+        }
       </div>`
     );
   });
 }
 
+// Toggle espansione macchinario
 function toggleExpand(id) {
   expandedId = expandedId === id ? null : id;
   renderMacchinari();
 }
 
+// Salva o aggiorna macchinario
 function salvaMacchinario(id, nome) {
   if (!savedMacchinari[id]) savedMacchinari[id] = { nome: "", note: [] };
   savedMacchinari[id].nome = nome;
@@ -81,163 +98,178 @@ function salvaMacchinario(id, nome) {
   renderMacchinari();
 }
 
+// Elimina macchinario
 function eliminaMacchinario(id) {
-  if (confirm("Sei sicuro di voler eliminare questo macchinario?")) {
+  if (confirm("Eliminare il macchinario?")) {
     delete savedMacchinari[id];
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    expandedId = null;
+    if (expandedId === id) expandedId = null;
     renderMacchinari();
   }
 }
 
-function aggiungiNota(event, id) {
-  event.preventDefault();
-  const form = event.target;
-  const dataVal = form.elements["data"].value;
-  const descVal = form.elements["desc"].value.trim();
-
-  if (!dataVal || !descVal || descVal.length > 50) {
-    alert("Inserisci una data valida e una descrizione di massimo 50 caratteri.");
-    return;
-  }
-
-  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
-
-  savedMacchinari[id].note.push({ data: dataVal, desc: descVal });
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-  expandedId = id; // rimani aperto
-}
-
-function eliminaNota(id, notaIndex) {
-  if (confirm("Sei sicuro di voler eliminare questa nota?")) {
-    savedMacchinari[id].note.splice(notaIndex, 1);
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-    expandedId = id; // rimani aperto
-  }
-}
-
-function modificaNota(id, notaIndex) {
-  const nota = savedMacchinari[id].note[notaIndex];
-  if (!nota) return;
-
-  const nuovaData = prompt("Modifica data (YYYY-MM-DD):", nota.data);
-  if (!nuovaData) return;
-
-  const nuovaDesc = prompt("Modifica descrizione (max 50 caratteri):", nota.desc);
-  if (!nuovaDesc || nuovaDesc.length > 50) {
-    alert("Descrizione non valida o troppo lunga.");
-    return;
-  }
-
-  nota.data = nuovaData;
-  nota.desc = nuovaDesc.trim();
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-  expandedId = id; // rimani aperto
-}
-
+// Modifica nome macchinario
 function modificaMacchinario(id) {
   const nuovoNome = prompt("Nuovo nome del macchinario:", savedMacchinari[id].nome);
   if (nuovoNome && nuovoNome.trim().length > 0) {
     salvaMacchinario(id, nuovoNome.trim());
-    expandedId = id; // rimani aperto
   }
 }
 
-function onScanSuccess(decodedText) {
-  if (html5QrcodeInstance) {
-    html5QrcodeInstance.stop().then(() => {
-      reader.classList.add("hidden");
-      scanStatus.textContent = "";
-      if (!savedMacchinari[decodedText]) {
-        const nome = prompt("Inserisci il nome del macchinario:");
-        if (nome && nome.trim().length > 0) {
-          salvaMacchinario(decodedText, nome.trim());
-          expandedId = decodedText;
-        }
-      } else {
-        expandedId = decodedText;
-      }
-      renderMacchinari();
-    }).catch(console.error);
+// Aggiungi nota (data e descrizione)
+function aggiungiNota(event, id) {
+  event.preventDefault();
+  const form = event.target;
+  const data = form.data.value;
+  const desc = form.desc.value.trim();
+
+  if (!data || !desc) return alert("Compila tutti i campi!");
+
+  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
+  savedMacchinari[id].note.push({ data, desc });
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+
+  form.reset();
+  renderMacchinari();
+}
+
+// Modifica nota
+function modificaNota(id, index) {
+  const nota = savedMacchinari[id].note[index];
+  if (!nota) return;
+
+  const nuovaData = prompt("Nuova data (gg/mm/aaaa):", formatDateIt(nota.data));
+  if (!nuovaData) return;
+
+  // Converti gg/mm/aaaa in yyyy-mm-dd per input date
+  const parts = nuovaData.split("/");
+  if (parts.length !== 3) return alert("Formato data non valido!");
+
+  const yyyy_mm_dd = `${parts[2]}-${parts[1].padStart(2,"0")}-${parts[0].padStart(2,"0")}`;
+
+  const nuovaDesc = prompt("Nuova descrizione (max 50 caratteri):", nota.desc);
+  if (!nuovaDesc || nuovaDesc.trim().length === 0) return;
+
+  savedMacchinari[id].note[index] = { data: yyyy_mm_dd, desc: nuovaDesc.trim() };
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+}
+
+// Elimina nota
+function eliminaNota(id, index) {
+  if (confirm("Eliminare questa nota?")) {
+    savedMacchinari[id].note.splice(index, 1);
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+    renderMacchinari();
   }
 }
 
-function startScanning(cameraId) {
+// Scan successo QR
+function onScanSuccess(decodedText, decodedResult) {
+  // Fermiamo scanner per evitare più letture
   if (html5QrcodeInstance) {
-    html5QrcodeInstance.stop().then(() => {
-      html5QrcodeInstance.clear();
-      startScanner(cameraId);
-    });
+    html5QrcodeInstance.pause();
+  }
+  reader.classList.add("hidden");
+
+  if (!savedMacchinari[decodedText]) {
+    const nome = prompt("Nome del macchinario:");
+    if (nome && nome.trim().length > 0) {
+      salvaMacchinario(decodedText, nome.trim());
+      alert("Macchinario salvato!");
+    }
   } else {
-    startScanner(cameraId);
+    expandedId = decodedText; // espandi automaticamente
+  }
+  renderMacchinari();
+
+  // Riprendi scanner
+  if (html5QrcodeInstance) {
+    html5QrcodeInstance.resume();
+    reader.classList.remove("hidden");
   }
 }
 
-function startScanner(cameraId) {
+// Inizializza selezione camera e scanner
+async function initScanner() {
+  if (html5QrcodeInstance) {
+    html5QrcodeInstance.clear();
+    html5QrcodeInstance = null;
+  }
+
+  html5QrcodeInstance = new Html5Qrcode("reader");
+
+  const devices = await Html5Qrcode.getCameras();
+  if (!devices || devices.length === 0) {
+    alert("Nessuna fotocamera trovata");
+    return;
+  }
+
+  cameraSelect.innerHTML = "";
+  devices.forEach((device) => {
+    const option = document.createElement("option");
+    option.value = device.id;
+    option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+    cameraSelect.appendChild(option);
+  });
+
+  currentCameraId = devices[0].id;
+  cameraSelect.value = currentCameraId;
+  cameraSelection.classList.remove("hidden");
   reader.classList.remove("hidden");
   scanStatus.textContent = "Scansione attiva...";
-  html5QrcodeInstance = new Html5Qrcode("reader");
+
   html5QrcodeInstance
     .start(
-      cameraId,
-      { fps: 10, qrbox: { width: 250, height: 250 } },
+      currentCameraId,
+      { fps: 10, qrbox: 250 },
       onScanSuccess,
-      (error) => {
-        // ignore scan errors
+      (errorMessage) => {
+        // puoi mostrare errore scansione qui se vuoi
       }
     )
     .catch((err) => {
-      scanStatus.textContent = "Errore avvio scansione: " + err;
+      alert("Errore nell'avviare la fotocamera: " + err);
     });
 }
 
-function loadCameras() {
-  Html5Qrcode.getCameras()
-    .then((devices) => {
-      if (devices && devices.length) {
-        cameraSelect.innerHTML = "";
-        devices.forEach((device, i) => {
-          const option = document.createElement("option");
-          option.value = device.id;
-          option.text = device.label || `Fotocamera ${i + 1}`;
-          cameraSelect.appendChild(option);
+// Cambia fotocamera
+cameraSelect.addEventListener("change", () => {
+  currentCameraId = cameraSelect.value;
+  if (html5QrcodeInstance) {
+    html5QrcodeInstance.stop().then(() => {
+      html5QrcodeInstance
+        .start(
+          currentCameraId,
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        )
+        .catch((err) => {
+          alert("Errore nel cambio fotocamera: " + err);
         });
-        cameraSelection.classList.remove("hidden");
-        currentCameraId = devices[0].id;
-        startScanning(currentCameraId);
-      } else {
-        scanStatus.textContent = "Nessuna fotocamera trovata.";
-      }
-    })
-    .catch((err) => {
-      scanStatus.textContent = "Errore accesso fotocamere.";
-      console.error(err);
     });
-}
-
-startBtn.addEventListener("click", () => {
-  scanStatus.textContent = "";
-  loadCameras();
+  }
 });
 
-cameraSelect.addEventListener("change", (e) => {
-  currentCameraId = e.target.value;
-  startScanning(currentCameraId);
-});
-
+// Riavvia scansione
 restartBtn.addEventListener("click", () => {
-  startScanning(currentCameraId);
+  if (html5QrcodeInstance) {
+    html5QrcodeInstance.stop().then(() => {
+      html5QrcodeInstance.start(
+        currentCameraId,
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
+    });
+  }
 });
 
-// Rendi le funzioni globali perché usate negli onclick inline
-window.modificaMacchinario = modificaMacchinario;
-window.eliminaMacchinario = eliminaMacchinario;
-window.toggleExpand = toggleExpand;
-window.aggiungiNota = aggiungiNota;
-window.eliminaNota = eliminaNota;
-window.modificaNota = modificaNota;
+// Bottone start scan
+startBtn.addEventListener("click", () => {
+  startBtn.classList.add("hidden");
+  initScanner();
+  renderMacchinari();
+});
 
+// Render iniziale
 renderMacchinari();
