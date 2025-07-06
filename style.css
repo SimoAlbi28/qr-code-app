@@ -172,19 +172,21 @@ button {
   margin-bottom: 12px;
   padding: 10px 12px;
   word-break: break-word;
-  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .nota-data {
   font-weight: 700;
   color: #9a7d00;
-  display: block;
-  margin-bottom: 6px;
   text-align: left;
+  margin: 0;
 }
 
 .nota-desc {
-  margin: 0 0 8px 0;
+  margin: 0;
   white-space: pre-wrap;
   text-align: left;
   font-size: 15px;
@@ -192,11 +194,9 @@ button {
 }
 
 .btns-note {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .btns-note button {
