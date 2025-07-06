@@ -96,6 +96,7 @@ button {
   width: 100%;
   max-width: 350px;
   margin: 0 auto 30px;
+  aspect-ratio: 1 / 1; /* Quadrato fisso */
 }
 
 #macchinari-list {
@@ -113,10 +114,6 @@ button {
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 220px; /* per spazio bottoni in basso */
 }
 
 .macchinario h3 {
@@ -124,16 +121,18 @@ button {
   font-size: 18px;
   font-weight: 700;
   color: cyan;
-  background-color: black;
   text-transform: uppercase;
+  background-color: black;
   padding: 6px 0;
-  border-radius: 5px;
+  border-radius: 6px;
   user-select: none;
 }
 
 .nome-e-btn {
   gap: 15px;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
 }
 
 .toggle-btn {
@@ -167,6 +166,7 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .nota-data {
@@ -176,11 +176,15 @@ button {
   border-radius: 6px;
   display: inline-block;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
+  text-align: left;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 .btns-note {
@@ -198,14 +202,12 @@ button {
 }
 
 .note-form {
-  margin-top: 15px;
-  max-width: 350px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-width: 350px;
+  margin: 0 auto 10px;
+  text-align: left;
 }
 
 .note-form label {
@@ -223,27 +225,45 @@ button {
   box-sizing: border-box;
 }
 
-.btns-note {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
 .btns-macchinario {
-  margin-top: 15px;
-  display: flex;
   justify-content: center;
   gap: 15px;
+  margin-top: 12px;
+  margin-bottom: 15px;
 }
 
 .btns-macchinario button {
   padding: 8px 14px;
   font-size: 15px;
   border-radius: 7px;
-  cursor: pointer;
 }
 
+/* Posiziona i bottoni (chiudi, rinomina, elimina) in basso nel riquadro */
+.macchinario .btns-macchinario {
+  position: relative;
+  bottom: 0;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+/* Posiziona i bottoni (aggiungi nota, annulla) dentro il form note */
+.note-form .btns-note {
+  position: static;
+  margin-top: 10px;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Bottoni note */
+.note-form button.btn-green {
+  min-width: 100px;
+}
+
+.note-form button.btn-red {
+  min-width: 100px;
+}
+
+/* Responsive per telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
