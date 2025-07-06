@@ -11,21 +11,19 @@
 <body>
   <main>
     <h1>🔧 Gestione Macchinari 🔧</h1>
+    <button id="start-scan">📷 Avvia Scansione QR</button>
 
-    <button id="start-scan" aria-label="Avvia scansione QR" title="Scansiona codice QR">📷 Scansiona macchinario</button>
-
-    <div id="camera-selection" class="hidden" aria-live="polite" aria-label="Seleziona la fotocamera per la scansione">
-      <label for="camera-select">Seleziona fotocamera:</label>
-      <select id="camera-select" aria-label="Seleziona fotocamera"></select>
-      <button id="restart-scan" aria-label="Riavvia scansione">🔄 Riavvia scansione</button>
+    <div id="camera-selection" class="hidden">
+      <label for="camera-select">Scegli fotocamera:</label>
+      <select id="camera-select"></select>
+      <button id="restart-scan" title="Riavvia scansione">🔄</button>
     </div>
 
-    <section id="reader" class="hidden" aria-live="polite"></section>
+    <div id="scan-status"></div>
+    <div id="reader" class="hidden"></div>
 
-    <div id="scan-status" role="alert" aria-live="assertive"></div>
-
-    <h2>📋 Macchinari salvati</h2>
-    <div id="macchinari-list" aria-live="polite" aria-relevant="additions removals"></div>
+    <h2>📋 Macchinari</h2>
+    <div id="macchinari-list"></div>
   </main>
 </body>
 </html>
