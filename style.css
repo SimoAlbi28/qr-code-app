@@ -3,7 +3,7 @@ body {
   padding: 20px;
   margin: 0 auto;
   max-width: 480px;
-  background: #f2f2f29a;
+  background: #e6e6e6;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -241,7 +241,7 @@ button {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
-  width: 100%;
+  width: 120px;
   box-sizing: border-box;
 }
 
