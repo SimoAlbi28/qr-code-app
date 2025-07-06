@@ -18,6 +18,7 @@ function renderMacchinari(highlightId = null) {
 
     const box = document.createElement("div");
     box.className = "macchinario";
+    box.setAttribute('data-id', id);
     box.innerHTML = `
       <h3>${data.nome}</h3>
       <div class="nome-e-btn">
@@ -139,14 +140,14 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  // Carica i dati della nota negli input per modificarli
+  // Carica i dati negli input per modificarli
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
 
-  // Salva l’indice della nota da modificare
+  // Salva indice nota da modificare
   savedMacchinari[id].modificaIndex = index;
 
-  // Assicura che la sezione dettagli sia aperta (non chiudere o rifare render qui)
+  // Apri dettagli senza fare render per non resettare input
   savedMacchinari[id].expanded = true;
 }
 
@@ -181,6 +182,7 @@ function startScan() {
         startBtn.disabled = false;
         stopBtn.disabled = true;
       });
+
       if (!savedMacchinari[qrCodeMessage]) {
         const nome = prompt("Nome del macchinario:");
         if (nome) {
@@ -189,6 +191,14 @@ function startScan() {
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
         renderMacchinari();
+
+        // Scrolla verso il macchinario scansionato
+        setTimeout(() => {
+          const elem = document.querySelector(`.macchinario[data-id="${qrCodeMessage}"]`);
+          if (elem) {
+            elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
       }
     }
   ).catch((err) => {
