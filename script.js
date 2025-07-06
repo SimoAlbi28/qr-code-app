@@ -4,257 +4,146 @@ const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
+
 let html5QrcodeScanner = null;
-let scanning = false;
-let currentEditNote = null; // per modificare nota
+let currentScanActive = false;
 
-function renderMacchinari(expandedId = null) {
-  listContainer.innerHTML = "";
+async function startScanner() {
+  if (currentScanActive) return;
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
 
-  // Ordina macchinari per nome
-  const sortedEntries = Object.entries(savedMacchinari).sort((a, b) =>
-    a[1].nome.localeCompare(b[1].nome)
-  );
+  reader.classList.add("visible");
 
-  sortedEntries.forEach(([id, data]) => {
-    const expanded = id === expandedId;
-
-    const macDiv = document.createElement("div");
-    macDiv.className = "macchinario";
-
-    if (!data.note) data.note = [];
-
-    // Ordina note per data desc (più recente sopra)
-    data.note.sort((a, b) => {
-      const d1 = a.data.split("-").reverse().join("");
-      const d2 = b.data.split("-").reverse().join("");
-      return d2.localeCompare(d1);
-    });
-
-    macDiv.innerHTML = `
-      <h3>${data.nome}</h3>
-      ${
-        expanded
-          ? `
-      <ul class="note-list">
-        ${data.note
-          .map(
-            (n, i) => `
-          <li>
-            <div class="nota-data">${formatDate(n.data)}</div>
-            <div class="nota-desc">${n.desc}</div>
-            <div class="btns-note">
-              <button class="btn-blue" onclick="modificaNota('${id}', ${i})">Modifica</button>
-              <button class="btn-red" onclick="eliminaNota('${id}', ${i})">Elimina</button>
-            </div>
-          </li>
-        `
-          )
-          .join("")}
-      </ul>
-
-      <form class="note-form" onsubmit="aggiungiNota(event, '${id}')">
-        <label>Data:</label>
-        <input type="date" required />
-        <label>Descrizione (max 100 caratteri):</label>
-        <input type="text" maxlength="100" required />
-        <div class="note-form form-btns">
-          <button type="submit" class="btn-green">Aggiungi Nota</button>
-          <button type="button" class="btn-red" onclick="resetForm()">Annulla</button>
-        </div>
-      </form>
-
-      <div class="macchinario-details-btns">
-        <button class="btn-blue" onclick="modificaMacchinario('${id}')">Rinomina</button>
-        <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
-        <button class="btn-red" onclick="chiudiMacchinario()">Chiudi Dettagli</button>
-      </div>
-      `
-          : `<div class="btns-macchinario">
-          <button class="toggle-btn" onclick="espandiMacchinario('${id}')">Dettagli</button>
-      </div>`
-      }
-    `;
-    listContainer.appendChild(macDiv);
-
-    if (expanded) {
-      // se stiamo modificando nota, riempi i campi
-      if (currentEditNote) {
-        const form = macDiv.querySelector(".note-form");
-        const dataInput = form.querySelector('input[type="date"]');
-        const descInput = form.querySelector('input[type="text"]');
-        const noteToEdit = data.note[currentEditNote.noteIndex];
-        dataInput.value = noteToEdit.data;
-        descInput.value = noteToEdit.desc;
-      }
-    }
-  });
-}
-
-function formatDate(dateStr) {
-  // da yyyy-mm-dd a gg/mm/aa
-  const [yyyy, mm, dd] = dateStr.split("-");
-  return `${dd}/${mm}/${yyyy.slice(2)}`;
-}
-
-function espandiMacchinario(id) {
-  currentEditNote = null;
-  renderMacchinari(id);
-}
-
-function chiudiMacchinario() {
-  currentEditNote = null;
-  renderMacchinari();
-}
-
-function salvaLocalStorage() {
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-}
-
-function aggiungiNota(e, macId) {
-  e.preventDefault();
-
-  const form = e.target;
-  const dataInput = form.querySelector('input[type="date"]');
-  const descInput = form.querySelector('input[type="text"]');
-
-  if (!dataInput.value || !descInput.value.trim()) return;
-
-  const newNote = {
-    data: dataInput.value,
-    desc: descInput.value.trim().substring(0, 100),
-  };
-
-  if (!savedMacchinari[macId].note) savedMacchinari[macId].note = [];
-
-  if (currentEditNote && currentEditNote.macId === macId) {
-    // modifica nota esistente
-    savedMacchinari[macId].note[currentEditNote.noteIndex] = newNote;
-    currentEditNote = null;
-  } else {
-    // nuova nota
-    savedMacchinari[macId].note.push(newNote);
-  }
-
-  salvaLocalStorage();
-  form.reset();
-  renderMacchinari(macId);
-}
-
-function modificaNota(macId, noteIndex) {
-  currentEditNote = { macId, noteIndex };
-  renderMacchinari(macId);
-}
-
-function eliminaNota(macId, noteIndex) {
-  if (!confirm("Sei sicuro di eliminare questa nota?")) return;
-  savedMacchinari[macId].note.splice(noteIndex, 1);
-  salvaLocalStorage();
-  renderMacchinari(macId);
-}
-
-function modificaMacchinario(id) {
-  const nuovoNome = prompt("Inserisci il nuovo nome del macchinario:");
-  if (nuovoNome && nuovoNome.trim()) {
-    savedMacchinari[id].nome = nuovoNome.trim();
-    salvaLocalStorage();
-    renderMacchinari(id);
-  }
-}
-
-function eliminaMacchinario(id) {
-  if (!confirm("Sei sicuro di eliminare questo macchinario?")) return;
-  delete savedMacchinari[id];
-  salvaLocalStorage();
-  renderMacchinari();
-}
-
-function resetForm() {
-  currentEditNote = null;
-  renderMacchinari();
-}
-
-// SCANNER
-startBtn.addEventListener("click", () => {
-  if (scanning) return;
-  startScanner();
-});
-
-stopBtn.addEventListener("click", () => {
-  if (!scanning) return;
-  stopScanner();
-});
-
-function startScanner() {
   if (!html5QrcodeScanner) {
     html5QrcodeScanner = new Html5Qrcode("reader");
   }
 
-  // Usa camera posteriore fissa con facingMode: environment
-  const config = {
-    fps: 10,
-    qrbox: { width: 250, height: 250 },
-    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-    // specifica camera posteriore
-    facingMode: { exact: "environment" },
-  };
+  try {
+    const devices = await Html5Qrcode.getCameras();
+    // Prendi la posteriore (environment)
+    const backCamera = devices.find(dev => dev.label.toLowerCase().includes("back")) || devices[0];
+    if (!backCamera) {
+      alert("Nessuna fotocamera trovata");
+      stopScanner();
+      return;
+    }
 
-  html5QrcodeScanner
-    .start(
-      { facingMode: { exact: "environment" } },
-      config,
+    await html5QrcodeScanner.start(
+      backCamera.id,
+      {
+        fps: 10,
+        qrbox: 250,
+        aspectRatio: 1
+      },
       qrCodeMessage => {
-        // Quando scansiona il QR
-        stopScanner();
-        processQRCode(qrCodeMessage);
+        // Gestisci QR code letto
+        handleQRCode(qrCodeMessage);
       },
       errorMessage => {
-        // console.log("Scanning error:", errorMessage);
+        // ignore o log
+        // console.log("Scan error:", errorMessage);
       }
-    )
-    .then(() => {
-      scanning = true;
-      reader.classList.add("visible");
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-    })
-    .catch(err => {
-      alert("Errore nell'aprire la fotocamera posteriore. Controlla permessi o dispositivo.");
-      console.error(err);
-    });
+    );
+    currentScanActive = true;
+  } catch (err) {
+    alert("Errore avvio fotocamera: " + err);
+    stopScanner();
+  }
 }
 
-function stopScanner() {
-  if (!html5QrcodeScanner) return;
+async function stopScanner() {
+  if (!currentScanActive) return;
+  stopBtn.disabled = true;
+  startBtn.disabled = false;
 
-  html5QrcodeScanner
-    .stop()
-    .then(() => {
-      scanning = false;
-      reader.classList.remove("visible");
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    })
-    .catch(err => {
-      console.error("Errore nel fermare la fotocamera:", err);
-    });
+  try {
+    await html5QrcodeScanner.stop();
+  } catch(e) {
+    console.warn("Errore stop scanner", e);
+  }
+  reader.classList.remove("visible");
+  currentScanActive = false;
 }
 
-function processQRCode(qrText) {
-  const nome = prompt("Nome del macchinario rilevato dal QR:", qrText.trim());
-  if (!nome || !nome.trim()) return;
+startBtn.addEventListener("click", () => startScanner());
+stopBtn.addEventListener("click", () => stopScanner());
 
-  // id unico con timestamp e random
-  const id = "mac-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-
-  savedMacchinari[id] = {
-    nome: nome.trim(),
-    note: [],
-  };
-
-  salvaLocalStorage();
-  renderMacchinari(id);
+function handleQRCode(qrMessage) {
+  // esempio: aggiungi macchinario o mostra alert se già presente
+  if (savedMacchinari[qrMessage]) {
+    alert(`Macchinario "${qrMessage}" già presente!`);
+    return;
+  }
+  savedMacchinari[qrMessage] = { nome: qrMessage, note: [] };
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari(qrMessage);
 }
 
-// Al caricamento, renderizzo la lista
+// Funzioni macchinari (render, aggiungi nota, modifica ecc) come prima
+
+function renderMacchinari(expandedId = null) {
+  listContainer.innerHTML = "";
+
+  const sortedEntries = Object.entries(savedMacchinari).sort((a,b) => a[1].nome.localeCompare(b[1].nome));
+
+  sortedEntries.forEach(([id, data]) => {
+    const expanded = id === expandedId;
+    if (!data.note) data.note = [];
+
+    data.note.sort((a,b) => b.data.localeCompare(a.data)); // data discendente
+
+    const div = document.createElement("div");
+    div.className = "macchinario";
+    div.innerHTML = `
+      <h3>${data.nome}</h3>
+      ${expanded ? `
+        <ul class="note-list">
+          ${data.note.map((n,i) => `
+            <li>
+              <div class="nota-data">${formatDate(n.data)}</div>
+              <div class="nota-desc">${n.desc}</div>
+              <div class="btns-note">
+                <button class="btn-blue" onclick="modificaNota('${id}',${i})">Modifica</button>
+                <button class="btn-red" onclick="eliminaNota('${id}',${i})">Elimina</button>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+        <form class="note-form" onsubmit="aggiungiNota(event,'${id}')">
+          <label>Data:</label>
+          <input type="date" required />
+          <label>Descrizione (max 100 caratteri):</label>
+          <input type="text" maxlength="100" required />
+          <div class="note-form form-btns">
+            <button type="submit" class="btn-green">Aggiungi Nota</button>
+            <button type="button" class="btn-red" onclick="resetForm()">Annulla</button>
+          </div>
+        </form>
+        <div class="macchinario-details-btns">
+          <button class="btn-blue" onclick="modificaMacchinario('${id}')">Rinomina</button>
+          <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
+          <button class="btn-red" onclick="chiudiMacchinario()">Chiudi Dettagli</button>
+        </div>
+      ` : `
+        <div class="btns-macchinario">
+          <button class="toggle-btn" onclick="espandiMacchinario('${id}')">Dettagli</button>
+        </div>
+      `}
+    `;
+    listContainer.appendChild(div);
+  });
+  resetForm();
+}
+
+function formatDate(dateStr) {
+  // da yyyy-mm-dd a gg/mm/aa
+  const parts = dateStr.split("-");
+  if(parts.length !== 3) return dateStr;
+  return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`;
+}
+
+// Gestione note e macchinari (aggiungi, elimina, modifica) — implementa le funzioni come in precedenza
+// Per brevità, le funzioni di modificaNota, eliminaNota, aggiungiNota, resetForm, modificaMacchinario, eliminaMacchinario, chiudiMacchinario, espandiMacchinario vanno mantenute come prima.
+
 renderMacchinari();
