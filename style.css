@@ -96,7 +96,6 @@ button {
   width: 100%;
   max-width: 350px;
   margin: 0 auto 30px;
-  aspect-ratio: 1 / 1; /* Quadrato fisso */
 }
 
 #macchinari-list {
@@ -122,17 +121,12 @@ button {
   font-weight: 700;
   color: cyan;
   text-transform: uppercase;
-  background-color: black;
-  padding: 6px 0;
-  border-radius: 6px;
-  user-select: none;
+  text-align: center;
 }
 
 .nome-e-btn {
   gap: 15px;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
 }
 
 .toggle-btn {
@@ -166,7 +160,6 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
 .nota-data {
@@ -176,15 +169,11 @@ button {
   border-radius: 6px;
   display: inline-block;
   margin-bottom: 6px;
-  text-align: left;
 }
 
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
-  text-align: left;
-  max-width: 100%;
-  word-break: break-word;
 }
 
 .btns-note {
@@ -226,41 +215,22 @@ button {
 }
 
 .btns-macchinario {
+  display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 10px;
   margin-top: 12px;
-  margin-bottom: 15px;
+  flex-wrap: nowrap;
 }
 
 .btns-macchinario button {
-  padding: 8px 14px;
-  font-size: 15px;
-  border-radius: 7px;
-}
-
-/* Posiziona i bottoni (chiudi, rinomina, elimina) in basso nel riquadro */
-.macchinario .btns-macchinario {
-  position: relative;
-  bottom: 0;
-  margin-top: 10px;
-  justify-content: center;
-}
-
-/* Posiziona i bottoni (aggiungi nota, annulla) dentro il form note */
-.note-form .btns-note {
-  position: static;
-  margin-top: 10px;
-  justify-content: center;
-  gap: 12px;
-}
-
-/* Bottoni note */
-.note-form button.btn-green {
-  min-width: 100px;
-}
-
-.note-form button.btn-red {
-  min-width: 100px;
+  flex: 1;
+  min-width: 90px;
+  max-width: 90px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Responsive per telefoni */
