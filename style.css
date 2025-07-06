@@ -1,311 +1,289 @@
-/* GENERALE */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
-  background: #e7f0fd;
+  background: #f9f9f9;
   text-align: center;
-  max-width: 480px;
-  margin: 0 auto;
-  color: #034078;
+  margin: 0;
 }
 
 h1 {
-  font-size: 28px;
-  margin-bottom: 24px;
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #007bff;
 }
 
 h2 {
-  margin-top: 40px;
-  margin-bottom: 16px;
-  color: #034078;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  color: #333;
 }
 
-/* BOTTONE SCANSIONE */
+/* Bottone start scan */
 #start-scan {
-  background: #1a73e8;
+  background: #007bff;
   color: white;
   font-weight: 700;
   font-size: 18px;
-  padding: 12px 20px;
-  border-radius: 10px;
+  padding: 12px 24px;
   border: none;
+  border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 5px 15px rgb(26 115 232 / 0.4);
-  transition: background-color 0.3s ease;
-  margin-bottom: 30px;
+  transition: background 0.3s ease;
+  margin-bottom: 10px;
 }
 
 #start-scan:hover {
-  background-color: #0c51b5;
-}
-
-/* SELEZIONE FOTOCAMERA */
-#camera-selection {
-  margin-bottom: 20px;
-  text-align: center;
-  max-width: 480px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#camera-selection label {
-  font-weight: 600;
-  margin-right: 10px;
-}
-
-#camera-select {
-  padding: 6px 8px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  max-width: 240px;
-  vertical-align: middle;
-}
-
-#restart-scan {
-  background: #0a6ed1;
-  color: white;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  margin-left: 10px;
-  vertical-align: middle;
-  box-shadow: 0 4px 8px rgb(10 110 209 / 0.5);
-  transition: background-color 0.3s ease;
-}
-
-#restart-scan:hover {
-  background-color: #064a84;
-}
-
-#scan-status {
-  margin-top: 8px;
-  font-style: italic;
-  color: #555;
-}
-
-/* READER - QUADRATO E CENTRATO */
-#reader {
-  width: 260px !important;
-  height: 260px !important;
-  margin: 0 auto 30px auto;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgb(0 0 0 / 0.15);
-  overflow: hidden;
-}
-
-/* MACCHINARI */
-#macchinari-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 0 10px;
-  max-width: 480px;
-  margin: 0 auto 40px auto;
-  text-align: left;
-  color: #034078;
-}
-
-/* Macchinario box */
-.macchinario {
-  background: white;
-  border: 2px solid #007bff;
-  border-radius: 12px;
-  padding: 15px 20px;
-  margin: 10px auto;
-  max-width: 480px;
-  box-shadow: 0 4px 8px rgb(0 123 255 / 0.15);
-  transition: all 0.3s ease;
-  text-align: center; /* nome centrato */
-  cursor: default;
-  user-select: none;
-  position: relative;
-}
-
-.macchinario.expanded {
-  background: #eef6ff;
-  transform: scale(1.02);
-  text-align: left; /* dettagli left aligned */
-  user-select: auto;
-}
-
-.macchinario h3 {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-  color: #007bff;
-  line-height: 1.2;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.nome-e-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.nome-e-btn button {
-  background: #007bff;
-  border: none;
-  color: white;
-  font-size: 20px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.nome-e-btn button:hover {
   background: #0056b3;
 }
 
-.macchinario.expanded h3 {
-  display: block;
+/* Camera selection */
+#camera-selection {
+  margin: 10px auto 15px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#camera-select {
+  padding: 6px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Reader area quadrata e centrata */
+#reader {
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,123,255,0.5);
+}
+
+/* Scan status */
+#scan-status {
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+/* Bottone chiudi scansione */
+#camera-selection button.close-scan-btn {
+  background: #d9534f;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-left: 15px;
+}
+
+/* Lista macchinari */
+#macchinari-list {
+  max-width: 420px;
+  margin: 0 auto 40px auto;
+}
+
+/* Macchinario singolo linea */
+.macchinario {
+  width: 100%;
+  max-width: 400px;
+  height: 40px;
+  margin: 8px auto;
+  padding: 0 15px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: right;
+  font-size: 16px;
+  overflow: hidden;
+}
+
+.macchinario h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}
+
+/* Bottone espandi riduci */
+.macchinario button {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #007bff;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+/* Macchinario espanso */
+.macchinario.expanded {
+  height: auto;
+  padding: 15px 20px 20px 20px;
   text-align: left;
-  margin-bottom: 10px;
+}
+
+/* Nome e bottone in riga per espanso */
+.macchinario.expanded > .nome-e-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 /* Lista note */
 .note-list {
   list-style: none;
   padding-left: 0;
-  margin-bottom: 16px;
+  margin: 0 0 15px 0;
 }
 
 .note-list li {
-  margin-bottom: 12px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 8px;
+  border-left: 4px solid #ffeb3b;
+  background: #fffde7;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  position: relative;
 }
 
-/* Data evidenziata */
+/* Data evidenziata gialla a sinistra */
 .nota-data {
-  background: #fff3b0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 14px;
-  display: inline-block;
-  min-width: 90px;
+  color: #b58900;
+  font-weight: 700;
+  display: block;
   text-align: left;
   margin-bottom: 4px;
-  font-family: monospace;
 }
 
-/* Descrizione nota (va a capo se lunga) */
+/* Descrizione sotto data */
 .nota-desc {
+  font-size: 15px;
+  text-align: left;
   white-space: normal;
-  word-wrap: break-word;
   max-width: 100%;
-  font-size: 14px;
-  margin-left: 8px;
+  word-wrap: break-word;
+}
+
+/* Bottoni nota */
+.btns-note {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.btns-note button {
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #555;
+}
+
+/* Form aggiunta nota */
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto 15px auto;
+}
+
+.note-form label {
+  font-weight: 600;
   text-align: left;
 }
 
-/* Pulsanti note */
-.btns-note button {
-  font-size: 16px;
-  margin-left: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.btns-note button:hover {
-  background-color: #0056b3;
-}
-
-/* Form aggiunta note */
-.note-form label,
-.note-form input {
-  display: block;
-  margin-bottom: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.note-form input[type="date"] {
-  padding: 6px 8px;
-  font-size: 14px;
-  max-width: 150px;
-  margin-bottom: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
+.note-form input[type="date"],
 .note-form input[type="text"] {
-  padding: 6px 8px;
-  font-size: 14px;
-  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 16px;
   border: 1px solid #ccc;
-  max-width: 100%;
+  border-radius: 8px;
+}
+
+.note-form input[type="text"]::placeholder {
+  color: #999;
 }
 
 .note-form button {
-  background: #1a73e8;
+  background: #007bff;
   color: white;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  font-weight: 700;
   border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
+  transition: background 0.3s ease;
 }
 
 .note-form button:hover {
-  background-color: #0c51b5;
+  background: #0056b3;
 }
 
-/* Pulsanti rinomina/elimina macchinario */
+/* Bottoni macchinario (rinomina/elimina) */
 .btns-macchinario {
   display: flex;
-  gap: 12px;
-  justify-content: flex-start;
-  margin-top: 12px;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
 }
 
 .btns-macchinario button {
+  padding: 8px 14px;
   font-size: 16px;
-  padding: 6px 14px;
+  font-weight: 600;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
-.btns-macchinario button:hover {
-  background-color: #0056b3;
+.btns-macchinario button:first-child {
+  background: #17a2b8;
+  color: white;
+}
+
+.btns-macchinario button:first-child:hover {
+  background: #117a8b;
+}
+
+.btns-macchinario button:last-child {
+  background: #dc3545;
+  color: white;
+}
+
+.btns-macchinario button:last-child:hover {
+  background: #a71d2a;
 }
 
 /* Responsive */
-@media (max-width: 480px) {
-  body,
-  #macchinari-list,
-  .macchinario {
-    max-width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
+@media (max-width: 420px) {
   #reader {
-    width: 100% !important;
-    height: auto !important;
+    width: 90vw;
+    height: 90vw;
   }
-
-  #camera-select {
-    max-width: 100%;
+  .macchinario {
+    max-width: 90vw;
+    height: 40px;
+  }
+  .note-form, .btns-macchinario {
+    max-width: 90vw;
   }
 }

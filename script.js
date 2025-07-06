@@ -3,7 +3,6 @@ const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const cameraSelection = document.getElementById("camera-selection");
 const cameraSelect = document.getElementById("camera-select");
-const restartBtn = document.getElementById("restart-scan");
 const scanStatus = document.getElementById("scan-status");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
@@ -11,14 +10,21 @@ let html5QrcodeInstance = null;
 let currentCameraId = null;
 let expandedId = null;
 
-// Formatta data da yyyy-mm-dd a gg/mm/aaaa
+// Bottone chiudi scansione creato dinamicamente
+const stopScanBtn = document.createElement("button");
+stopScanBtn.textContent = "✖ Chiudi scansione";
+stopScanBtn.classList.add("close-scan-btn");
+stopScanBtn.style.display = "none";
+cameraSelection.appendChild(stopScanBtn);
+
+// Funzione formatta data gg/mm/aaaa da yyyy-mm-dd
 function formatDateIt(dateStr) {
   if (!dateStr) return "";
   const [year, month, day] = dateStr.split("-");
   return `${day}/${month}/${year}`;
 }
 
-// Render macchinari con note e form aggiunta
+// Render macchinari lista
 function renderMacchinari() {
   listContainer.innerHTML = "";
 
@@ -84,7 +90,7 @@ function renderMacchinari() {
   });
 }
 
-// Toggle espansione macchinario
+// Toggle espandi macchinario
 function toggleExpand(id) {
   expandedId = expandedId === id ? null : id;
   renderMacchinari();
@@ -116,7 +122,7 @@ function modificaMacchinario(id) {
   }
 }
 
-// Aggiungi nota (data e descrizione)
+// Aggiungi nota (data + descrizione)
 function aggiungiNota(event, id) {
   event.preventDefault();
   const form = event.target;
@@ -141,7 +147,6 @@ function modificaNota(id, index) {
   const nuovaData = prompt("Nuova data (gg/mm/aaaa):", formatDateIt(nota.data));
   if (!nuovaData) return;
 
-  // Converti gg/mm/aaaa in yyyy-mm-dd per input date
   const parts = nuovaData.split("/");
   if (parts.length !== 3) return alert("Formato data non valido!");
 
@@ -164,36 +169,27 @@ function eliminaNota(id, index) {
   }
 }
 
-// Scan successo QR
-function onScanSuccess(decodedText, decodedResult) {
-  // Fermiamo scanner per evitare più letture
+// Funzione stop scanner (chiude tutto)
+function stopScanner() {
   if (html5QrcodeInstance) {
-    html5QrcodeInstance.pause();
-  }
-  reader.classList.add("hidden");
-
-  if (!savedMacchinari[decodedText]) {
-    const nome = prompt("Nome del macchinario:");
-    if (nome && nome.trim().length > 0) {
-      salvaMacchinario(decodedText, nome.trim());
-      alert("Macchinario salvato!");
-    }
-  } else {
-    expandedId = decodedText; // espandi automaticamente
-  }
-  renderMacchinari();
-
-  // Riprendi scanner
-  if (html5QrcodeInstance) {
-    html5QrcodeInstance.resume();
-    reader.classList.remove("hidden");
+    html5QrcodeInstance.stop().then(() => {
+      html5QrcodeInstance.clear();
+      html5QrcodeInstance = null;
+      reader.classList.add("hidden");
+      cameraSelection.classList.add("hidden");
+      stopScanBtn.style.display = "none";
+      startBtn.classList.remove("hidden");
+      scanStatus.textContent = "";
+    }).catch(err => {
+      alert("Errore nello stoppare la fotocamera: " + err);
+    });
   }
 }
 
-// Inizializza selezione camera e scanner
+// Init scanner con posteriore di default e UI
 async function initScanner() {
   if (html5QrcodeInstance) {
-    html5QrcodeInstance.clear();
+    await html5QrcodeInstance.clear();
     html5QrcodeInstance = null;
   }
 
@@ -202,8 +198,16 @@ async function initScanner() {
   const devices = await Html5Qrcode.getCameras();
   if (!devices || devices.length === 0) {
     alert("Nessuna fotocamera trovata");
+    startBtn.classList.remove("hidden");
     return;
   }
+
+  // Cerca fotocamera posteriore (back, rear, environment)
+  let rearCamera = devices.find(device =>
+    /back|rear|posteriore|environment/i.test(device.label)
+  );
+
+  currentCameraId = rearCamera ? rearCamera.id : devices[0].id;
 
   cameraSelect.innerHTML = "";
   devices.forEach((device) => {
@@ -213,27 +217,48 @@ async function initScanner() {
     cameraSelect.appendChild(option);
   });
 
-  currentCameraId = devices[0].id;
   cameraSelect.value = currentCameraId;
   cameraSelection.classList.remove("hidden");
   reader.classList.remove("hidden");
+  stopScanBtn.style.display = "inline-block";
   scanStatus.textContent = "Scansione attiva...";
 
-  html5QrcodeInstance
-    .start(
-      currentCameraId,
-      { fps: 10, qrbox: 250 },
-      onScanSuccess,
-      (errorMessage) => {
-        // puoi mostrare errore scansione qui se vuoi
+  html5QrcodeInstance.start(
+    currentCameraId,
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      html5QrcodeInstance.pause();
+
+      if (!savedMacchinari[decodedText]) {
+        const nome = prompt("Nome del macchinario:");
+        if (nome && nome.trim().length > 0) {
+          salvaMacchinario(decodedText, nome.trim());
+          alert("Macchinario salvato!");
+          expandedId = decodedText;
+        }
+      } else {
+        expandedId = decodedText;
       }
-    )
-    .catch((err) => {
-      alert("Errore nell'avviare la fotocamera: " + err);
-    });
+      renderMacchinari();
+
+      // Chiudi scanner dopo inserimento nome
+      stopScanner();
+    },
+    (errorMessage) => {
+      // puoi gestire errori o ignorarli
+    }
+  ).catch((err) => {
+    alert("Errore nell'avviare la fotocamera: " + err);
+    startBtn.classList.remove("hidden");
+  });
 }
 
-// Cambia fotocamera
+// Bottone chiudi scansione manuale
+stopScanBtn.addEventListener("click", () => {
+  stopScanner();
+});
+
+// Cambio fotocamera da select
 cameraSelect.addEventListener("change", () => {
   currentCameraId = cameraSelect.value;
   if (html5QrcodeInstance) {
@@ -242,7 +267,23 @@ cameraSelect.addEventListener("change", () => {
         .start(
           currentCameraId,
           { fps: 10, qrbox: 250 },
-          onScanSuccess
+          (decodedText) => {
+            html5QrcodeInstance.pause();
+
+            if (!savedMacchinari[decodedText]) {
+              const nome = prompt("Nome del macchinario:");
+              if (nome && nome.trim().length > 0) {
+                salvaMacchinario(decodedText, nome.trim());
+                alert("Macchinario salvato!");
+                expandedId = decodedText;
+              }
+            } else {
+              expandedId = decodedText;
+            }
+            renderMacchinari();
+
+            stopScanner();
+          }
         )
         .catch((err) => {
           alert("Errore nel cambio fotocamera: " + err);
@@ -251,20 +292,7 @@ cameraSelect.addEventListener("change", () => {
   }
 });
 
-// Riavvia scansione
-restartBtn.addEventListener("click", () => {
-  if (html5QrcodeInstance) {
-    html5QrcodeInstance.stop().then(() => {
-      html5QrcodeInstance.start(
-        currentCameraId,
-        { fps: 10, qrbox: 250 },
-        onScanSuccess
-      );
-    });
-  }
-});
-
-// Bottone start scan
+// Bottone avvia scansione
 startBtn.addEventListener("click", () => {
   startBtn.classList.add("hidden");
   initScanner();
