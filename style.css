@@ -226,7 +226,7 @@ button {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
-  width: 100%;
+  width: 120px; /* campo data più stretto */
   box-sizing: border-box;
 }
 
