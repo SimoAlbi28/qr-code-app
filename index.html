@@ -9,18 +9,16 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>🔧 Gestione Macchinari 🔧</h1>
+  <h1>🔧 Gestione Macchinari</h1>
 
   <div id="buttons-container">
-    <button id="start-scan-btn" class="btn-green">Avvia scansione 📷</button>
-    <button id="stop-scan-btn" class="btn-red" disabled>Chiudi fotocamera ❌</button>
+    <button id="start-scan" class="btn-green">📷 Avvia scansione</button>
+    <button id="stop-scan" class="btn-red" disabled>❌ Chiudi scansione</button>
   </div>
 
-  <div id="scan-status" hidden>
-    <div id="reader" hidden></div>
-  </div>
+  <div id="reader" class="hidden"></div>
 
-  <h2>📋 Macchinari</h2>
+  <h2>📋 Elenco Macchinari</h2>
   <div id="macchinari-list"></div>
 </body>
 </html>
