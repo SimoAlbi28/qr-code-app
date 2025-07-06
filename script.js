@@ -5,7 +5,7 @@ const startBtn = document.getElementById("start-scan-btn");
 const stopBtn = document.getElementById("stop-scan-btn");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-let expandedId = null;
+let expandedId = null; // macchinari sempre chiusi all’avvio
 let html5QrcodeInstance = null;
 
 function renderMacchinari() {
@@ -35,7 +35,6 @@ function renderMacchinari() {
 }
 
 function renderNoteSection(id, data) {
-  // Ordina le note per ordine di inserimento (timestamp ascendente)
   const noteEntries = Object.entries(data.note || {}).sort((a, b) => a[0] - b[0]);
 
   let notesHtml = `<ul class="note-list">`;
@@ -58,7 +57,7 @@ function renderNoteSection(id, data) {
   notesHtml += `
     <form class="note-form" onsubmit="aggiungiNota(event, '${id}')">
       <label for="data-${id}">Data (gg/mm/aaaa):</label>
-      <input type="date" id="data-${id}" name="data" required pattern="\\d{4}-\\d{2}-\\d{2}" />
+      <input type="date" id="data-${id}" name="data" required />
       
       <label for="desc-${id}">Descrizione (max 50 caratteri):</label>
       <input type="text" id="desc-${id}" name="desc" maxlength="50" required placeholder="Descrizione..." />
@@ -70,7 +69,6 @@ function renderNoteSection(id, data) {
   return notesHtml;
 }
 
-// Funzione per formattare la data da yyyy-mm-dd a gg/mm/aaaa
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const parts = dateStr.split("-");
@@ -123,7 +121,6 @@ function modificaNota(idMacchinario, timestamp) {
   const nuovaData = prompt("Modifica data (gg/mm/aaaa):", formatDate(nota.data));
   if (!nuovaData) return;
 
-  // Converti da gg/mm/aaaa a yyyy-mm-dd per salvare correttamente
   const parts = nuovaData.split("/");
   if (parts.length !== 3) {
     alert("Formato data non valido, usa gg/mm/aaaa");
@@ -215,17 +212,14 @@ function startScan() {
   const config = {
     fps: 10,
     qrbox: { width: 250, height: 250 },
-    // Use back camera only:
-    facingMode: { exact: "environment" }
   };
 
   html5QrcodeInstance.start(
-    config.facingMode,
+    { facingMode: { exact: "environment" } },
     config,
     onScanSuccess,
     errorMessage => {
-      // Ignore scan errors or show console
-      // console.warn(`Scan error: ${errorMessage}`);
+      // scan errors ignored silently
     }
   ).catch(err => {
     alert("Errore nell'avviare la fotocamera: " + err);
@@ -250,9 +244,7 @@ function stopScan() {
     });
 }
 
-// Event listeners
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
-// All'inizio renderizza la lista macchinari
 renderMacchinari();
