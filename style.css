@@ -119,23 +119,22 @@ button {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
-  color: cyan;
+  background-color: cyan;
+  color: black;
   text-transform: uppercase;
   text-align: center;
-  background-color: black;
-  padding: 5px 0;
-  border-radius: 5px;
+  padding: 5px;
+  border-radius: 6px;
 }
 
 .nome-e-btn {
   gap: 15px;
   align-items: center;
-  justify-content: center;
 }
 
 .toggle-btn {
-  font-size: 14px;
-  padding: 6px 12px;
+  font-size: 16px;
+  padding: 4px 8px;
   cursor: pointer;
   border: none;
   background: #007bff;
@@ -219,18 +218,18 @@ button {
 }
 
 .btns-macchinario {
+  display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 20px;
 }
 
 .btns-macchinario button {
-  padding: 8px 14px;
-  font-size: 15px;
-  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 6px;
 }
 
-/* Responsive per telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
