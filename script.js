@@ -43,14 +43,14 @@ function renderMacchinari(highlightId = null) {
           <span class="nota-data">${formatData(nota.data)}</span><br>
           <span class="nota-desc">${nota.desc}</span>
           <div class="btns-note">
-            <button class="btn-blue modifica-btn" data-id="${id}" data-index="${index}">✏️</button>
+            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
             <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
           </div>
         `;
         noteList.appendChild(li);
       });
 
-      // form note
+      // form note con nuovo layout bottoni
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -58,10 +58,12 @@ function renderMacchinari(highlightId = null) {
         <input type="date" id="data-${id}">
         <label>Descrizione (max 100):</label>
         <input type="text" id="desc-${id}" maxlength="100">
-        <div class="btns-macchinario">
+        <div style="text-align:center; margin-top:10px;">
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
-          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+        </div>
+        <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
           <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
           <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
       `;
@@ -73,17 +75,18 @@ function renderMacchinari(highlightId = null) {
     listContainer.appendChild(box);
   });
 
-  addModificaListeners();
-}
-
-function addModificaListeners() {
-  document.querySelectorAll(".modifica-btn").forEach(btn => {
-    btn.onclick = () => {
-      const id = btn.getAttribute("data-id");
-      const index = Number(btn.getAttribute("data-index"));
-      modificaNota(id, index);
-    };
-  });
+  // Highlight se richiesto
+  if (highlightId) {
+    const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
+    if (highlightBox) {
+      highlightBox.classList.add("highlight");
+      setTimeout(() => {
+        highlightBox.classList.remove("highlight");
+      }, 2500);
+      // Scrolla in mezzo allo schermo
+      highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
 }
 
 function salvaMacchinario(id, nome) {
@@ -120,17 +123,9 @@ function eliminaMacchinario(id) {
 function aggiungiNota(id) {
   const data = document.getElementById(`data-${id}`).value;
   const desc = document.getElementById(`desc-${id}`).value.trim();
-
   if (data && desc) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
-
-    if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
-      savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
-      delete savedMacchinari[id].modificaIndex;
-    } else {
-      savedMacchinari[id].note.push({ data, desc });
-    }
-
+    savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
     renderMacchinari();
   }
@@ -138,11 +133,9 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
+  // Riporta i dati nei campi input
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
-
-  savedMacchinari[id].modificaIndex = index;
-  savedMacchinari[id].expanded = true;
 }
 
 function eliminaNota(id, index) {
@@ -156,6 +149,7 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
+// QR CAM
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -175,26 +169,18 @@ function startScan() {
         startBtn.disabled = false;
         stopBtn.disabled = true;
       });
-
       if (!savedMacchinari[qrCodeMessage]) {
         const nome = prompt("Nome del macchinario:");
         if (nome) {
           salvaMacchinario(qrCodeMessage, nome);
+          // Apri e highlighta il nuovo
+          savedMacchinari[qrCodeMessage].expanded = true;
+          renderMacchinari(qrCodeMessage);
         }
       } else {
+        // Espandi, mostra e highlighta il macchinario già salvato
         savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinari();
-
-        setTimeout(() => {
-          const elem = document.querySelector(`.macchinario[data-id="${qrCodeMessage}"]`);
-          if (elem) {
-            elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            elem.classList.add('highlight');
-            setTimeout(() => {
-              elem.classList.remove('highlight');
-            }, 2000);
-          }
-        }, 100);
+        renderMacchinari(qrCodeMessage);
       }
     }
   ).catch((err) => {

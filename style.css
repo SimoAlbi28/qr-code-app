@@ -3,7 +3,7 @@ body {
   padding: 20px;
   margin: 0 auto;
   max-width: 480px;
-  background: #f2f2f293;
+  background: #f2f2f29a;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -42,6 +42,15 @@ button {
   min-width: 60px;
   max-width: 130px;
   transition: background-color 0.3s ease;
+}
+
+/* Pulsanti piccoli uniformi nel riquadro */
+.macchinario .btns-macchinario button,
+.macchinario .btns-note button {
+  padding: 4px 7px !important;
+  font-size: 12px !important;
+  min-width: auto !important;
+  max-width: none !important;
 }
 
 .toggle-btn,
@@ -127,6 +136,12 @@ button {
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.macchinario.highlight {
+  box-shadow: 0 0 15px 4px #00ffffaa;
+  border-color: #00ffff;
 }
 
 .macchinario h3 {
@@ -226,7 +241,7 @@ button {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
-  width: 120px; /* campo data più stretto */
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -242,14 +257,8 @@ button {
 .btns-macchinario {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.btns-macchinario button {
-  padding: 6px 10px;
-  font-size: 13px;
-  border-radius: 6px;
+  gap: 10px;
+  margin-top: 8px;
 }
 
 @media (max-width: 400px) {
@@ -270,18 +279,4 @@ button {
   #reader {
     max-width: 100%;
   }
-}
-
-.macchinario.highlight {
-  box-shadow: 0 0 15px 4px #00ffffaa;
-  border-color: #00ffff;
-  transition: box-shadow 0.3s ease;
-}
-
-.macchinario .btns-macchinario button,
-.macchinario .btns-note button {
-  padding: 4px 7px !important;
-  font-size: 12px !important;
-  min-width: auto !important;
-  max-width: none !important;
 }
