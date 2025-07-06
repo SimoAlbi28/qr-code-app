@@ -35,11 +35,61 @@ h2 {
   color: #003366;
 }
 
+#controls {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+button {
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.25s;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-green {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-green:hover:not(:disabled) {
+  background-color: #1e7e34;
+}
+
+.btn-red {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-red:hover:not(:disabled) {
+  background-color: #a71d2a;
+}
+
+.btn-blue {
+  background-color: #5bc0de;
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #31b0d5;
+}
+
 #reader {
   margin: 0 auto;
   width: 90vw;
   max-width: 320px;
-  aspect-ratio: 1 / 1; /* Quadrato */
+  aspect-ratio: 1 / 1;
   border: 3px solid #007bff;
   border-radius: 15px;
   background: #e0f0ff;
@@ -131,7 +181,7 @@ h2 {
   margin: 0;
   font-size: 15px;
   color: #6c757d;
-  white-space: pre-wrap; /* wrap lungo testo */
+  white-space: pre-wrap;
 }
 
 .btns-note {
@@ -143,9 +193,6 @@ h2 {
 }
 
 .btns-note button {
-  background: #007bff;
-  border: none;
-  color: white;
   font-size: 12px;
   padding: 4px 7px;
   border-radius: 6px;
@@ -154,8 +201,34 @@ h2 {
   transition: background-color 0.2s;
 }
 
-.btns-note button:hover {
-  background: #0056b3;
+.btns-note .btn-green {
+  background: #28a745;
+  color: white;
+  border: none;
+}
+
+.btns-note .btn-green:hover {
+  background: #1e7e34;
+}
+
+.btns-note .btn-red {
+  background: #dc3545;
+  color: white;
+  border: none;
+}
+
+.btns-note .btn-red:hover {
+  background: #a71d2a;
+}
+
+.btns-note .btn-blue {
+  background: #5bc0de;
+  color: white;
+  border: none;
+}
+
+.btns-note .btn-blue:hover {
+  background: #31b0d5;
 }
 
 .note-form {
@@ -198,7 +271,7 @@ h2 {
   border-radius: 12px;
   font-weight: 700;
   font-size: 16px;
-  background: #007bff;
+  background: #28a745;
   border: none;
   color: white;
   cursor: pointer;
@@ -207,7 +280,7 @@ h2 {
 }
 
 .note-form button:hover {
-  background: #0056b3;
+  background: #1e7e34;
 }
 
 .btns-macchinario {
@@ -229,12 +302,12 @@ h2 {
 }
 
 .btns-macchinario .renomina {
-  background-color: #17a2b8;
+  background-color: #5bc0de;
   color: white;
 }
 
 .btns-macchinario .renomina:hover {
-  background-color: #117a8b;
+  background-color: #31b0d5;
 }
 
 .btns-macchinario .elimina {
@@ -256,5 +329,9 @@ h2 {
   .toggle-btn {
     font-size: 26px;
     padding: 6px 12px;
+  }
+
+  #controls {
+    flex-direction: column;
   }
 }

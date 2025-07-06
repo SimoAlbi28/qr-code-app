@@ -11,8 +11,14 @@
 <body>
   <main>
     <h1>🔧 Gestione Macchinari 🔧</h1>
-    <div id="reader"></div>
-    <p id="scan-status">Scanner attivo, inquadra un QR code</p>
+
+    <div id="controls">
+      <button id="start-scan-btn" class="btn-green">Avvia scansione 📷</button>
+      <button id="stop-scan-btn" class="btn-red" disabled>Chiudi scansione ✖️</button>
+    </div>
+
+    <div id="reader" hidden></div>
+    <p id="scan-status" hidden>Scanner attivo, inquadra un QR code</p>
 
     <h2>📋 Macchinari</h2>
     <div id="macchinari-list"></div>
