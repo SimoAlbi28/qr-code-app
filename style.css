@@ -105,12 +105,13 @@ button {
 }
 
 .macchinario {
+  position: relative;
   margin: 10px auto;
   max-width: 400px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 12px;
+  padding: 12px 12px 50px 12px; /* spazio in basso per bottoni */
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
 }
@@ -119,18 +120,22 @@ button {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
-  color: #000;
-  background-color: cyan;
-  padding: 6px 10px;
-  border-radius: 6px;
+  color: cyan;
   text-transform: uppercase;
   text-align: center;
 }
 
 .nome-e-btn {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   gap: 15px;
   align-items: center;
   justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+  width: calc(100% - 24px);
 }
 
 .toggle-btn {
@@ -171,15 +176,13 @@ button {
   font-weight: bold;
   padding: 3px 8px;
   border-radius: 6px;
-  display: block;
-  margin-bottom: 8px;
+  display: inline-block;
+  margin-bottom: 6px;
 }
 
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
-  display: block;
-  margin-bottom: 25px;
 }
 
 .btns-note {
@@ -199,7 +202,7 @@ button {
 .note-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
   max-width: 350px;
   margin: 0 auto 10px;
   text-align: left;
@@ -208,19 +211,9 @@ button {
 .note-form label {
   font-weight: 600;
   margin-bottom: 4px;
-  display: block;
 }
 
-.note-form input[type="date"] {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  width: 150px;
-  box-sizing: border-box;
-  margin-bottom: 0;
-}
-
+.note-form input[type="date"],
 .note-form input[type="text"] {
   padding: 8px;
   border-radius: 6px;
@@ -228,7 +221,6 @@ button {
   font-size: 16px;
   width: 100%;
   box-sizing: border-box;
-  margin-top: 0;
 }
 
 .btns-macchinario {
@@ -243,7 +235,6 @@ button {
   border-radius: 7px;
 }
 
-/* Responsive per telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;

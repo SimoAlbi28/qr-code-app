@@ -4,23 +4,28 @@ const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-let html5QrcodeScanner = null;
+let html5QrcodeScanner;
+let isScanning = false;
+let currentExpanded = null; // id macchinario espanso
+let editingNoteId = null; // id nota in modifica
 
-let editNoteInfo = null; // { macchinarioId, noteIndex } se stai modificando una nota
-
-function renderMacchinari(highlightId = null) {
+function renderMacchinari() {
   listContainer.innerHTML = "";
+
   const entriesOrdinate = Object.entries(savedMacchinari).sort((a, b) => {
-    return a[1].nome.localeCompare(b[1].nome);
+    return a[0].localeCompare(b[0]); // ordina per id (qr code)
   });
+
   entriesOrdinate.forEach(([id, data]) => {
-    const expanded = id === highlightId;
+    const expanded = currentExpanded === id;
+
     const box = document.createElement("div");
     box.className = "macchinario";
+
     box.innerHTML = `
       <h3>${data.nome.toUpperCase()}</h3>
       <div class="nome-e-btn">
-        <button class="toggle-btn">${expanded ? "Chiudi" : "Dettagli"}</button>
+        <button class="toggle-btn" onclick="toggleDetails('${id}')">${expanded ? "Chiudi" : "Dettagli"}</button>
         <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
         <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
       </div>
@@ -29,185 +34,215 @@ function renderMacchinari(highlightId = null) {
         ${renderNoteList(id)}
       </div>
     `;
+
     listContainer.appendChild(box);
-
-    box.querySelector(".toggle-btn").onclick = () => {
-      if (expanded) {
-        editNoteInfo = null;
-        renderMacchinari();
-      } else {
-        editNoteInfo = null;
-        renderMacchinari(id);
-      }
-    };
   });
+}
 
-  if (editNoteInfo) {
-    // Se stai modificando una nota, riempi il form coi dati
-    const form = document.querySelector(`form[data-macchinario-id="${editNoteInfo.macchinarioId}"]`);
-    if (form) {
-      const nota = savedMacchinari[editNoteInfo.macchinarioId].note[editNoteInfo.noteIndex];
-      if (nota) {
-        form.data.value = nota.data;
-        form.descrizione.value = nota.descrizione;
-        form.querySelector("button[type=submit]").textContent = "Salva Modifica";
-      }
-    }
+function toggleDetails(id) {
+  if (currentExpanded === id) {
+    currentExpanded = null;
+  } else {
+    currentExpanded = id;
+    editingNoteId = null;
+  }
+  renderMacchinari();
+}
+
+function salvaMacchinario(id, nome) {
+  savedMacchinari[id] = savedMacchinari[id] || { nome: "", note: [] };
+  savedMacchinari[id].nome = nome;
+  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+}
+
+function eliminaMacchinario(id) {
+  delete savedMacchinari[id];
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  if (currentExpanded === id) currentExpanded = null;
+  renderMacchinari();
+}
+
+function rinominaMacchinario(id) {
+  const nuovoNome = prompt("Inserisci nuovo nome:", savedMacchinari[id].nome);
+  if (nuovoNome && nuovoNome.trim() !== "") {
+    salvaMacchinario(id, nuovoNome.trim());
   }
 }
 
 function renderNoteForm(macchinarioId) {
-  // Aggiunto data-macchinario-id per gestire modifica
+  const note = savedMacchinari[macchinarioId].note || [];
+  const noteDaModificare = editingNoteId && note.find(n => n.id === editingNoteId);
   return `
-    <form data-macchinario-id="${macchinarioId}" onsubmit="aggiungiOModificaNota(event, '${macchinarioId}')">
-      <label for="data-${macchinarioId}">Data (gg/mm/aa):</label>
-      <input id="data-${macchinarioId}" name="data" type="date" required />
-      <label for="descrizione-${macchinarioId}">Descrizione (max 100 caratteri):</label>
-      <input id="descrizione-${macchinarioId}" name="descrizione" type="text" maxlength="100" required />
-      <button type="submit" class="btn-green">Aggiungi Nota</button>
-      <button type="button" class="btn-red" onclick="annullaModifica()">Annulla</button>
+    <form class="note-form" onsubmit="return salvaNota(event, '${macchinarioId}')">
+      <label for="data">Data (gg/mm/aaaa):</label>
+      <input type="text" id="data" name="data" maxlength="10" placeholder="gg/mm/aaaa" pattern="\\d{2}/\\d{2}/\\d{4}" required
+        value="${noteDaModificare ? noteDaModificare.data : ''}" />
+      
+      <label for="desc">Descrizione (max 100 caratteri):</label>
+      <input type="text" id="desc" name="desc" maxlength="100" required
+        value="${noteDaModificare ? noteDaModificare.desc : ''}" />
+      
+      <div class="btns-macchinario">
+        <button type="submit" class="btn-green">${editingNoteId ? "Salva Modifica" : "Aggiungi Nota"}</button>
+        ${editingNoteId ? `<button type="button" class="btn-red" onclick="annullaModifica()">Annulla</button>` : ""}
+      </div>
     </form>
   `;
 }
 
 function renderNoteList(macchinarioId) {
-  if (!savedMacchinari[macchinarioId].note || savedMacchinari[macchinarioId].note.length === 0) {
-    return "<p>Nessuna nota.</p>";
+  let note = savedMacchinari[macchinarioId].note || [];
+  // Ordina le note per data decrescente (recenti sopra)
+  note = note.slice().sort((a, b) => {
+    // Converti stringa "gg/mm/aaaa" in data vera
+    const parseData = d => {
+      const [gg, mm, aaaa] = d.split("/");
+      return new Date(`${aaaa}-${mm}-${gg}`);
+    };
+    return parseData(b.data) - parseData(a.data);
+  });
+
+  if (note.length === 0) return `<p>Nessuna nota.</p>`;
+
+  return `
+    <ul class="note-list">
+      ${note.map(n => `
+        <li>
+          <span class="nota-data">${n.data}</span>
+          <p class="nota-desc">${n.desc}</p>
+          <div class="btns-note">
+            <button class="btn-blue" onclick="modificaNota('${macchinarioId}', '${n.id}')">Modifica</button>
+            <button class="btn-red" onclick="eliminaNota('${macchinarioId}', '${n.id}')">Elimina</button>
+          </div>
+        </li>
+      `).join("")}
+    </ul>
+  `;
+}
+
+function salvaNota(event, macchinarioId) {
+  event.preventDefault();
+  const form = event.target;
+  const dataInput = form.querySelector('input[name="data"]');
+  const descInput = form.querySelector('input[name="desc"]');
+
+  // Validazione semplice formato data gg/mm/aaaa
+  const dataVal = dataInput.value.trim();
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dataVal)) {
+    alert("Data non valida. Usa il formato gg/mm/aaaa.");
+    return false;
   }
-  // Ordino note per data discendente
-  const notes = savedMacchinari[macchinarioId].note.slice().sort((a,b) => b.data.localeCompare(a.data));
-  return `<ul class="note-list">
-    ${notes.map((nota, i) => `
-      <li>
-        <span class="nota-data">${formatData(nota.data)}</span>
-        <span class="nota-desc">${nota.descrizione}</span>
-        <div class="btns-note">
-          <button onclick="modificaNota('${macchinarioId}', ${i})" class="btn-blue">Modifica</button>
-          <button onclick="eliminaNota('${macchinarioId}', ${i})" class="btn-red">Elimina</button>
-        </div>
-      </li>
-    `).join("")}
-  </ul>`;
-}
 
-function formatData(isoDate) {
-  const d = new Date(isoDate);
-  const gg = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth()+1).padStart(2, '0');
-  const aa = String(d.getFullYear()).slice(2);
-  return `${gg}/${mm}/${aa}`;
-}
+  const descVal = descInput.value.trim();
+  if (descVal.length === 0 || descVal.length > 100) {
+    alert("Descrizione obbligatoria, max 100 caratteri.");
+    return false;
+  }
 
-function aggiungiOModificaNota(e, macchinarioId) {
-  e.preventDefault();
-  const form = e.target;
-  const data = form.data.value;
-  const descrizione = form.descrizione.value.trim();
-  if (!descrizione) return alert("Descrizione obbligatoria");
-  if (!savedMacchinari[macchinarioId].note) savedMacchinari[macchinarioId].note = [];
+  const note = savedMacchinari[macchinarioId].note || [];
 
-  if (editNoteInfo && editNoteInfo.macchinarioId === macchinarioId) {
-    // Modifica nota
-    savedMacchinari[macchinarioId].note[editNoteInfo.noteIndex] = { data, descrizione };
-    editNoteInfo = null;
+  if (editingNoteId) {
+    // modifica nota
+    const notaIndex = note.findIndex(n => n.id === editingNoteId);
+    if (notaIndex >= 0) {
+      note[notaIndex].data = dataVal;
+      note[notaIndex].desc = descVal;
+    }
+    editingNoteId = null;
   } else {
-    // Aggiungi nota
-    savedMacchinari[macchinarioId].note.push({ data, descrizione });
+    // nuova nota, id randomico
+    note.push({ id: generateId(), data: dataVal, desc: descVal });
   }
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(macchinarioId);
-}
 
-function modificaNota(macchinarioId, index) {
-  editNoteInfo = { macchinarioId, noteIndex: index };
-  renderMacchinari(macchinarioId);
+  savedMacchinari[macchinarioId].note = note;
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+  return false;
 }
 
 function annullaModifica() {
-  editNoteInfo = null;
+  editingNoteId = null;
   renderMacchinari();
 }
 
-function eliminaNota(macchinarioId, index) {
-  if (!confirm("Sei sicuro di eliminare questa nota?")) return;
-  savedMacchinari[macchinarioId].note.splice(index, 1);
+function modificaNota(macchinarioId, notaId) {
+  editingNoteId = notaId;
+  currentExpanded = macchinarioId;
+  renderMacchinari();
+}
+
+function eliminaNota(macchinarioId, notaId) {
+  let note = savedMacchinari[macchinarioId].note || [];
+  note = note.filter(n => n.id !== notaId);
+  savedMacchinari[macchinarioId].note = note;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(macchinarioId);
+  renderMacchinari();
 }
 
-function rinominaMacchinario(id) {
-  const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome);
-  if (nuovoNome && nuovoNome.trim() !== "") {
-    savedMacchinari[id].nome = nuovoNome.trim();
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
+// ID casuale semplice per note
+function generateId() {
+  return Math.random().toString(36).substr(2, 9);
 }
 
-function eliminaMacchinario(id) {
-  if (confirm("Sei sicuro di eliminare questo macchinario?")) {
-    delete savedMacchinari[id];
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
-}
+// QR Code Scanner
 
 startBtn.addEventListener("click", () => {
-  if (html5QrcodeScanner) return;
+  if (isScanning) return;
   reader.classList.remove("hidden");
+  html5QrcodeScanner = new Html5Qrcode("reader");
+  isScanning = true;
   stopBtn.disabled = false;
   startBtn.disabled = true;
 
-  html5QrcodeScanner = new Html5Qrcode("reader", { 
-    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
-    experimentalFeatures: {useBarCodeDetectorIfSupported: true},
-    verbose: false
-  });
+  const config = { fps: 10, qrbox: 250, experimentalFeatures: { useBarCodeDetectorIfSupported: true } };
 
   html5QrcodeScanner.start(
-    { facingMode: "environment" }, // SOLO POSTERIORE
-    { fps: 10, qrbox: {width: 250, height: 250} },
+    { facingMode: "environment" },
+    config,
     qrCodeMessage => {
-      html5QrcodeScanner.stop().then(() => {
-        html5QrcodeScanner.clear();
-        html5QrcodeScanner = null;
-        reader.classList.add("hidden");
-        stopBtn.disabled = true;
-        startBtn.disabled = false;
+      // Quando scanner riconosce QR
+      stopScanner();
 
-        if (savedMacchinari[qrCodeMessage]) {
-          renderMacchinari(qrCodeMessage);
-          return;
+      if (!savedMacchinari[qrCodeMessage]) {
+        const nome = prompt("Nuovo macchinario trovato, inserisci il nome:");
+        if (nome && nome.trim() !== "") {
+          salvaMacchinario(qrCodeMessage, nome.trim());
+          currentExpanded = qrCodeMessage;
         }
-        const nome = prompt("Nuovo macchinario trovato, inserisci nome:");
-        if (!nome || nome.trim() === "") return;
-        savedMacchinari[qrCodeMessage] = {nome: nome.trim(), note: []};
-        localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-        renderMacchinari(qrCodeMessage);
-      });
+      } else {
+        alert("Macchinario già presente.");
+        currentExpanded = qrCodeMessage;
+      }
+      renderMacchinari();
     },
     err => {
-      // console.log("Scan error:", err);
+      // Ignora errori di scansione, normale
+      // console.log(err);
     }
   ).catch(err => {
-    alert("Errore attivando fotocamera: " + err);
-    reader.classList.add("hidden");
-    stopBtn.disabled = true;
-    startBtn.disabled = false;
-    html5QrcodeScanner = null;
+    alert("Errore avvio fotocamera: " + err);
+    stopScanner();
   });
 });
 
 stopBtn.addEventListener("click", () => {
-  if (!html5QrcodeScanner) return;
-  html5QrcodeScanner.stop().then(() => {
-    html5QrcodeScanner.clear();
-    html5QrcodeScanner = null;
-    reader.classList.add("hidden");
-    stopBtn.disabled = true;
-    startBtn.disabled = false;
-  });
+  stopScanner();
 });
 
-// render iniziale
+function stopScanner() {
+  if (html5QrcodeScanner && isScanning) {
+    html5QrcodeScanner.stop().then(() => {
+      html5QrcodeScanner.clear();
+      isScanning = false;
+      stopBtn.disabled = true;
+      startBtn.disabled = false;
+      reader.classList.add("hidden");
+    }).catch(err => {
+      alert("Errore durante stop fotocamera: " + err);
+    });
+  }
+}
+
 renderMacchinari();
