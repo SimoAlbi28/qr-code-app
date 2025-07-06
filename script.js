@@ -59,7 +59,7 @@ function renderMacchinari(highlightId = null) {
         <input type="text" id="desc-${id}" maxlength="100">
         <div class="btns-macchinario">
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
-          <button class="btn-red" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
           <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
           <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>

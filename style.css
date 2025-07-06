@@ -65,6 +65,11 @@ button {
   flex-wrap: wrap;
 }
 
+#btn-chiudi {
+  background-color: rgb(255, 102, 0);
+  color: white;
+}
+
 .btn-red {
   background-color: #e74c3c;
   color: white;
