@@ -124,11 +124,11 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
 
     if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
-      // modifica nota esistente
+      // Modifica nota esistente
       savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
       delete savedMacchinari[id].modificaIndex;
     } else {
-      // aggiungi nuova nota
+      // Aggiungi nuova nota
       savedMacchinari[id].note.push({ data, desc });
     }
 
@@ -139,16 +139,15 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  // metti i dati negli input per modificarli
+  // Carica i dati della nota negli input per modificarli
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
 
-  // salva indice modifica
+  // Salva l’indice della nota da modificare
   savedMacchinari[id].modificaIndex = index;
 
-  // apri dettagli se chiusi
+  // Assicura che la sezione dettagli sia aperta (non chiudere o rifare render qui)
   savedMacchinari[id].expanded = true;
-  renderMacchinari();
 }
 
 function eliminaNota(id, index) {
