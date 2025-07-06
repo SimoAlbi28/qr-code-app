@@ -132,10 +132,22 @@ function aggiungiNota(id) {
 }
 
 function modificaNota(id, index) {
+  const dataInput = document.getElementById(`data-${id}`);
+  const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
-  // Riporta i dati nei campi input
-  document.getElementById(`data-${id}`).value = nota.data;
-  document.getElementById(`desc-${id}`).value = nota.desc;
+
+  if (
+    dataInput.value === nota.data &&
+    descInput.value === nota.desc
+  ) {
+    // se già i dati sono uguali, svuota i campi
+    dataInput.value = "";
+    descInput.value = "";
+  } else {
+    // altrimenti mette i dati della nota
+    dataInput.value = nota.data;
+    descInput.value = nota.desc;
+  }
 }
 
 function eliminaNota(id, index) {
