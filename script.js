@@ -5,7 +5,6 @@ const stopBtn = document.getElementById("stop-scan");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
-
 let notaInModifica = { macchinarioId: null, notaIndex: null };
 
 function renderMacchinari() {
@@ -63,7 +62,6 @@ function renderMacchinari() {
     `;
     listContainer.appendChild(box);
 
-    // Se stiamo modificando una nota di questo macchinario, carico i valori nei campi
     if (notaInModifica.macchinarioId === id) {
       const dataInput = document.getElementById(`data-${id}`);
       const descInput = document.getElementById(`desc-${id}`);
@@ -77,11 +75,13 @@ function renderMacchinari() {
   });
 }
 
-function toggleMacchinario(id) {
-  savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  notaInModifica = { macchinarioId: null, notaIndex: null };
-  renderMacchinari();
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const gg = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const aa = String(d.getFullYear()).slice(-2);
+  return `${gg}/${mm}/${aa}`;
 }
 
 function salvaMacchinario(id, nome) {
@@ -101,71 +101,76 @@ function eliminaMacchinario(id) {
 }
 
 function rinominaMacchinario(id) {
-  const nuovoNome = prompt("Nuovo nome del macchinario:", savedMacchinari[id].nome);
-  if (nuovoNome) {
-    savedMacchinari[id].nome = nuovoNome;
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
+  const nuovoNome = prompt("Inserisci nuovo nome:", savedMacchinari[id].nome);
+  if (nuovoNome && nuovoNome.trim() !== "") {
+    salvaMacchinario(id, nuovoNome.trim());
   }
 }
 
-function salvaNota(e, id) {
-  e.preventDefault();
-  const dataInput = document.getElementById(`data-${id}`);
-  const descInput = document.getElementById(`desc-${id}`);
-  const data = dataInput.value;
-  const desc = descInput.value.trim();
-
-  if (!data || !desc) return;
-
-  if (notaInModifica.macchinarioId === id) {
-    // modifica nota esistente
-    savedMacchinari[id].note[notaInModifica.notaIndex] = { data, desc };
-    notaInModifica = { macchinarioId: null, notaIndex: null };
-  } else {
-    // nuova nota
-    savedMacchinari[id].note.push({ data, desc });
-  }
+function toggleMacchinario(id) {
+  savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
 }
 
-function preparaModificaNota(id, index) {
-  notaInModifica = { macchinarioId: id, notaIndex: index };
-  savedMacchinari[id].expanded = true;
+function onScanSuccess(qr) {
+  stopScanner();
+
+  if (!savedMacchinari[qr]) {
+    const nome = prompt("Nome del macchinario:");
+    if (nome && nome.trim() !== "") {
+      salvaMacchinario(qr, nome.trim());
+    }
+  } else {
+    savedMacchinari[qr].expanded = true;
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  }
+  renderMacchinari();
+}
+
+function salvaNota(event, macchinarioId) {
+  event.preventDefault();
+  const dataInput = document.getElementById(`data-${macchinarioId}`);
+  const descInput = document.getElementById(`desc-${macchinarioId}`);
+  const data = dataInput.value;
+  const desc = descInput.value.trim();
+
+  if (!data || !desc || desc.length > 50) {
+    alert("Inserisci data valida e descrizione max 50 caratteri.");
+    return;
+  }
+
+  if (!savedMacchinari[macchinarioId].note) {
+    savedMacchinari[macchinarioId].note = [];
+  }
+
+  if (notaInModifica.macchinarioId === macchinarioId && notaInModifica.notaIndex !== null) {
+    // Modifica nota esistente
+    savedMacchinari[macchinarioId].note[notaInModifica.notaIndex] = { data, desc };
+    notaInModifica = { macchinarioId: null, notaIndex: null };
+  } else {
+    // Aggiungi nuova nota
+    savedMacchinari[macchinarioId].note.push({ data, desc });
+  }
+
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+}
+
+function eliminaNota(macchinarioId, notaIndex) {
+  savedMacchinari[macchinarioId].note.splice(notaIndex, 1);
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+}
+
+function preparaModificaNota(macchinarioId, notaIndex) {
+  notaInModifica = { macchinarioId, notaIndex };
   renderMacchinari();
 }
 
 function annullaModifica() {
   notaInModifica = { macchinarioId: null, notaIndex: null };
   renderMacchinari();
-}
-
-function eliminaNota(id, index) {
-  savedMacchinari[id].note.splice(index, 1);
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const parts = dateStr.split("-");
-  if(parts.length !== 3) return dateStr; // fallback
-  return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`; // gg/mm/aa
-}
-
-function onScanSuccess(decodedText) {
-  stopScanner();
-
-  if (!savedMacchinari[decodedText]) {
-    const nome = prompt("Nome del macchinario:");
-    if (nome) {
-      salvaMacchinario(decodedText, nome);
-    }
-  } else {
-    savedMacchinari[decodedText].expanded = true;
-    renderMacchinari();
-  }
 }
 
 function startScanner() {
@@ -175,27 +180,35 @@ function startScanner() {
 
   html5QrCode = new Html5Qrcode("reader");
 
-  html5QrCode.start(
-    { facingMode: "environment" },
-    { fps: 10, qrbox: { width: 250, height: 250 } },
-    onScanSuccess
-  ).catch(err => {
-    alert("Errore nell'avvio della fotocamera: " + err);
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    reader.classList.add("hidden");
-  });
+  html5QrCode
+    .start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      (decodedText) => {
+        onScanSuccess(decodedText);
+        stopScanner();
+      }
+    )
+    .catch((err) => {
+      alert("Errore fotocamera: " + err);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      reader.classList.add("hidden");
+    });
 }
 
 function stopScanner() {
   if (html5QrCode) {
-    html5QrCode.stop().then(() => {
-      reader.classList.add("hidden");
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    }).catch(err => {
-      console.error("Errore nello stop:", err);
-    });
+    html5QrCode
+      .stop()
+      .then(() => {
+        reader.classList.add("hidden");
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      })
+      .catch((err) => {
+        console.error("Errore stop cam:", err);
+      });
   }
 }
 
