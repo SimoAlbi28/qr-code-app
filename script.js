@@ -42,7 +42,7 @@ function renderMacchinari(highlightId = null) {
           <span class="nota-data">${formatData(nota.data)}</span><br>
           <span class="nota-desc">${nota.desc}</span>
           <div class="btns-note">
-            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+            <button class="btn-blue modifica-btn" data-id="${id}" data-index="${index}">✏️</button>
             <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
           </div>
         `;
@@ -70,6 +70,18 @@ function renderMacchinari(highlightId = null) {
     }
 
     listContainer.appendChild(box);
+  });
+
+  addModificaListeners();
+}
+
+function addModificaListeners() {
+  document.querySelectorAll(".modifica-btn").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute("data-id");
+      const index = Number(btn.getAttribute("data-index"));
+      modificaNota(id, index);
+    };
   });
 }
 
@@ -107,9 +119,19 @@ function eliminaMacchinario(id) {
 function aggiungiNota(id) {
   const data = document.getElementById(`data-${id}`).value;
   const desc = document.getElementById(`desc-${id}`).value.trim();
+
   if (data && desc) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
-    savedMacchinari[id].note.push({ data, desc });
+
+    if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
+      // modifica nota esistente
+      savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
+      delete savedMacchinari[id].modificaIndex;
+    } else {
+      // aggiungi nuova nota
+      savedMacchinari[id].note.push({ data, desc });
+    }
+
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
     renderMacchinari();
   }
@@ -117,37 +139,16 @@ function aggiungiNota(id) {
 
 function modificaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
-  // Metti i dati della nota negli input per modificarli
+  // metti i dati negli input per modificarli
   document.getElementById(`data-${id}`).value = nota.data;
   document.getElementById(`desc-${id}`).value = nota.desc;
 
-  // Salva l'indice della nota da modificare per aggiornarla dopo
+  // salva indice modifica
   savedMacchinari[id].modificaIndex = index;
 
-  // Assicura che i dettagli siano aperti
+  // apri dettagli se chiusi
   savedMacchinari[id].expanded = true;
   renderMacchinari();
-}
-
-function aggiungiNota(id) {
-  const data = document.getElementById(`data-${id}`).value;
-  const desc = document.getElementById(`desc-${id}`).value.trim();
-
-  if (data && desc) {
-    savedMacchinari[id].note = savedMacchinari[id].note || [];
-
-    if (savedMacchinari[id].hasOwnProperty('modificaIndex')) {
-      // Modifica nota esistente
-      savedMacchinari[id].note[savedMacchinari[id].modificaIndex] = { data, desc };
-      delete savedMacchinari[id].modificaIndex;
-    } else {
-      // Aggiungi nuova nota
-      savedMacchinari[id].note.push({ data, desc });
-    }
-
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
 }
 
 function eliminaNota(id, index) {
