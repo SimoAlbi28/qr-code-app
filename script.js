@@ -1,13 +1,9 @@
 const listContainer = document.getElementById("macchinari-list");
 const reader = document.getElementById("reader");
-const startBtn = document.getElementById("start-scan");
-const stopScanBtn = document.getElementById("close-scan-btn");
-const scanStatus = document.getElementById("scan-status");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let expandedId = null;
 let html5QrcodeInstance = null;
-let currentCameraId = null;
 
 function renderMacchinari() {
   listContainer.innerHTML = "";
@@ -145,7 +141,6 @@ function modificaNota(id, index) {
 }
 
 function formatDate(dateStr) {
-  // formato da yyyy-mm-dd a dd/mm/yyyy
   if (!dateStr) return "";
   const parts = dateStr.split("-");
   if (parts.length !== 3) return dateStr;
@@ -158,13 +153,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Scanner QR
-function initScanner() {
-  scanStatus.textContent = "Scansione attiva...";
-  reader.style.display = "block";
-  stopScanBtn.style.display = "inline-block";
-  startBtn.style.display = "none";
-
+function startScanner() {
   if (!html5QrcodeInstance) {
     html5QrcodeInstance = new Html5Qrcode("reader");
   }
@@ -172,68 +161,36 @@ function initScanner() {
   Html5Qrcode.getCameras()
     .then((devices) => {
       if (devices && devices.length) {
-        currentCameraId = devices[devices.length - 1].id; // posteriore sempre
-        return html5QrcodeInstance.start(
-          currentCameraId,
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          onScanSuccess,
-          (err) => {
-            // errore di scansione ignorato
-          }
-        );
+        const cameraId = devices[devices.length - 1].id; // posteriore
+        html5QrcodeInstance
+          .start(
+            cameraId,
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess
+          )
+          .catch((err) => alert("Errore avvio fotocamera: " + err));
       } else {
         alert("Nessuna fotocamera trovata.");
       }
     })
-    .catch((err) => {
-      alert("Errore nell'accesso alla fotocamera: " + err);
-      stopScanner();
-    });
+    .catch((err) => alert("Errore accesso fotocamera: " + err));
 }
 
 function onScanSuccess(decodedText) {
-  html5QrcodeInstance.pause();
-
-  if (!savedMacchinari[decodedText]) {
-    const nome = prompt("Nome del macchinario:");
-    if (nome && nome.trim().length > 0) {
-      salvaMacchinario(decodedText, nome.trim());
-      alert("Macchinario salvato!");
+  html5QrcodeInstance.stop().then(() => {
+    if (!savedMacchinari[decodedText]) {
+      const nome = prompt("Nome del macchinario:");
+      if (nome && nome.trim().length > 0) {
+        salvaMacchinario(decodedText, nome.trim());
+        expandedId = decodedText;
+      }
+    } else {
       expandedId = decodedText;
     }
-  } else {
-    expandedId = decodedText;
-  }
-  renderMacchinari();
-
-  stopScanner();
+    renderMacchinari();
+  });
 }
 
-function stopScanner() {
-  if (html5QrcodeInstance) {
-    html5QrcodeInstance
-      .stop()
-      .then(() => {
-        scanStatus.textContent = "";
-        reader.style.display = "none";
-        stopScanBtn.style.display = "none";
-        startBtn.style.display = "inline-block";
-      })
-      .catch((err) => {
-        alert("Errore nello stop della fotocamera: " + err);
-      });
-  }
-}
-
-// Eventi bottoni
-startBtn.addEventListener("click", () => {
-  initScanner();
-  renderMacchinari();
-});
-
-stopScanBtn.addEventListener("click", () => {
-  stopScanner();
-});
-
-// Render iniziale
+// Avvia scanner subito
+startScanner();
 renderMacchinari();

@@ -3,24 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QR Macchinari</title>
+  <title>🔧 Gestione Macchinari 🔧</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/html5-qrcode" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>🔧 Gestione Macchinari 🔧</h1>
-  <button id="start-scan">📷 Avvia scansione</button>
+  <main>
+    <h1>🔧 Gestione Macchinari 🔧</h1>
+    <div id="reader"></div>
+    <p id="scan-status">Scanner attivo, inquadra un QR code</p>
 
-  <div id="camera-selection" class="hidden">
-    <label for="camera-select">Scegli fotocamera:</label>
-    <select id="camera-select"></select>
-  </div>
-
-  <div id="reader" class="hidden"></div>
-  <div id="scan-status"></div>
-
-  <h2>📋 Macchinari</h2>
-  <div id="macchinari-list"></div>
+    <h2>📋 Macchinari</h2>
+    <div id="macchinari-list"></div>
+  </main>
 </body>
 </html>
