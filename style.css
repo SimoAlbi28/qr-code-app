@@ -105,37 +105,33 @@ button {
 }
 
 .macchinario {
-  position: relative;
   margin: 10px auto;
   max-width: 400px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 12px 12px 50px 12px; /* spazio in basso per bottoni */
+  padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
 }
 
 .macchinario h3 {
-  margin: 0 0 10px;
+  margin: 0 0 15px;
   font-size: 18px;
   font-weight: 700;
-  color: cyan;
+  color: black;             /* scritta nera */
+  background-color: cyan;   /* sfondo ciano */
+  padding: 8px 0;
+  border-radius: 6px;
   text-transform: uppercase;
   text-align: center;
 }
 
 .nome-e-btn {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
   gap: 15px;
   align-items: center;
+  margin-top: 25px; /* sposta bottoni più in basso */
   justify-content: center;
-  display: flex;
-  flex-wrap: nowrap;
-  width: calc(100% - 24px);
 }
 
 .toggle-btn {
