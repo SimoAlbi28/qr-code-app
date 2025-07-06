@@ -171,13 +171,15 @@ button {
   font-weight: bold;
   padding: 3px 8px;
   border-radius: 6px;
-  display: inline-block;
-  margin-bottom: 6px;
+  display: block;
+  margin-bottom: 8px;
 }
 
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
+  display: block;
+  margin-bottom: 25px;
 }
 
 .btns-note {
@@ -197,7 +199,7 @@ button {
 .note-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   max-width: 350px;
   margin: 0 auto 10px;
   text-align: left;
@@ -206,6 +208,7 @@ button {
 .note-form label {
   font-weight: 600;
   margin-bottom: 4px;
+  display: block;
 }
 
 .note-form input[type="date"] {
@@ -215,6 +218,7 @@ button {
   font-size: 16px;
   width: 150px;
   box-sizing: border-box;
+  margin-bottom: 0;
 }
 
 .note-form input[type="text"] {
@@ -224,6 +228,7 @@ button {
   font-size: 16px;
   width: 100%;
   box-sizing: border-box;
+  margin-top: 0;
 }
 
 .btns-macchinario {
