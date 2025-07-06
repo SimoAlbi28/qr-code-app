@@ -92,6 +92,15 @@ button {
   background-color: #2980b9;
 }
 
+.btn-orange {
+  background-color: orange;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: darkorange;
+}
+
 #reader {
   width: 100%;
   max-width: 350px;
@@ -207,7 +216,15 @@ button {
   margin-bottom: 4px;
 }
 
-.note-form input[type="date"],
+.note-form input[type="date"] {
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .note-form input[type="text"] {
   padding: 8px;
   border-radius: 6px;
