@@ -96,14 +96,6 @@ button {
   width: 100%;
   max-width: 350px;
   margin: 0 auto 30px;
-  aspect-ratio: 1 / 1; /* quadrato */
-  border: 2px solid #007bff;
-  border-radius: 10px;
-  display: none;
-}
-
-#reader.visible {
-  display: block;
 }
 
 #macchinari-list {
@@ -130,20 +122,20 @@ button {
   color: cyan;
   text-transform: uppercase;
   text-align: center;
-  background-color: #00bcd4;
-  padding: 5px 10px;
-  border-radius: 6px;
-  user-select: none;
+  background-color: black;
+  padding: 5px 0;
+  border-radius: 5px;
 }
 
 .nome-e-btn {
   gap: 15px;
   align-items: center;
+  justify-content: center;
 }
 
 .toggle-btn {
-  font-size: 16px;
-  padding: 4px 8px;
+  font-size: 14px;
+  padding: 6px 12px;
   cursor: pointer;
   border: none;
   background: #007bff;
@@ -172,7 +164,6 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
 .nota-data {
@@ -182,12 +173,11 @@ button {
   border-radius: 6px;
   display: inline-block;
   margin-bottom: 6px;
-  text-align: left;
 }
 
 .nota-desc {
   margin-top: 6px;
-  text-align: left;
+  white-space: pre-wrap;
 }
 
 .btns-note {
@@ -229,57 +219,18 @@ button {
 }
 
 .btns-macchinario {
-  display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
   margin-top: 12px;
-  flex-wrap: nowrap;
 }
 
 .btns-macchinario button {
-  flex: 1;
-  min-width: 90px;
-  max-width: 90px;
-  padding: 6px 0;
-  font-size: 13px;
-  border-radius: 6px;
-  cursor: pointer;
-  user-select: none;
+  padding: 8px 14px;
+  font-size: 15px;
+  border-radius: 7px;
 }
 
-/* Pulsanti chiudi, rinomina, elimina su stessa riga in basso */
-.macchinario-details-btns {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.macchinario-details-btns button {
-  padding: 6px 10px;
-  font-size: 13px;
-  border-radius: 6px;
-  flex: 1;
-  max-width: 100px;
-}
-
-/* Pulsanti aggiungi e annulla dentro il form note */
-.note-form .form-btns {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.note-form .form-btns button {
-  padding: 6px 12px;
-  font-size: 13px;
-  border-radius: 6px;
-  flex: 1;
-  max-width: 120px;
-}
-
-/* Responsive telefoni */
+/* Responsive per telefoni */
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;

@@ -3,314 +3,222 @@ const readerContainer = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
-let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-let currentStream = null;
 let html5QrScanner = null;
-let expandedMacchinarioId = null;
-let editingNote = null;
+let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
+let notaInModifica = null;
 
-// Start camera with real back camera
+function renderMacchinari(highlightId = null) {
+  listContainer.innerHTML = "";
+
+  Object.entries(savedMacchinari)
+    .sort((a, b) => a[1].nome.localeCompare(b[1].nome))
+    .forEach(([id, data]) => {
+      const expanded = id === highlightId;
+      const macchinarioDiv = document.createElement("div");
+      macchinarioDiv.className = "macchinario";
+
+      const nomeHtml = `<h3 style="background: cyan; color: black; padding: 6px; border-radius: 6px;">${data.nome.toUpperCase()}</h3>`;
+
+      let detailsHtml = "";
+      if (expanded) {
+        let noteHtml = "";
+        const noteOrdinate = [...(data.note || [])].sort((a, b) => b.data.localeCompare(a.data));
+        if (noteOrdinate.length > 0) {
+          noteHtml += `<ul class="note-list">`;
+          noteOrdinate.forEach((nota, idx) => {
+            noteHtml += `
+              <li>
+                <div class="nota-data">${formatDate(nota.data)}</div>
+                <div class="nota-desc">${escapeHtml(nota.desc)}</div>
+                <div class="btns-note">
+                  <button class="btn-blue" onclick="modificaNota('${id}', ${idx})">Modifica</button>
+                  <button class="btn-red" onclick="eliminaNota('${id}', ${idx})">Elimina</button>
+                </div>
+              </li>`;
+          });
+          noteHtml += `</ul>`;
+        } else {
+          noteHtml = `<p>Nessuna nota presente.</p>`;
+        }
+
+        detailsHtml = `
+          ${noteHtml}
+          ${renderFormNota(id)}
+          <div class="btns-macchinario">
+            <button class="toggle-btn" onclick="chiudiMacchinario()">Chiudi Dettagli</button>
+            <button class="btn-blue" onclick="rinominaMacchinario('${id}')">Rinomina</button>
+            <button class="btn-red" onclick="eliminaMacchinario('${id}')">Elimina</button>
+          </div>`;
+      } else {
+        detailsHtml = `
+          <div class="btns-macchinario">
+            <button class="toggle-btn" onclick="espandiMacchinario('${id}')">Mostra Dettagli</button>
+          </div>`;
+      }
+
+      macchinarioDiv.innerHTML = nomeHtml + detailsHtml;
+      listContainer.appendChild(macchinarioDiv);
+    });
+}
+
+function renderFormNota(id) {
+  return `
+    <form class="note-form" onsubmit="return salvaNota(event, '${id}')">
+      <label for="data-nota">Data:</label>
+      <input type="date" id="data-nota" name="data-nota" max="${getTodayDate()}" required>
+      <label for="desc-nota">Descrizione (max 100 caratteri):</label>
+      <input type="text" id="desc-nota" name="desc-nota" maxlength="100" required>
+      <div class="btns-macchinario">
+        <button type="submit" class="btn-green">Aggiungi Nota</button>
+        <button type="button" class="btn-red" onclick="annullaNota()">Annulla</button>
+      </div>
+    </form>`;
+}
+
+function getTodayDate() {
+  const d = new Date();
+  return d.toISOString().split("T")[0];
+}
+
+function formatDate(iso) {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function escapeHtml(txt) {
+  return txt.replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;',
+    '"': '&quot;', "'": '&#39;'
+  })[m]);
+}
+
+function salvaNota(e, id) {
+  e.preventDefault();
+  const form = e.target;
+  const data = form["data-nota"].value;
+  const desc = form["desc-nota"].value.trim();
+
+  if (!data || desc.length > 100) return alert("Controlla i campi!");
+
+  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
+
+  if (notaInModifica) {
+    savedMacchinari[notaInModifica.id].note[notaInModifica.index] = { data, desc };
+    notaInModifica = null;
+  } else {
+    savedMacchinari[id].note.push({ data, desc });
+  }
+
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari(id);
+  form.reset();
+  return false;
+}
+
+function modificaNota(id, index) {
+  notaInModifica = { id, index };
+  renderMacchinari(id);
+  setTimeout(() => {
+    const nota = savedMacchinari[id].note[index];
+    const form = document.querySelector(".note-form");
+    form["data-nota"].value = nota.data;
+    form["desc-nota"].value = nota.desc;
+    form.querySelector("button[type=submit]").textContent = "Salva Modifica";
+  }, 0);
+}
+
+function eliminaNota(id, index) {
+  if (!confirm("Eliminare la nota?")) return;
+  savedMacchinari[id].note.splice(index, 1);
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari(id);
+}
+
+function annullaNota() {
+  notaInModifica = null;
+  renderMacchinari();
+}
+
+function rinominaMacchinario(id) {
+  const nuovo = prompt("Nuovo nome:", savedMacchinari[id].nome);
+  if (nuovo) {
+    savedMacchinari[id].nome = nuovo.trim();
+    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+    renderMacchinari(id);
+  }
+}
+
+function eliminaMacchinario(id) {
+  if (!confirm("Eliminare il macchinario?")) return;
+  delete savedMacchinari[id];
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
+}
+
+function espandiMacchinario(id) {
+  renderMacchinari(id);
+}
+
+function chiudiMacchinario() {
+  notaInModifica = null;
+  renderMacchinari();
+}
+
+// Fotocamera
 async function startCamera() {
   try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(d => d.kind === "videoinput");
-    let backCamera = videoDevices.find(d => d.label.toLowerCase().includes("back") || d.label.toLowerCase().includes("rear"));
-    if (!backCamera) backCamera = videoDevices[0];
+    const devices = await Html5Qrcode.getCameras();
+    if (!devices.length) return alert("Nessuna fotocamera trovata");
 
-    if (currentStream) stopCamera();
+    const backCam = devices.find(d => /back|rear/i.test(d.label)) || devices[0];
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: backCamera.deviceId ? { exact: backCamera.deviceId } : undefined }
-    });
-    currentStream = stream;
-    readerContainer.classList.remove("hidden");
+    if (!html5QrScanner) html5QrScanner = new Html5Qrcode("reader");
+
     startBtn.disabled = true;
     stopBtn.disabled = false;
+    readerContainer.classList.remove("hidden");
 
-    html5QrScanner = new Html5Qrcode("reader");
     await html5QrScanner.start(
-      { deviceId: { exact: backCamera.deviceId } },
-      { fps: 10, qrbox: 250 },
-      onScanSuccess,
-      onScanFailure
+      { deviceId: { exact: backCam.id } },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      text => {
+        html5QrScanner.stop().then(() => {
+          readerContainer.classList.add("hidden");
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+
+          if (!savedMacchinari[text]) {
+            const nome = prompt("Nome nuovo macchinario:");
+            if (nome) {
+              savedMacchinari[text] = { nome: nome.trim(), note: [] };
+              localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+              renderMacchinari(text);
+            }
+          } else {
+            alert("Già presente: " + savedMacchinari[text].nome);
+            renderMacchinari(text);
+          }
+        });
+      },
+      err => {} // ignora errori
     );
-  } catch (e) {
-    alert("Errore apertura fotocamera: " + e.message);
+  } catch (err) {
+    alert("Errore fotocamera: " + err.message);
     stopCamera();
   }
 }
 
 function stopCamera() {
   if (html5QrScanner) {
-    html5QrScanner.stop().catch(() => { });
-    html5QrScanner.clear();
-    html5QrScanner = null;
-  }
-  if (currentStream) {
-    currentStream.getTracks().forEach(track => track.stop());
-    currentStream = null;
-  }
-  readerContainer.classList.add("hidden");
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-}
-
-// Callback scan success
-function onScanSuccess(qrCodeMessage) {
-  stopCamera();
-  if (!savedMacchinari[qrCodeMessage]) {
-    const nome = prompt("Inserisci il nome del macchinario:");
-    if (nome && nome.trim() !== "") {
-      salvaMacchinario(qrCodeMessage, nome.trim(), []);
-      renderMacchinari(qrCodeMessage);
-    }
-  } else {
-    renderMacchinari(qrCodeMessage);
+    html5QrScanner.stop().then(() => {
+      readerContainer.classList.add("hidden");
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
   }
 }
 
-function onScanFailure(error) {
-  // puoi ignorare o loggare l'errore
-  // console.warn(`Scan failed: ${error}`);
-}
+startBtn.onclick = startCamera;
+stopBtn.onclick = stopCamera;
 
-// Salva/aggiorna macchinario
-function salvaMacchinario(id, nome, note) {
-  savedMacchinari[id] = { nome, note };
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
-}
-
-// Elimina macchinario
-function eliminaMacchinario(id) {
-  if (confirm("Eliminare il macchinario?")) {
-    delete savedMacchinari[id];
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
-}
-
-// Rinominare macchinario
-function rinominaMacchinario(id) {
-  const nuovoNome = prompt("Nuovo nome del macchinario:", savedMacchinari[id].nome);
-  if (nuovoNome && nuovoNome.trim() !== "") {
-    savedMacchinari[id].nome = nuovoNome.trim();
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(id);
-  }
-}
-
-// Espandi/chiudi macchinario
-function toggleMacchinario(id) {
-  expandedMacchinarioId = expandedMacchinarioId === id ? null : id;
-  editingNote = null;
-  renderMacchinari(expandedMacchinarioId);
-}
-
-// Render macchinari e note
-function renderMacchinari(highlightId = null) {
-  listContainer.innerHTML = "";
-
-  // Ordina per nome
-  const entriesOrdinate = Object.entries(savedMacchinari).sort((a, b) => a[1].nome.localeCompare(b[1].nome));
-
-  entriesOrdinate.forEach(([id, data]) => {
-    const isExpanded = id === highlightId;
-
-    const macchinarioDiv = document.createElement("div");
-    macchinarioDiv.className = "macchinario";
-
-    // Titolo macchinario
-    const nomeH3 = document.createElement("h3");
-    nomeH3.textContent = data.nome.toUpperCase();
-    macchinarioDiv.appendChild(nomeH3);
-
-    // Pulsanti chiudi, rinomina, elimina (solo se espanso)
-    if (isExpanded) {
-      // Note
-      const noteList = document.createElement("ul");
-      noteList.className = "note-list";
-
-      // Ordina note per data discendente
-      const sortedNotes = data.note.slice().sort((a, b) => b.data.localeCompare(a.data));
-
-      sortedNotes.forEach((nota, idx) => {
-        const li = document.createElement("li");
-
-        const dataSpan = document.createElement("div");
-        dataSpan.className = "nota-data";
-        dataSpan.textContent = formatDate(nota.data);
-        li.appendChild(dataSpan);
-
-        const descSpan = document.createElement("div");
-        descSpan.className = "nota-desc";
-        descSpan.textContent = nota.desc;
-        li.appendChild(descSpan);
-
-        const btnsNote = document.createElement("div");
-        btnsNote.className = "btns-note";
-
-        // Modifica nota
-        const modBtn = document.createElement("button");
-        modBtn.textContent = "✏️";
-        modBtn.className = "btn-blue";
-        modBtn.onclick = () => modificaNota(id, idx);
-        btnsNote.appendChild(modBtn);
-
-        // Elimina nota
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "🗑️";
-        delBtn.className = "btn-red";
-        delBtn.onclick = () => eliminaNota(id, idx);
-        btnsNote.appendChild(delBtn);
-
-        li.appendChild(btnsNote);
-        noteList.appendChild(li);
-      });
-
-      macchinarioDiv.appendChild(noteList);
-
-      // Form aggiungi/modifica nota
-      const noteForm = document.createElement("form");
-      noteForm.className = "note-form";
-
-      const labelData = document.createElement("label");
-      labelData.textContent = "Data (gg/mm/aaaa)";
-      noteForm.appendChild(labelData);
-
-      const inputData = document.createElement("input");
-      inputData.type = "date";
-      inputData.id = "input-data";
-      inputData.required = true;
-      noteForm.appendChild(inputData);
-
-      const labelDesc = document.createElement("label");
-      labelDesc.textContent = "Descrizione (max 100 caratteri)";
-      noteForm.appendChild(labelDesc);
-
-      const inputDesc = document.createElement("input");
-      inputDesc.type = "text";
-      inputDesc.id = "input-desc";
-      inputDesc.maxLength = 100;
-      inputDesc.required = true;
-      noteForm.appendChild(inputDesc);
-
-      // Pulsanti aggiungi/annulla
-      const btnsNoteForm = document.createElement("div");
-      btnsNoteForm.className = "btns-note";
-
-      const addNoteBtn = document.createElement("button");
-      addNoteBtn.type = "submit";
-      addNoteBtn.textContent = editingNote !== null ? "Salva" : "Aggiungi";
-      addNoteBtn.className = "btn-green";
-      btnsNoteForm.appendChild(addNoteBtn);
-
-      const cancelNoteBtn = document.createElement("button");
-      cancelNoteBtn.type = "button";
-      cancelNoteBtn.textContent = "Annulla";
-      cancelNoteBtn.className = "btn-red";
-      cancelNoteBtn.onclick = e => {
-        e.preventDefault();
-        editingNote = null;
-        renderMacchinari(id);
-      };
-      btnsNoteForm.appendChild(cancelNoteBtn);
-
-      noteForm.appendChild(btnsNoteForm);
-
-      noteForm.onsubmit = e => {
-        e.preventDefault();
-        const d = inputData.value;
-        const des = inputDesc.value.trim();
-        if (!d || !des) {
-          alert("Compila tutti i campi");
-          return;
-        }
-        if (editingNote !== null) {
-          data.note[editingNote] = { data: d, desc: des };
-          editingNote = null;
-        } else {
-          data.note.push({ data: d, desc: des });
-        }
-        salvaMacchinario(id, data.nome, data.note);
-        renderMacchinari(id);
-      };
-
-      macchinarioDiv.appendChild(noteForm);
-
-      // Pulsanti chiudi, rinomina, elimina macchinario - orizzontali e piccoli
-      const btnsMac = document.createElement("div");
-      btnsMac.className = "btns-macchinario";
-
-      const closeBtn = document.createElement("button");
-      closeBtn.textContent = "Chiudi";
-      closeBtn.className = "btn-red";
-      closeBtn.onclick = () => toggleMacchinario(id);
-      btnsMac.appendChild(closeBtn);
-
-      const renameBtn = document.createElement("button");
-      renameBtn.textContent = "Rinomina";
-      renameBtn.className = "btn-blue";
-      renameBtn.onclick = () => rinominaMacchinario(id);
-      btnsMac.appendChild(renameBtn);
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Elimina";
-      deleteBtn.className = "btn-red";
-      deleteBtn.onclick = () => eliminaMacchinario(id);
-      btnsMac.appendChild(deleteBtn);
-
-      macchinarioDiv.appendChild(btnsMac);
-    } else {
-      // Solo nome e pulsante espandi
-      const toggleBtn = document.createElement("button");
-      toggleBtn.textContent = "Dettagli";
-      toggleBtn.className = "toggle-btn";
-      toggleBtn.onclick = () => toggleMacchinario(id);
-      macchinarioDiv.appendChild(toggleBtn);
-    }
-
-    listContainer.appendChild(macchinarioDiv);
-  });
-}
-
-function modificaNota(idMac, idxNota) {
-  editingNote = idxNota;
-  renderMacchinari(idMac);
-  // Dopo render, setta i valori nel form
-  setTimeout(() => {
-    const mac = savedMacchinari[idMac];
-    if (!mac) return;
-    const nota = mac.note[editingNote];
-    if (!nota) return;
-    const inputData = document.getElementById("input-data");
-    const inputDesc = document.getElementById("input-desc");
-    if (inputData && inputDesc) {
-      inputData.value = nota.data;
-      inputDesc.value = nota.desc;
-      inputDesc.focus();
-    }
-  }, 10);
-}
-
-function eliminaNota(idMac, idxNota) {
-  if (confirm("Eliminare questa nota?")) {
-    savedMacchinari[idMac].note.splice(idxNota, 1);
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(idMac);
-  }
-}
-
-function formatDate(isoDate) {
-  // isoDate è tipo "2025-07-06"
-  if (!isoDate) return "";
-  const parts = isoDate.split("-");
-  if (parts.length !== 3) return isoDate;
-  return `${parts[2]}/${parts[1]}/${parts[0]}`;
-}
-
-// Init
 renderMacchinari();
-
-startBtn.onclick = () => startCamera();
-stopBtn.onclick = () => stopCamera();
