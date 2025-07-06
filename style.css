@@ -213,12 +213,15 @@ button {
   flex-direction: column;
   gap: 12px;
   font-size: 15px;
+  align-items: center;
 }
 
 .note-form label {
   font-weight: 600;
   text-align: left;
   color: #333;
+  width: 100%;
+  max-width: 300px;
 }
 
 .note-form input[type="date"],
@@ -228,6 +231,7 @@ button {
   border: 1.5px solid #ccc;
   font-size: 14px;
   width: 100%;
+  max-width: 300px;
   box-sizing: border-box;
 }
 
