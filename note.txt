@@ -1,0 +1,5 @@
+PROSSIMI AGGIORNAMENTI:
+- Max 300 caratteri (al posto di max 100);
+- Aggiunta torcia con fotocamera attiva;
+- cambio icona app (chiave inglese);
+- campo ricerca macchinario;
