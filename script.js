@@ -7,9 +7,7 @@ const showAllBtn = document.getElementById("show-all-btn");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
-let videoTrack = null;
-let stream = null;
-let torchOn = false;
+
 let searchFilter = "";
 
 function renderMacchinari(highlightId = null) {
@@ -93,14 +91,12 @@ function renderMacchinari(highlightId = null) {
       setTimeout(() => {
         highlightBox.classList.remove("highlight");
       }, 2500);
-      // Scrolla in mezzo allo schermo
       highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
 }
 
 function salvaMacchinario(id, nome) {
-  // Controllo nomi esistenti (case insensitive)
   const nomeUpper = nome.trim().toUpperCase();
   for (const key in savedMacchinari) {
     if (savedMacchinari[key].nome.toUpperCase() === nomeUpper) {
@@ -134,7 +130,6 @@ function toggleDettagli(id) {
 function rinominaMacchinario(id) {
   const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome);
   if (nuovoNome) {
-    // Evita nomi duplicati
     const nomeUpper = nuovoNome.trim().toUpperCase();
     for (const key in savedMacchinari) {
       if (key !== id && savedMacchinari[key].nome.toUpperCase() === nomeUpper) {
@@ -219,7 +214,6 @@ function startScan() {
         const nome = prompt("Nome del macchinario:");
         if (nome) {
           if (!salvaMacchinario(qrCodeMessage, nome)) {
-            // nome duplicato, riapri la scansione (non chiudere)
             startScan();
           }
         }
