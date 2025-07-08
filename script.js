@@ -72,10 +72,11 @@ function renderMacchinari(highlightId = null) {
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
         <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
-          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
-          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
-          <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
+          <button class="btn-blue btn-small" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+          <button id="btn-chiudi" class="btn-red btn-small" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+          <button class="btn-red btn-small" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
+
       `;
 
       box.appendChild(noteList);

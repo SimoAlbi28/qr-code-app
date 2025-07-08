@@ -289,3 +289,10 @@ button {
     max-width: 100%;
   }
 }
+
+.btn-small {
+  padding: 4px 7px;
+  font-size: 12px;
+  min-width: auto;
+  max-width: none;
+}
