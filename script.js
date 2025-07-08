@@ -246,5 +246,9 @@ showAllBtn.addEventListener("click", () => {
   renderMacchinari();
 });
 
-// Iniziale
+// All'avvio, chiudi tutti i macchinari
+Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
+localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+
 renderMacchinari();
+
