@@ -7,21 +7,28 @@ const showAllBtn = document.getElementById("show-all-btn");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
+let videoTrack = null;
+let stream = null;
+let torchOn = false;
+let searchFilter = "";
 
-function renderMacchinari(highlightId = null, filter = "") {
+function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
-  const sorted = Object.entries(savedMacchinari)
-    .filter(([id, data]) => data.nome.toLowerCase().startsWith(filter.toLowerCase()))
-    .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+  const filtered = Object.entries(savedMacchinari).filter(([id, data]) =>
+    data.nome.toLowerCase().startsWith(searchFilter.toLowerCase())
+  );
+
+  const sorted = filtered.sort((a, b) =>
+    a[1].nome.localeCompare(b[1].nome)
+  );
 
   sorted.forEach(([id, data]) => {
     const expanded = data.expanded;
 
     const box = document.createElement("div");
     box.className = "macchinario";
-    box.setAttribute("data-id", id);
-
+    box.setAttribute('data-id', id);
     box.innerHTML = `
       <h3>${data.nome}</h3>
       <div class="nome-e-btn">
@@ -36,20 +43,20 @@ function renderMacchinari(highlightId = null, filter = "") {
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
-      const notesSorted = (data.note || []).sort((a, b) => b.data.localeCompare(a.data));
+      const notesSorted = (data.note || []).sort((a, b) =>
+        b.data.localeCompare(a.data)
+      );
 
       notesSorted.forEach((nota, index) => {
         const li = document.createElement("li");
-
         li.innerHTML = `
-          <span class="nota-data">${formatData(nota.data)}</span>
+          <span class="nota-data">${formatData(nota.data)}</span><br>
           <span class="nota-desc">${nota.desc}</span>
           <div class="btns-note">
-            <button class="btn-blue btn-modifica-nota" onclick="modificaNota('${id}', ${index})">✏️</button>
-            <button class="btn-red btn-elimina-nota" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
           </div>
         `;
-
         noteList.appendChild(li);
       });
 
@@ -64,10 +71,10 @@ function renderMacchinari(highlightId = null, filter = "") {
         <div style="text-align:center; margin-top:10px;">
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
-        <div class="btns-macchinario">
-          <button class="btn-blue btn-rinomina-macchinario" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+        <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
+          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
           <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
-          <button class="btn-red btn-elimina-macchinario" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
+          <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
       `;
 
@@ -93,58 +100,60 @@ function renderMacchinari(highlightId = null, filter = "") {
 }
 
 function salvaMacchinario(id, nome) {
-  if (!nome.trim()) return false;
-
-  // controllo duplicati ignorando maiuscole/minuscole
+  // Controllo nomi esistenti (case insensitive)
   const nomeUpper = nome.trim().toUpperCase();
-  const esiste = Object.values(savedMacchinari).some(m => m.nome.toUpperCase() === nomeUpper);
-
-  if (esiste) {
-    alert("Nome già esistente, inserisci un nome diverso.");
-    // lascia aperto il form con campi svuotati
-    const dataInput = document.getElementById(`data-${id}`);
-    const descInput = document.getElementById(`desc-${id}`);
-    if (dataInput) dataInput.value = "";
-    if (descInput) descInput.value = "";
-    return false;
+  for (const key in savedMacchinari) {
+    if (savedMacchinari[key].nome.toUpperCase() === nomeUpper) {
+      alert("Nome già esistente, inseriscine un altro.");
+      if (!savedMacchinari[id]) {
+        savedMacchinari[id] = { nome: "", note: [], expanded: true };
+      } else {
+        savedMacchinari[id].expanded = true;
+      }
+      renderMacchinari(id);
+      return false;
+    }
   }
 
   if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: true };
+    savedMacchinari[id] = { nome, note: [], expanded: false };
   } else {
     savedMacchinari[id].nome = nome;
-    savedMacchinari[id].expanded = true;
   }
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(id, searchInput.value);
+  renderMacchinari(id);
   return true;
 }
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(null, searchInput.value);
+  renderMacchinari();
 }
 
 function rinominaMacchinario(id) {
   const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome);
   if (nuovoNome) {
+    // Evita nomi duplicati
     const nomeUpper = nuovoNome.trim().toUpperCase();
-    const esiste = Object.values(savedMacchinari).some((m, i) => m.nome.toUpperCase() === nomeUpper && i !== id);
-    if (esiste) {
-      alert("Nome già esistente, inserisci un nome diverso.");
-      return;
+    for (const key in savedMacchinari) {
+      if (key !== id && savedMacchinari[key].nome.toUpperCase() === nomeUpper) {
+        alert("Nome già esistente, scegli un altro.");
+        savedMacchinari[id].expanded = true;
+        renderMacchinari(id);
+        return;
+      }
     }
     savedMacchinari[id].nome = nuovoNome;
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(id, searchInput.value);
+    renderMacchinari(id);
   }
 }
 
 function eliminaMacchinario(id) {
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(null, searchInput.value);
+  renderMacchinari();
 }
 
 function aggiungiNota(id) {
@@ -154,7 +163,7 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari(id, searchInput.value);
+    renderMacchinari(id);
   }
 }
 
@@ -163,7 +172,10 @@ function modificaNota(id, index) {
   const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
 
-  if (dataInput.value === nota.data && descInput.value === nota.desc) {
+  if (
+    dataInput.value === nota.data &&
+    descInput.value === nota.desc
+  ) {
     dataInput.value = "";
     descInput.value = "";
   } else {
@@ -175,7 +187,7 @@ function modificaNota(id, index) {
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(null, searchInput.value);
+  renderMacchinari();
 }
 
 function formatData(d) {
@@ -191,43 +203,36 @@ function startScan() {
 
   html5QrCode = new Html5Qrcode("reader");
 
-  html5QrCode
-    .start(
-      { facingMode: { exact: "environment" } },
-      {
-        fps: 10,
-        qrbox: 250,
-      },
-      (qrCodeMessage) => {
-        html5QrCode.stop().then(() => {
-          reader.classList.add("hidden");
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
-        });
-        if (!savedMacchinari[qrCodeMessage]) {
-          const nome = prompt("Nome del macchinario:");
-          if (nome) {
-            const ok = salvaMacchinario(qrCodeMessage, nome);
-            if (!ok) {
-              // Se nome duplicato, riapri prompt finché non correggi o annulli
-              let nuovoNome;
-              do {
-                nuovoNome = prompt("Nome già esistente. Inserisci nome diverso:");
-                if (nuovoNome === null) break;
-              } while (!salvaMacchinario(qrCodeMessage, nuovoNome));
-            }
+  html5QrCode.start(
+    { facingMode: { exact: "environment" } },
+    {
+      fps: 10,
+      qrbox: 250
+    },
+    (qrCodeMessage) => {
+      html5QrCode.stop().then(() => {
+        reader.classList.add("hidden");
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      });
+      if (!savedMacchinari[qrCodeMessage]) {
+        const nome = prompt("Nome del macchinario:");
+        if (nome) {
+          if (!salvaMacchinario(qrCodeMessage, nome)) {
+            // nome duplicato, riapri la scansione (non chiudere)
+            startScan();
           }
-        } else {
-          savedMacchinari[qrCodeMessage].expanded = true;
-          renderMacchinari(qrCodeMessage, searchInput.value);
         }
+      } else {
+        savedMacchinari[qrCodeMessage].expanded = true;
+        renderMacchinari(qrCodeMessage);
       }
-    )
-    .catch((err) => {
-      alert("Errore nell'avvio della fotocamera: " + err);
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    });
+    }
+  ).catch((err) => {
+    alert("Errore nell'avvio della fotocamera: " + err);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+  });
 }
 
 function stopScan() {
@@ -244,10 +249,12 @@ startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
 searchInput.addEventListener("input", () => {
-  renderMacchinari(null, searchInput.value);
+  searchFilter = searchInput.value.trim();
+  renderMacchinari();
 });
 
 showAllBtn.addEventListener("click", () => {
+  searchFilter = "";
   searchInput.value = "";
   renderMacchinari();
 });

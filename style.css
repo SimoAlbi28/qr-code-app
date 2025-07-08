@@ -60,7 +60,6 @@ button {
   font-size: 12px !important;
   min-width: auto !important;
   max-width: none !important;
-  cursor: pointer;
 }
 
 .toggle-btn,
@@ -82,45 +81,34 @@ button {
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
-  align-items: center;
 }
 
-/* Rinomina, Chiudi, Elimina (macchinario) uguali dimensioni */
+/* Pulsanti rinomina, chiudi, elimina macchinario */
 .btns-macchinario button {
   padding: 4px 7px !important;
   font-size: 12px !important;
   min-width: auto !important;
   max-width: none !important;
+  height: 28px;
+  line-height: 20px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-/* Stile bottone elimina macchinario */
-#btn-chiudi,
-.btns-macchinario button.btn-elimina-macchinario,
-.btns-macchinario button.btn-rinomina-macchinario {
-  background-color: #e74c3c;
+#btn-chiudi {
+  background-color: rgb(255, 102, 0);
   color: white;
 }
 
-#btn-chiudi:hover,
-.btns-macchinario button.btn-elimina-macchinario:hover,
-.btns-macchinario button.btn-rinomina-macchinario:hover {
-  background-color: #c0392b;
-}
-
-/* Bottone rinomina con background rosso come elimina */
-.btns-macchinario button.btn-rinomina-macchinario {
-  background-color: #3498db; /* Blue like modifica */
-  color: white;
-}
-
-/* Bottone modifica nota e elimina nota stessi stili */
-.btns-note button.btn-modifica-nota,
-.btns-note button.btn-elimina-nota {
+/* Pulsanti modifica, elimina note */
+.btns-note button {
   padding: 4px 7px !important;
   font-size: 12px !important;
   min-width: auto !important;
   max-width: none !important;
+  height: 28px;
+  line-height: 20px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -239,9 +227,6 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .nota-data {
@@ -256,14 +241,6 @@ button {
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
-  flex-grow: 1;
-  margin-left: 10px;
-}
-
-.btns-note {
-  gap: 6px;
-  display: flex;
-  flex-shrink: 0;
 }
 
 .note-form {
@@ -303,7 +280,6 @@ button {
   justify-content: center;
   gap: 10px;
   margin-top: 8px;
-  align-items: center;
 }
 
 #search-box {
@@ -316,7 +292,7 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   box-sizing: border-box;
 }
 
@@ -328,6 +304,8 @@ button {
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 #search-input:focus {
@@ -335,10 +313,20 @@ button {
 }
 
 #show-all-btn {
-  padding: 8px 14px;
+  flex-shrink: 0;
+  padding: 10px 15px;
   font-size: 14px;
   border-radius: 8px;
+  border: none;
+  background-color: #007bff;
+  color: white;
   cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+#show-all-btn:hover {
+  background-color: #0056b3;
 }
 
 @media (max-width: 400px) {
@@ -361,6 +349,11 @@ button {
   }
   #search-box {
     max-width: 100%;
-    padding: 10px 12px;
+    padding: 12px;
+    margin: 15px auto 10px;
+  }
+  #show-all-btn {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }
