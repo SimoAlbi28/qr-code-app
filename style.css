@@ -13,10 +13,13 @@ body {
 }
 
 #tit1 {
-  display: flex;
   color: white;
   background-color: black;
-  border-radius: solid cyan 5px;
+  border-radius: 5px;
+  padding: 10px 0;
+  width: 100%;
+  max-width: 480px;
+  user-select: none;
 }
 
 h2 {
@@ -51,7 +54,6 @@ button {
   transition: background-color 0.3s ease;
 }
 
-/* Pulsanti piccoli uniformi nel riquadro */
 .macchinario .btns-macchinario button,
 .macchinario .btns-note button {
   padding: 4px 7px !important;
@@ -270,6 +272,30 @@ button {
   margin-top: 8px;
 }
 
+#search-box {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto 10px;
+  background: white;
+  padding: 12px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+#search-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 10px 15px;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#search-input:focus {
+  border-color: #0056b3;
+}
+
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
@@ -288,11 +314,7 @@ button {
   #reader {
     max-width: 100%;
   }
-}
-
-.btn-small {
-  padding: 4px 7px;
-  font-size: 12px;
-  min-width: auto;
-  max-width: none;
+  #search-box {
+    max-width: 95%;
+  }
 }

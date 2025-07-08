@@ -3,12 +3,11 @@ const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
-// Crea dinamicamente il bottone torcia e lo inserisce dopo stopBtn
 const torchBtn = document.createElement("button");
 torchBtn.textContent = "💡 Torcia OFF";
 torchBtn.className = "btn-orange";
 torchBtn.style.marginTop = "50px";
-torchBtn.disabled = true; // parte disabilitato
+torchBtn.disabled = true;
 startBtn.parentNode.insertBefore(torchBtn, stopBtn.nextSibling);
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
@@ -18,12 +17,20 @@ let stream = null;
 let videoTrack = null;
 let torchOn = false;
 
+let filtroRicerca = "";
+
+const searchInput = document.getElementById("search-input");
+searchInput.addEventListener("input", (e) => {
+  filtroRicerca = e.target.value.toLowerCase();
+  renderMacchinari();
+});
+
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
-  const sorted = Object.entries(savedMacchinari).sort((a, b) =>
-    a[1].nome.localeCompare(b[1].nome)
-  );
+  const sorted = Object.entries(savedMacchinari)
+    .filter(([id, data]) => data.nome.toLowerCase().startsWith(filtroRicerca))
+    .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
 
   sorted.forEach(([id, data]) => {
     const expanded = data.expanded;
@@ -76,7 +83,6 @@ function renderMacchinari(highlightId = null) {
           <button id="btn-chiudi" class="btn-red btn-small" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
           <button class="btn-red btn-small" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
-
       `;
 
       box.appendChild(noteList);
@@ -168,82 +174,107 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-function toggleTorch() {
-  if (!videoTrack) return alert("Torcia non disponibile");
-  videoTrack.applyConstraints({ advanced: [{ torch: !torchOn }] })
-    .then(() => {
-      torchOn = !torchOn;
-      torchBtn.textContent = torchOn ? "💡 Torcia ON" : "💡 Torcia OFF";
-    })
-    .catch(() => alert("Impossibile cambiare stato torcia"));
+// --- QR CAM + Torcia ---
+
+function updateTorchBtn() {
+  if (torchOn) {
+    torchBtn.textContent = "💡 Torcia ON";
+  } else {
+    torchBtn.textContent = "💡 Torcia OFF";
+  }
+  torchBtn.disabled = !videoTrack || !videoTrack.getCapabilities().torch;
 }
 
-async function startScan() {
+torchBtn.addEventListener("click", () => {
+  if (!videoTrack) return;
+
+  const cap = videoTrack.getCapabilities();
+  if (!cap.torch) {
+    alert("Torcia non supportata su questo dispositivo");
+    return;
+  }
+
+  torchOn = !torchOn;
+  videoTrack.applyConstraints({
+    advanced: [{ torch: torchOn }]
+  }).then(() => {
+    updateTorchBtn();
+  }).catch(() => {
+    alert("Errore nell'attivazione della torcia");
+  });
+});
+
+function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
   stopBtn.disabled = false;
   torchBtn.disabled = true;
   torchOn = false;
-  torchBtn.textContent = "💡 Torcia OFF";
+  updateTorchBtn();
 
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { exact: "environment" } }
+  html5QrCode = new Html5Qrcode("reader");
+
+  html5QrCode.start(
+    { facingMode: { exact: "environment" } },
+    {
+      fps: 10,
+      qrbox: 250
+    },
+    (qrCodeMessage) => {
+      html5QrCode.stop().then(() => {
+        reader.classList.add("hidden");
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        torchBtn.disabled = true;
+        torchOn = false;
+        updateTorchBtn();
+      });
+      if (!savedMacchinari[qrCodeMessage]) {
+        const nome = prompt("Nome del macchinario:");
+        if (nome) {
+          salvaMacchinario(qrCodeMessage, nome);
+          savedMacchinari[qrCodeMessage].expanded = true;
+          renderMacchinari(qrCodeMessage);
+        }
+      } else {
+        savedMacchinari[qrCodeMessage].expanded = true;
+        renderMacchinari(qrCodeMessage);
+      }
+    }
+  ).then(() => {
+    // Ottieni stream e videoTrack per torcia
+    html5QrCode.getState().then(state => {
+      if (state?.stream) {
+        stream = state.stream;
+        videoTrack = stream.getVideoTracks()[0];
+        updateTorchBtn();
+      }
+    }).catch(() => {
+      // fallback no stream
+      torchBtn.disabled = true;
     });
-
-    videoTrack = stream.getVideoTracks()[0];
-    const capabilities = videoTrack.getCapabilities();
-    torchBtn.disabled = !capabilities.torch;
-
-    html5QrCode = new Html5Qrcode("reader");
-    await html5QrCode.start(stream, { fps: 10, qrbox: 250 }, onScanSuccess);
-
-  } catch (err) {
+  }).catch((err) => {
     alert("Errore nell'avvio della fotocamera: " + err);
     startBtn.disabled = false;
     stopBtn.disabled = true;
     torchBtn.disabled = true;
-  }
+  });
 }
 
-async function stopScan() {
-  if (html5QrCode) await html5QrCode.stop();
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-  }
-  reader.classList.add("hidden");
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-  torchBtn.disabled = true;
-  torchOn = false;
-  torchBtn.textContent = "💡 Torcia OFF";
-}
-
-function onScanSuccess(qrCodeMessage) {
-  html5QrCode.stop();
-  stream.getTracks().forEach(track => track.stop());
-  reader.classList.add("hidden");
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-  torchBtn.disabled = true;
-  torchOn = false;
-  torchBtn.textContent = "💡 Torcia OFF";
-
-  if (!savedMacchinari[qrCodeMessage]) {
-    const nome = prompt("Nome del macchinario:");
-    if (nome) {
-      salvaMacchinario(qrCodeMessage, nome);
-      savedMacchinari[qrCodeMessage].expanded = true;
-      renderMacchinari(qrCodeMessage);
-    }
-  } else {
-    savedMacchinari[qrCodeMessage].expanded = true;
-    renderMacchinari(qrCodeMessage);
+function stopScan() {
+  if (html5QrCode) {
+    html5QrCode.stop().then(() => {
+      reader.classList.add("hidden");
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      torchBtn.disabled = true;
+      torchOn = false;
+      updateTorchBtn();
+    });
   }
 }
 
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
-torchBtn.addEventListener("click", toggleTorch);
 
 renderMacchinari();
