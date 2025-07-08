@@ -7,25 +7,29 @@ const searchInput = document.getElementById("search-input");
 const resetSearchBtn = document.getElementById("reset-search");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-let html5QrCode;
-let videoTrack;
-let stream;
 
-// Render macchinari con filtro per ricerca
+let html5QrCode;
+let stream = null;
+let videoTrack = null;
+
 function renderMacchinariFiltered(filter = "") {
   listContainer.innerHTML = "";
-  const lowerFilter = filter.toLowerCase();
 
-  const filtered = Object.entries(savedMacchinari)
-    .filter(([id, data]) => data.nome.toLowerCase().startsWith(lowerFilter))
-    .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+  const filterLower = filter.toLowerCase().trim();
 
-  filtered.forEach(([id, data]) => {
+  const filteredEntries = Object.entries(savedMacchinari).filter(([id, data]) => {
+    if (!filterLower) return true;
+    return data.nome.toLowerCase().startsWith(filterLower);
+  });
+
+  filteredEntries.sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+
+  filteredEntries.forEach(([id, data]) => {
     const expanded = data.expanded;
 
     const box = document.createElement("div");
     box.className = "macchinario";
-    box.setAttribute('data-id', id);
+    box.setAttribute("data-id", id);
     box.innerHTML = `
       <h3>${data.nome}</h3>
       <div class="nome-e-btn">
@@ -36,12 +40,11 @@ function renderMacchinariFiltered(filter = "") {
     `;
 
     if (expanded) {
+      // note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
-      const notesSorted = (data.note || []).sort((a, b) =>
-        b.data.localeCompare(a.data)
-      );
+      const notesSorted = (data.note || []).sort((a, b) => b.data.localeCompare(a.data));
 
       notesSorted.forEach((nota, index) => {
         const li = document.createElement("li");
@@ -56,6 +59,7 @@ function renderMacchinariFiltered(filter = "") {
         noteList.appendChild(li);
       });
 
+      // form note con nuovo layout bottoni
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -79,9 +83,20 @@ function renderMacchinariFiltered(filter = "") {
 
     listContainer.appendChild(box);
   });
+
+  // Highlight se richiesto
+  if (filter && filteredEntries.length === 1) {
+    const highlightBox = document.querySelector(`.macchinario[data-id="${filteredEntries[0][0]}"]`);
+    if (highlightBox) {
+      highlightBox.classList.add("highlight");
+      setTimeout(() => {
+        highlightBox.classList.remove("highlight");
+      }, 2500);
+      highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
 }
 
-// Salva o aggiorna macchinario
 function salvaMacchinario(id, nome) {
   if (!savedMacchinari[id]) {
     savedMacchinari[id] = { nome, note: [], expanded: false };
@@ -89,14 +104,13 @@ function salvaMacchinario(id, nome) {
     savedMacchinari[id].nome = nome;
   }
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered(""); // FORZA senza filtro per mostrare tutti dopo il salvataggio
+  renderMacchinariFiltered(""); // mostra tutti dopo salvataggio
 }
-
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered();
+  renderMacchinariFiltered(searchInput.value);
 }
 
 function rinominaMacchinario(id) {
@@ -104,14 +118,14 @@ function rinominaMacchinario(id) {
   if (nuovoNome) {
     savedMacchinari[id].nome = nuovoNome;
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinariFiltered();
+    renderMacchinariFiltered(searchInput.value);
   }
 }
 
 function eliminaMacchinario(id) {
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered();
+  renderMacchinariFiltered(searchInput.value);
 }
 
 function aggiungiNota(id) {
@@ -121,7 +135,7 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinariFiltered();
+    renderMacchinariFiltered(searchInput.value);
   }
 }
 
@@ -130,10 +144,7 @@ function modificaNota(id, index) {
   const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
 
-  if (
-    dataInput.value === nota.data &&
-    descInput.value === nota.desc
-  ) {
+  if (dataInput.value === nota.data && descInput.value === nota.desc) {
     dataInput.value = "";
     descInput.value = "";
   } else {
@@ -145,7 +156,7 @@ function modificaNota(id, index) {
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered();
+  renderMacchinariFiltered(searchInput.value);
 }
 
 function formatData(d) {
@@ -153,30 +164,7 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// --- QR CAM + TORCIA ---
-
-function updateTorchBtn() {
-  if (!videoTrack) return;
-
-  if ("torch" in videoTrack.getCapabilities()) {
-    torchBtn.style.display = "inline-block";
-    torchBtn.textContent = videoTrack.getSettings().torch ? "💡 Torcia ON" : "💡 Torcia OFF";
-  } else {
-    torchBtn.style.display = "none";
-  }
-}
-
-async function toggleTorch() {
-  if (!videoTrack) return;
-  const currentTorch = videoTrack.getSettings().torch || false;
-  try {
-    await videoTrack.applyConstraints({ advanced: [{ torch: !currentTorch }] });
-    updateTorchBtn();
-  } catch {
-    alert("Torcia non supportata o errore nell'attivazione.");
-  }
-}
-
+// QR CAM + TORCIA
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -186,35 +174,31 @@ function startScan() {
 
   html5QrCode.start(
     { facingMode: { exact: "environment" } },
-    { fps: 10, qrbox: 250 },
+    {
+      fps: 10,
+      qrbox: 250
+    },
     (qrCodeMessage) => {
       html5QrCode.stop().then(() => {
         reader.classList.add("hidden");
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        torchBtn.style.display = "none";
+        removeTorchBtn(); // togli torcia alla fine
       });
       if (!savedMacchinari[qrCodeMessage]) {
         const nome = prompt("Nome del macchinario:");
         if (nome) {
           salvaMacchinario(qrCodeMessage, nome);
           savedMacchinari[qrCodeMessage].expanded = true;
-          renderMacchinariFiltered(qrCodeMessage);
+          renderMacchinariFiltered(""); 
         }
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinariFiltered(qrCodeMessage);
+        renderMacchinariFiltered("");
       }
     }
   ).then(() => {
-    // Dopo partenza
-    html5QrCode.getState().then(state => {
-      if (state?.stream) {
-        stream = state.stream;
-        videoTrack = stream.getVideoTracks()[0];
-        updateTorchBtn();
-      }
-    });
+    setupTorchControl();
   }).catch((err) => {
     alert("Errore nell'avvio della fotocamera: " + err);
     startBtn.disabled = false;
@@ -228,22 +212,70 @@ function stopScan() {
       reader.classList.add("hidden");
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      torchBtn.style.display = "none";
+      removeTorchBtn();
     });
   }
 }
 
-// BOTTONI TORCIA
-const torchBtn = document.createElement("button");
-torchBtn.textContent = "💡 Torcia OFF";
-torchBtn.className = "btn-orange";
-torchBtn.style.margin = "10px auto";
-torchBtn.style.display = "none";
-torchBtn.style.minWidth = "110px";
-torchBtn.addEventListener("click", toggleTorch);
-document.body.insertBefore(torchBtn, document.getElementById("reader"));
+// TORCH BUTTON & CONTROL
+let torchBtn = null;
+let torchOn = false;
 
-// Eventi
+function setupTorchControl() {
+  if (!html5QrCode) return;
+
+  const videoElem = document.querySelector("#reader video");
+  if (!videoElem) return;
+
+  stream = videoElem.srcObject;
+  if (!stream) return;
+
+  videoTrack = stream.getVideoTracks()[0];
+  if (!videoTrack || !videoTrack.getCapabilities) return;
+
+  const capabilities = videoTrack.getCapabilities();
+  if (!capabilities.torch) return; // Torcia non supportata
+
+  addTorchBtn();
+}
+
+function addTorchBtn() {
+  if (torchBtn) return; // già presente
+
+  torchBtn = document.createElement("button");
+  torchBtn.textContent = "🔦 Torcia OFF";
+  torchBtn.className = "btn-orange";
+  torchBtn.style.margin = "10px auto";
+  torchBtn.style.display = "block";
+  torchBtn.onclick = toggleTorch;
+
+  reader.appendChild(torchBtn);
+}
+
+function removeTorchBtn() {
+  if (torchBtn) {
+    torchBtn.remove();
+    torchBtn = null;
+    torchOn = false;
+  }
+}
+
+function toggleTorch() {
+  if (!videoTrack) return;
+
+  torchOn = !torchOn;
+  videoTrack.applyConstraints({ advanced: [{ torch: torchOn }] }).then(() => {
+    if (torchBtn) {
+      torchBtn.textContent = torchOn ? "🔦 Torcia ON" : "🔦 Torcia OFF";
+    }
+  }).catch(() => {
+    // Errore applicazione torcia
+    torchOn = false;
+    if (torchBtn) torchBtn.textContent = "🔦 Torcia OFF";
+  });
+}
+
+// EVENTI
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
@@ -253,8 +285,8 @@ searchInput.addEventListener("input", () => {
 
 resetSearchBtn.addEventListener("click", () => {
   searchInput.value = "";
-  renderMacchinariFiltered();
+  renderMacchinariFiltered("");
 });
 
-// Start iniziale
-renderMacchinariFiltered();
+// Avvio render iniziale
+renderMacchinariFiltered("");

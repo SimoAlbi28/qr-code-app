@@ -272,14 +272,35 @@ button {
   margin-top: 8px;
 }
 
+#search-box {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto 10px;
+  background: white;
+  padding: 12px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+#search-label {
+  font-weight: 700;
+  user-select: none;
+  white-space: nowrap;
+}
+
 #search-input {
+  flex-grow: 1;
   font-size: 16px;
-  padding: 8px 12px;
+  padding: 10px 15px;
   border: 2px solid #007bff;
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease;
-  width: 100%;
+  min-width: 0;
 }
 
 #search-input:focus {
@@ -304,7 +325,8 @@ button {
   #reader {
     max-width: 100%;
   }
-  #search-container {
-    max-width: 95%;
+  #search-box {
+    max-width: 100%;
+    padding: 10px;
   }
 }
