@@ -5,9 +5,49 @@ const stopBtn = document.getElementById("stop-scan");
 const searchInput = document.getElementById("search-input");
 const showAllBtn = document.getElementById("show-all-btn");
 
+const nomeModal = document.getElementById("nomeModal");
+const nomeInput = document.getElementById("nomeInput");
+const btnConferma = document.getElementById("btnConferma");
+const btnAnnulla = document.getElementById("btnAnnulla");
+const erroreNome = document.getElementById("erroreNome");
+
 let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
+
+// Funzione per mostrare modal inserimento nome
+function chiediNomeModal(onSuccess, onCancel) {
+  nomeModal.classList.remove("hidden");
+  nomeInput.value = "";
+  erroreNome.style.display = "none";
+  nomeInput.focus();
+
+  function confermaHandler() {
+    const val = nomeInput.value.trim().toUpperCase();
+    if (!val) return;
+    if (Object.values(savedMacchinari).some(m => m.nome === val)) {
+      erroreNome.style.display = "block";
+      nomeInput.focus();
+      return;
+    }
+    cleanup();
+    onSuccess(val);
+  }
+
+  function annullaHandler() {
+    cleanup();
+    if (onCancel) onCancel();
+  }
+
+  function cleanup() {
+    btnConferma.removeEventListener("click", confermaHandler);
+    btnAnnulla.removeEventListener("click", annullaHandler);
+    nomeModal.classList.add("hidden");
+  }
+
+  btnConferma.addEventListener("click", confermaHandler);
+  btnAnnulla.addEventListener("click", annullaHandler);
+}
 
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
@@ -111,21 +151,23 @@ function toggleDettagli(id) {
 }
 
 function rinominaMacchinario(id) {
-  const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome)?.trim().toUpperCase();
-  if (!nuovoNome) return;
+  chiediNomeModal(
+    (nuovoNome) => {
+      const esisteGia = Object.values(savedMacchinari).some(
+        m => m.nome.toUpperCase() === nuovoNome && m !== savedMacchinari[id]
+      );
 
-  const esisteGia = Object.values(savedMacchinari).some(
-    m => m.nome.toUpperCase() === nuovoNome && m !== savedMacchinari[id]
+      if (esisteGia) {
+        alert("⚠️ Nome già esistente.");
+        return;
+      }
+
+      savedMacchinari[id].nome = nuovoNome;
+      localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+      renderMacchinari();
+    },
+    () => {}
   );
-
-  if (esisteGia) {
-    alert("⚠️ Nome già esistente.");
-    return;
-  }
-
-  savedMacchinari[id].nome = nuovoNome;
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
 }
 
 function eliminaMacchinario(id) {
@@ -192,23 +234,16 @@ function startScan() {
       });
 
       if (!savedMacchinari[qrCodeMessage]) {
-        function chiediNome() {
-          const nome = prompt("Nome del macchinario:")?.trim().toUpperCase();
-          if (!nome) return;
-
-          const esisteGia = Object.values(savedMacchinari).some(
-            m => m.nome.toUpperCase() === nome
-          );
-
-          if (esisteGia) {
-            alert("⚠️ Nome già esistente. Inserisci un nome diverso.");
-            chiediNome(); // Riprova
-          } else {
+        chiediNomeModal(
+          (nome) => {
             salvaMacchinario(qrCodeMessage, nome);
+            savedMacchinari[qrCodeMessage].expanded = true;
             renderMacchinari(qrCodeMessage);
+          },
+          () => {
+            // utente annulla, non chiudo scansione ma non salvo
           }
-        }
-        chiediNome();
+        );
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
         renderMacchinari(qrCodeMessage);
@@ -252,3 +287,10 @@ localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 
 renderMacchinari();
 
+// Esporta alcune funzioni per onclick inline nel render
+window.toggleDettagli = toggleDettagli;
+window.modificaNota = modificaNota;
+window.eliminaNota = eliminaNota;
+window.aggiungiNota = aggiungiNota;
+window.rinominaMacchinario = rinominaMacchinario;
+window.eliminaMacchinario = eliminaMacchinario;

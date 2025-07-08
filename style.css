@@ -76,7 +76,7 @@ button {
 }
 
 #btn-chiudi {
-  background-color: #e74c3c;
+  background-color: #e67e22;
   color: white;
 }
 
@@ -312,43 +312,65 @@ button {
   border-radius: 8px;
   background-color: #3498db;
   color: white;
+  cursor: pointer;
+  user-select: none;
 }
 
 #show-all-btn:hover {
   background-color: #2980b9;
 }
 
-@media (max-width: 400px) {
-  #buttons-container {
-    flex-direction: column;
-    gap: 12px;
-  }
-  button {
-    max-width: 100%;
-  }
-  .macchinario {
-    max-width: 95%;
-    padding: 10px;
-  }
-  .note-form {
-    max-width: 100%;
-  }
-  #reader {
-    max-width: 100%;
-  }
-  #search-box {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  #search-input {
-    max-width: 100%;
-  }
-  #show-all-btn {
-    width: 100%;
-    text-align: center;
-  }
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-input, textarea {
-  user-select: text !important;
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 280px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.modal-content input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.modal-content input[type="text"]:focus {
+  border-color: #0056b3;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modal-buttons button {
+  min-width: 90px;
 }
