@@ -12,66 +12,6 @@ body {
   align-items: center;
 }
 
-#reader {
-  width: 100%;
-  max-width: 350px;
-  margin: 0 auto 30px;
-}
-
-#search-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 400px;
-  width: 100%;
-  margin-bottom: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-  user-select: none;
-}
-
-#search-label {
-  font-weight: 600;
-  font-size: 16px;
-  min-width: 50px;
-  text-align: left;
-}
-
-#search-input {
-  flex: 1 1 auto;
-  min-width: 150px;
-  max-width: 250px;
-  font-size: 16px;
-  padding: 10px 15px;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-#search-input:focus {
-  border-color: #0056b3;
-}
-
-#show-all-btn {
-  padding: 6px 14px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: none;
-  background-color: #3498db;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  flex: none;
-  min-width: 90px;
-  max-width: 120px;
-  transition: background-color 0.3s ease;
-}
-
-#show-all-btn:hover {
-  background-color: #2980b9;
-}
-
 #tit1 {
   color: white;
   background-color: black;
@@ -79,6 +19,13 @@ body {
   padding: 10px 0;
   width: 100%;
   max-width: 480px;
+  user-select: none;
+}
+
+h2 {
+  font-weight: 700;
+  margin: 20px 0 15px;
+  color: #007bff;
   user-select: none;
 }
 
@@ -107,18 +54,6 @@ button {
   transition: background-color 0.3s ease;
 }
 
-.macchinario .btns-macchinario button,
-.macchinario .btns-note button {
-  padding: 4px 7px !important;
-  font-size: 12px !important;
-  min-width: auto !important;
-  max-width: none !important;
-  height: 28px;
-  line-height: 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .toggle-btn,
 .btns-note button,
 .note-form button,
@@ -140,14 +75,8 @@ button {
   flex-wrap: wrap;
 }
 
-.btns-macchinario {
-  align-items: center;
-  margin-top: 8px;
-  justify-content: center;
-}
-
 #btn-chiudi {
-  background-color: rgb(255, 102, 0);
+  background-color: #e74c3c;
   color: white;
 }
 
@@ -178,7 +107,21 @@ button {
   background-color: #2980b9;
 }
 
-/* Macchinario box */
+.btn-orange {
+  background-color: orange;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: darkorange;
+}
+
+#reader {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto 30px;
+}
+
 #macchinari-list {
   width: 100%;
   max-width: 400px;
@@ -217,10 +160,8 @@ button {
 .nome-e-btn {
   gap: 15px;
   align-items: center;
-  justify-content: center;
 }
 
-/* Toggle bottone */
 .toggle-btn {
   font-size: 16px;
   padding: 4px 8px;
@@ -237,26 +178,23 @@ button {
   background: #0056b3;
 }
 
-/* Note list */
 .note-list {
   list-style: none;
   padding: 0;
   margin: 0 0 15px;
   text-align: left;
-  position: relative;
 }
 
 .note-list li {
+  position: relative;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
   margin-bottom: 12px;
-  padding: 12px 12px 40px 12px; /* spazio per bottoni in basso */
+  padding: 12px 12px 40px 12px;
   word-wrap: break-word;
-  position: relative;
 }
 
-/* Note date */
 .nota-data {
   background: #fff176;
   font-weight: bold;
@@ -266,13 +204,11 @@ button {
   margin-bottom: 6px;
 }
 
-/* Note description */
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
 }
 
-/* Bottone modifica e elimina nota in basso a destra */
 .btns-note {
   position: absolute;
   bottom: 8px;
@@ -281,7 +217,18 @@ button {
   gap: 6px;
 }
 
-/* Form note */
+.btns-note button {
+  padding: 4px 7px;
+  font-size: 12px;
+  border-radius: 5px;
+  background-color: #3498db;
+  color: white;
+}
+
+.btns-note button:hover {
+  background-color: #2980b9;
+}
+
 .note-form {
   display: flex;
   flex-direction: column;
@@ -314,7 +261,63 @@ button {
   box-sizing: border-box;
 }
 
-/* Responsive */
+.btns-macchinario {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+#search-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 480px;
+  margin: 20px auto 10px;
+  background: white;
+  padding: 10px 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  flex-wrap: wrap;
+}
+
+#search-box label {
+  font-weight: 600;
+  user-select: none;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+#search-input {
+  flex: 1;
+  min-width: 100px;
+  max-width: 200px;
+  font-size: 15px;
+  padding: 7px 10px;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+#search-input:focus {
+  border-color: #0056b3;
+}
+
+#show-all-btn {
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background-color: #3498db;
+  color: white;
+}
+
+#show-all-btn:hover {
+  background-color: #2980b9;
+}
+
 @media (max-width: 400px) {
   #buttons-container {
     flex-direction: column;
@@ -333,7 +336,15 @@ button {
   #reader {
     max-width: 100%;
   }
-  #search-container {
+  #search-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #search-input {
     max-width: 100%;
+  }
+  #show-all-btn {
+    width: 100%;
+    text-align: center;
   }
 }
