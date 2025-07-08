@@ -3,36 +3,24 @@ const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
-const torchBtn = document.createElement("button");
-torchBtn.textContent = "💡 Torcia OFF";
-torchBtn.className = "btn-orange";
-torchBtn.style.marginTop = "50px";
-torchBtn.disabled = true;
-startBtn.parentNode.insertBefore(torchBtn, stopBtn.nextSibling);
+const searchInput = document.getElementById("search-input");
+const resetSearchBtn = document.getElementById("reset-search");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-
 let html5QrCode;
-let stream = null;
-let videoTrack = null;
-let torchOn = false;
+let videoTrack;
+let stream;
 
-let filtroRicerca = "";
-
-const searchInput = document.getElementById("search-input");
-searchInput.addEventListener("input", (e) => {
-  filtroRicerca = e.target.value.toLowerCase();
-  renderMacchinari();
-});
-
-function renderMacchinari(highlightId = null) {
+// Render macchinari con filtro per ricerca
+function renderMacchinariFiltered(filter = "") {
   listContainer.innerHTML = "";
+  const lowerFilter = filter.toLowerCase();
 
-  const sorted = Object.entries(savedMacchinari)
-    .filter(([id, data]) => data.nome.toLowerCase().startsWith(filtroRicerca))
+  const filtered = Object.entries(savedMacchinari)
+    .filter(([id, data]) => data.nome.toLowerCase().startsWith(lowerFilter))
     .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
 
-  sorted.forEach(([id, data]) => {
+  filtered.forEach(([id, data]) => {
     const expanded = data.expanded;
 
     const box = document.createElement("div");
@@ -79,9 +67,9 @@ function renderMacchinari(highlightId = null) {
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
         <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
-          <button class="btn-blue btn-small" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
-          <button id="btn-chiudi" class="btn-red btn-small" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
-          <button class="btn-red btn-small" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
+          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+          <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
       `;
 
@@ -91,19 +79,9 @@ function renderMacchinari(highlightId = null) {
 
     listContainer.appendChild(box);
   });
-
-  if (highlightId) {
-    const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
-    if (highlightBox) {
-      highlightBox.classList.add("highlight");
-      setTimeout(() => {
-        highlightBox.classList.remove("highlight");
-      }, 2500);
-      highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  }
 }
 
+// Salva o aggiorna macchinario
 function salvaMacchinario(id, nome) {
   if (!savedMacchinari[id]) {
     savedMacchinari[id] = { nome, note: [], expanded: false };
@@ -111,13 +89,13 @@ function salvaMacchinario(id, nome) {
     savedMacchinari[id].nome = nome;
   }
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinariFiltered();
 }
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinariFiltered();
 }
 
 function rinominaMacchinario(id) {
@@ -125,14 +103,14 @@ function rinominaMacchinario(id) {
   if (nuovoNome) {
     savedMacchinari[id].nome = nuovoNome;
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
+    renderMacchinariFiltered();
   }
 }
 
 function eliminaMacchinario(id) {
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinariFiltered();
 }
 
 function aggiungiNota(id) {
@@ -142,7 +120,7 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
+    renderMacchinariFiltered();
   }
 }
 
@@ -166,7 +144,7 @@ function modificaNota(id, index) {
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinariFiltered();
 }
 
 function formatData(d) {
@@ -174,90 +152,72 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// --- QR CAM + Torcia ---
+// --- QR CAM + TORCIA ---
 
 function updateTorchBtn() {
-  if (torchOn) {
-    torchBtn.textContent = "💡 Torcia ON";
-  } else {
-    torchBtn.textContent = "💡 Torcia OFF";
-  }
-  torchBtn.disabled = !videoTrack || !videoTrack.getCapabilities().torch;
-}
-
-torchBtn.addEventListener("click", () => {
   if (!videoTrack) return;
 
-  const cap = videoTrack.getCapabilities();
-  if (!cap.torch) {
-    alert("Torcia non supportata su questo dispositivo");
-    return;
+  if ("torch" in videoTrack.getCapabilities()) {
+    torchBtn.style.display = "inline-block";
+    torchBtn.textContent = videoTrack.getSettings().torch ? "💡 Torcia ON" : "💡 Torcia OFF";
+  } else {
+    torchBtn.style.display = "none";
   }
+}
 
-  torchOn = !torchOn;
-  videoTrack.applyConstraints({
-    advanced: [{ torch: torchOn }]
-  }).then(() => {
+async function toggleTorch() {
+  if (!videoTrack) return;
+  const currentTorch = videoTrack.getSettings().torch || false;
+  try {
+    await videoTrack.applyConstraints({ advanced: [{ torch: !currentTorch }] });
     updateTorchBtn();
-  }).catch(() => {
-    alert("Errore nell'attivazione della torcia");
-  });
-});
+  } catch {
+    alert("Torcia non supportata o errore nell'attivazione.");
+  }
+}
 
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
   stopBtn.disabled = false;
-  torchBtn.disabled = true;
-  torchOn = false;
-  updateTorchBtn();
 
   html5QrCode = new Html5Qrcode("reader");
 
   html5QrCode.start(
     { facingMode: { exact: "environment" } },
-    {
-      fps: 10,
-      qrbox: 250
-    },
+    { fps: 10, qrbox: 250 },
     (qrCodeMessage) => {
       html5QrCode.stop().then(() => {
         reader.classList.add("hidden");
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        torchBtn.disabled = true;
-        torchOn = false;
-        updateTorchBtn();
+        torchBtn.style.display = "none";
       });
       if (!savedMacchinari[qrCodeMessage]) {
         const nome = prompt("Nome del macchinario:");
         if (nome) {
           salvaMacchinario(qrCodeMessage, nome);
           savedMacchinari[qrCodeMessage].expanded = true;
-          renderMacchinari(qrCodeMessage);
+          renderMacchinariFiltered(qrCodeMessage);
         }
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinari(qrCodeMessage);
+        renderMacchinariFiltered(qrCodeMessage);
       }
     }
   ).then(() => {
-    // Ottieni stream e videoTrack per torcia
+    // Dopo partenza
     html5QrCode.getState().then(state => {
       if (state?.stream) {
         stream = state.stream;
         videoTrack = stream.getVideoTracks()[0];
         updateTorchBtn();
       }
-    }).catch(() => {
-      // fallback no stream
-      torchBtn.disabled = true;
     });
   }).catch((err) => {
     alert("Errore nell'avvio della fotocamera: " + err);
     startBtn.disabled = false;
     stopBtn.disabled = true;
-    torchBtn.disabled = true;
   });
 }
 
@@ -267,14 +227,33 @@ function stopScan() {
       reader.classList.add("hidden");
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      torchBtn.disabled = true;
-      torchOn = false;
-      updateTorchBtn();
+      torchBtn.style.display = "none";
     });
   }
 }
 
+// BOTTONI TORCIA
+const torchBtn = document.createElement("button");
+torchBtn.textContent = "💡 Torcia OFF";
+torchBtn.className = "btn-orange";
+torchBtn.style.margin = "10px auto";
+torchBtn.style.display = "none";
+torchBtn.style.minWidth = "110px";
+torchBtn.addEventListener("click", toggleTorch);
+document.body.insertBefore(torchBtn, document.getElementById("reader"));
+
+// Eventi
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
-renderMacchinari();
+searchInput.addEventListener("input", () => {
+  renderMacchinariFiltered(searchInput.value);
+});
+
+resetSearchBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  renderMacchinariFiltered();
+});
+
+// Start iniziale
+renderMacchinariFiltered();

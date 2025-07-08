@@ -18,15 +18,11 @@
 
   <div id="reader" class="hidden"></div>
 
-  <!-- Riquadro ricerca -->
-  <div id="search-box">
-    <input
-      type="text"
-      id="search-input"
-      placeholder="🔍 Cerca macchinari..."
-      autocomplete="off"
-      spellcheck="false"
-    />
+  <!-- Search box -->
+  <div id="search-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 400px; margin: 20px auto 10px;">
+    <label for="search-input" style="font-weight: 700; font-size: 18px; user-select:none;">🔍 Cerca</label>
+    <input id="search-input" type="text" placeholder="Digita nome..." style="flex:1; font-size:16px; padding:8px; border-radius:8px; border:2px solid #007bff; outline:none;"/>
+    <button id="reset-search" class="btn-blue" style="padding: 8px 12px; font-size: 14px; min-width: auto; user-select:none;">Mostra Tutti</button>
   </div>
 
   <h2>⚙️ Macchinari ⚙️</h2>
