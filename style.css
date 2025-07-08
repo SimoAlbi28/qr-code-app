@@ -60,6 +60,7 @@ button {
   font-size: 12px !important;
   min-width: auto !important;
   max-width: none !important;
+  cursor: pointer;
 }
 
 .toggle-btn,
@@ -81,45 +82,46 @@ button {
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-/* Bottoni modifica ed elimina note sulla stessa riga, stessa altezza e stile */
-.btns-note {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  display: flex;
-  gap: 6px;
   align-items: center;
 }
 
-/* Stile rosso uguale per bottoni modifica nota e rinomina */
-.note-form .btns-macchinario button.btn-rename,
-.btns-note button {
-  background-color: #e74c3c;
-  color: white;
+/* Rinomina, Chiudi, Elimina (macchinario) uguali dimensioni */
+.btns-macchinario button {
   padding: 4px 7px !important;
   font-size: 12px !important;
-  border-radius: 5px;
   min-width: auto !important;
   max-width: none !important;
-  border: none;
   cursor: pointer;
-  user-select: none;
 }
 
-.note-form .btns-macchinario button.btn-rename {
-  margin: 0;
+/* Stile bottone elimina macchinario */
+#btn-chiudi,
+.btns-macchinario button.btn-elimina-macchinario,
+.btns-macchinario button.btn-rinomina-macchinario {
+  background-color: #e74c3c;
+  color: white;
 }
 
-.note-form .btns-macchinario button.btn-rename:hover,
-.btns-note button:hover {
+#btn-chiudi:hover,
+.btns-macchinario button.btn-elimina-macchinario:hover,
+.btns-macchinario button.btn-rinomina-macchinario:hover {
   background-color: #c0392b;
 }
 
-#btn-chiudi {
-  background-color: rgb(255, 102, 0);
+/* Bottone rinomina con background rosso come elimina */
+.btns-macchinario button.btn-rinomina-macchinario {
+  background-color: #3498db; /* Blue like modifica */
   color: white;
+}
+
+/* Bottone modifica nota e elimina nota stessi stili */
+.btns-note button.btn-modifica-nota,
+.btns-note button.btn-elimina-nota {
+  padding: 4px 7px !important;
+  font-size: 12px !important;
+  min-width: auto !important;
+  max-width: none !important;
+  cursor: pointer;
 }
 
 .btn-red {
@@ -237,6 +239,9 @@ button {
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
   word-wrap: break-word;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nota-data {
@@ -251,12 +256,14 @@ button {
 .nota-desc {
   margin-top: 6px;
   white-space: pre-wrap;
+  flex-grow: 1;
+  margin-left: 10px;
 }
 
-.btns-note button {
-  padding: 4px 7px;
-  font-size: 12px;
-  border-radius: 5px;
+.btns-note {
+  gap: 6px;
+  display: flex;
+  flex-shrink: 0;
 }
 
 .note-form {
@@ -296,6 +303,7 @@ button {
   justify-content: center;
   gap: 10px;
   margin-top: 8px;
+  align-items: center;
 }
 
 #search-box {
@@ -308,8 +316,8 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
+  box-sizing: border-box;
 }
 
 #search-input {
@@ -320,7 +328,6 @@ button {
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease;
-  min-width: 0; /* per evitare overflow */
 }
 
 #search-input:focus {
@@ -328,29 +335,10 @@ button {
 }
 
 #show-all-btn {
-  background-color: #3498db;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0;
+  padding: 8px 14px;
   font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-#show-all-btn:hover {
-  background-color: #2980b9;
-}
-
-#search-label {
-  font-weight: 700;
-  margin-right: 10px;
-  color: #007bff;
-  user-select: none;
-  white-space: nowrap;
-  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 @media (max-width: 400px) {
@@ -373,5 +361,6 @@ button {
   }
   #search-box {
     max-width: 100%;
+    padding: 10px 12px;
   }
 }
