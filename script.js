@@ -3,8 +3,20 @@ const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
+// Crea dinamicamente il bottone torcia e lo inserisce dopo stopBtn
+const torchBtn = document.createElement("button");
+torchBtn.textContent = "💡 Torcia OFF";
+torchBtn.className = "btn-orange";
+torchBtn.style.marginTop = "50px";
+torchBtn.disabled = true; // parte disabilitato
+startBtn.parentNode.insertBefore(torchBtn, stopBtn.nextSibling);
+
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
+
 let html5QrCode;
+let stream = null;
+let videoTrack = null;
+let torchOn = false;
 
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
@@ -29,7 +41,6 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
-      // note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
@@ -50,7 +61,6 @@ function renderMacchinari(highlightId = null) {
         noteList.appendChild(li);
       });
 
-      // form note con nuovo layout bottoni
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -75,7 +85,6 @@ function renderMacchinari(highlightId = null) {
     listContainer.appendChild(box);
   });
 
-  // Highlight se richiesto
   if (highlightId) {
     const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
     if (highlightBox) {
@@ -83,7 +92,6 @@ function renderMacchinari(highlightId = null) {
       setTimeout(() => {
         highlightBox.classList.remove("highlight");
       }, 2500);
-      // Scrolla in mezzo allo schermo
       highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
@@ -140,11 +148,9 @@ function modificaNota(id, index) {
     dataInput.value === nota.data &&
     descInput.value === nota.desc
   ) {
-    // se già i dati sono uguali, svuota i campi
     dataInput.value = "";
     descInput.value = "";
   } else {
-    // altrimenti mette i dati della nota
     dataInput.value = nota.data;
     descInput.value = nota.desc;
   }
@@ -161,57 +167,82 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// QR CAM
-function startScan() {
+function toggleTorch() {
+  if (!videoTrack) return alert("Torcia non disponibile");
+  videoTrack.applyConstraints({ advanced: [{ torch: !torchOn }] })
+    .then(() => {
+      torchOn = !torchOn;
+      torchBtn.textContent = torchOn ? "💡 Torcia ON" : "💡 Torcia OFF";
+    })
+    .catch(() => alert("Impossibile cambiare stato torcia"));
+}
+
+async function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
   stopBtn.disabled = false;
+  torchBtn.disabled = true;
+  torchOn = false;
+  torchBtn.textContent = "💡 Torcia OFF";
 
-  html5QrCode = new Html5Qrcode("reader");
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { exact: "environment" } }
+    });
 
-  html5QrCode.start(
-    { facingMode: { exact: "environment" } },
-    {
-      fps: 10,
-      qrbox: 250
-    },
-    (qrCodeMessage) => {
-      html5QrCode.stop().then(() => {
-        reader.classList.add("hidden");
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      });
-      if (!savedMacchinari[qrCodeMessage]) {
-        const nome = prompt("Nome del macchinario:");
-        if (nome) {
-          salvaMacchinario(qrCodeMessage, nome);
-          // Apri e highlighta il nuovo
-          savedMacchinari[qrCodeMessage].expanded = true;
-          renderMacchinari(qrCodeMessage);
-        }
-      } else {
-        // Espandi, mostra e highlighta il macchinario già salvato
-        savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinari(qrCodeMessage);
-      }
-    }
-  ).catch((err) => {
+    videoTrack = stream.getVideoTracks()[0];
+    const capabilities = videoTrack.getCapabilities();
+    torchBtn.disabled = !capabilities.torch;
+
+    html5QrCode = new Html5Qrcode("reader");
+    await html5QrCode.start(stream, { fps: 10, qrbox: 250 }, onScanSuccess);
+
+  } catch (err) {
     alert("Errore nell'avvio della fotocamera: " + err);
     startBtn.disabled = false;
     stopBtn.disabled = true;
-  });
+    torchBtn.disabled = true;
+  }
 }
 
-function stopScan() {
-  if (html5QrCode) {
-    html5QrCode.stop().then(() => {
-      reader.classList.add("hidden");
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    });
+async function stopScan() {
+  if (html5QrCode) await html5QrCode.stop();
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+  reader.classList.add("hidden");
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  torchBtn.disabled = true;
+  torchOn = false;
+  torchBtn.textContent = "💡 Torcia OFF";
+}
+
+function onScanSuccess(qrCodeMessage) {
+  html5QrCode.stop();
+  stream.getTracks().forEach(track => track.stop());
+  reader.classList.add("hidden");
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  torchBtn.disabled = true;
+  torchOn = false;
+  torchBtn.textContent = "💡 Torcia OFF";
+
+  if (!savedMacchinari[qrCodeMessage]) {
+    const nome = prompt("Nome del macchinario:");
+    if (nome) {
+      salvaMacchinario(qrCodeMessage, nome);
+      savedMacchinari[qrCodeMessage].expanded = true;
+      renderMacchinari(qrCodeMessage);
+    }
+  } else {
+    savedMacchinari[qrCodeMessage].expanded = true;
+    renderMacchinari(qrCodeMessage);
   }
 }
 
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
+torchBtn.addEventListener("click", toggleTorch);
+
 renderMacchinari();
