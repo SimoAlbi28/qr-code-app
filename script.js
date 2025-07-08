@@ -98,26 +98,28 @@ function renderMacchinariFiltered(filter = "") {
 }
 
 function salvaMacchinario(id, nome) {
-  nome = nome.trim().toUpperCase();
-
-  // Controlla se il nome esiste già (ignora maiuscole/minuscole)
-  const nomiEsistenti = Object.values(savedMacchinari).map(m => m.nome.toUpperCase());
-  if (nomiEsistenti.includes(nome)) {
-    alert("Errore: Nome macchinario già esistente!");
-    return false;  // blocca il salvataggio
+  // controlla se nome già esiste (case insensitive)
+  const nomeUpper = nome.toUpperCase();
+  const nomeEsiste = Object.values(savedMacchinari).some(
+    m => m.nome.toUpperCase() === nomeUpper
+  );
+  if (nomeEsiste) {
+    alert("Nome già esistente, scegli un altro nome");
+    return false;
   }
 
   if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: false };
+    savedMacchinari[id] = { nome, note: [], expanded: true }; // apro il dettaglio subito
   } else {
     savedMacchinari[id].nome = nome;
+    savedMacchinari[id].expanded = true; // apro dettaglio se esiste già
   }
 
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinari(id); // aggiorno lista e highlight
+
   return true;
 }
-
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
