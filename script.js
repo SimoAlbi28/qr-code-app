@@ -3,33 +3,23 @@ const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 
-const searchInput = document.getElementById("search-input");
-const resetSearchBtn = document.getElementById("reset-search");
-
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
-
 let html5QrCode;
-let stream = null;
-let videoTrack = null;
 
-function renderMacchinariFiltered(filter = "") {
+// Renderizza lista macchinari
+function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
-  const filterLower = filter.toLowerCase().trim();
+  const sorted = Object.entries(savedMacchinari).sort((a, b) =>
+    a[1].nome.localeCompare(b[1].nome)
+  );
 
-  const filteredEntries = Object.entries(savedMacchinari).filter(([id, data]) => {
-    if (!filterLower) return true;
-    return data.nome.toLowerCase().startsWith(filterLower);
-  });
-
-  filteredEntries.sort((a, b) => a[1].nome.localeCompare(b[1].nome));
-
-  filteredEntries.forEach(([id, data]) => {
+  sorted.forEach(([id, data]) => {
     const expanded = data.expanded;
 
     const box = document.createElement("div");
     box.className = "macchinario";
-    box.setAttribute("data-id", id);
+    box.setAttribute('data-id', id);
     box.innerHTML = `
       <h3>${data.nome}</h3>
       <div class="nome-e-btn">
@@ -40,11 +30,12 @@ function renderMacchinariFiltered(filter = "") {
     `;
 
     if (expanded) {
-      // note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
-      const notesSorted = (data.note || []).sort((a, b) => b.data.localeCompare(a.data));
+      const notesSorted = (data.note || []).sort((a, b) =>
+        b.data.localeCompare(a.data)
+      );
 
       notesSorted.forEach((nota, index) => {
         const li = document.createElement("li");
@@ -59,7 +50,6 @@ function renderMacchinariFiltered(filter = "") {
         noteList.appendChild(li);
       });
 
-      // form note con nuovo layout bottoni
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -71,7 +61,7 @@ function renderMacchinariFiltered(filter = "") {
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
         <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
-          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+          <button class="btn-red" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
           <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
           <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
@@ -84,9 +74,8 @@ function renderMacchinariFiltered(filter = "") {
     listContainer.appendChild(box);
   });
 
-  // Highlight se richiesto
-  if (filter && filteredEntries.length === 1) {
-    const highlightBox = document.querySelector(`.macchinario[data-id="${filteredEntries[0][0]}"]`);
+  if (highlightId) {
+    const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
     if (highlightBox) {
       highlightBox.classList.add("highlight");
       setTimeout(() => {
@@ -98,7 +87,6 @@ function renderMacchinariFiltered(filter = "") {
 }
 
 function salvaMacchinario(id, nome) {
-  // controlla se nome già esiste (case insensitive)
   const nomeUpper = nome.toUpperCase();
   const nomeEsiste = Object.values(savedMacchinari).some(
     m => m.nome.toUpperCase() === nomeUpper
@@ -109,37 +97,61 @@ function salvaMacchinario(id, nome) {
   }
 
   if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: true }; // apro il dettaglio subito
+    savedMacchinari[id] = { nome, note: [], expanded: true };
   } else {
     savedMacchinari[id].nome = nome;
-    savedMacchinari[id].expanded = true; // apro dettaglio se esiste già
+    savedMacchinari[id].expanded = true;
   }
 
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(id); // aggiorno lista e highlight
-
+  renderMacchinari(id);
   return true;
+}
+
+function chiediNomeERegistra(id) {
+  const nome = prompt("Nome del macchinario:");
+  if (!nome) return;
+
+  const nomeUpper = nome.toUpperCase();
+  const nomeEsiste = Object.values(savedMacchinari).some(
+    m => m.nome.toUpperCase() === nomeUpper
+  );
+
+  if (nomeEsiste) {
+    alert("Nome già esistente, inserisci un nome diverso");
+    chiediNomeERegistra(id);
+  } else {
+    salvaMacchinario(id, nome);
+  }
 }
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered(searchInput.value);
+  renderMacchinari();
 }
 
 function rinominaMacchinario(id) {
   const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome);
   if (nuovoNome) {
+    const nomeUpper = nuovoNome.toUpperCase();
+    const nomeEsiste = Object.values(savedMacchinari).some(
+      (m, key) => m.nome.toUpperCase() === nomeUpper && key !== id
+    );
+    if (nomeEsiste) {
+      alert("Nome già esistente, scegli un altro nome");
+      return;
+    }
     savedMacchinari[id].nome = nuovoNome;
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinariFiltered(searchInput.value);
+    renderMacchinari();
   }
 }
 
 function eliminaMacchinario(id) {
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered(searchInput.value);
+  renderMacchinari();
 }
 
 function aggiungiNota(id) {
@@ -149,7 +161,7 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinariFiltered(searchInput.value);
+    renderMacchinari();
   }
 }
 
@@ -158,7 +170,10 @@ function modificaNota(id, index) {
   const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
 
-  if (dataInput.value === nota.data && descInput.value === nota.desc) {
+  if (
+    dataInput.value === nota.data &&
+    descInput.value === nota.desc
+  ) {
     dataInput.value = "";
     descInput.value = "";
   } else {
@@ -170,7 +185,7 @@ function modificaNota(id, index) {
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered(searchInput.value);
+  renderMacchinari();
 }
 
 function formatData(d) {
@@ -178,7 +193,23 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// QR CAM + TORCIA
+// Funzione ricerca
+function filtraMacchinari() {
+  const query = document.getElementById("search-input").value.toLowerCase();
+  const boxes = document.querySelectorAll(".macchinario");
+  boxes.forEach(box => {
+    const nome = box.querySelector("h3").textContent.toLowerCase();
+    box.style.display = nome.startsWith(query) ? "block" : "none";
+  });
+}
+
+function mostraTutti() {
+  document.getElementById("search-input").value = "";
+  filtraMacchinari();
+}
+
+// QR CAM
+
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -197,23 +228,15 @@ function startScan() {
         reader.classList.add("hidden");
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        removeTorchBtn(); // togli torcia alla fine
       });
       if (!savedMacchinari[qrCodeMessage]) {
-        const nome = prompt("Nome del macchinario:");
-        if (nome) {
-          salvaMacchinario(qrCodeMessage, nome);
-          savedMacchinari[qrCodeMessage].expanded = true;
-          renderMacchinariFiltered(""); 
-        }
+        chiediNomeERegistra(qrCodeMessage);
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinariFiltered("");
+        renderMacchinari(qrCodeMessage);
       }
     }
-  ).then(() => {
-    setupTorchControl();
-  }).catch((err) => {
+  ).catch((err) => {
     alert("Errore nell'avvio della fotocamera: " + err);
     startBtn.disabled = false;
     stopBtn.disabled = true;
@@ -226,81 +249,11 @@ function stopScan() {
       reader.classList.add("hidden");
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      removeTorchBtn();
     });
   }
 }
 
-// TORCH BUTTON & CONTROL
-let torchBtn = null;
-let torchOn = false;
-
-function setupTorchControl() {
-  if (!html5QrCode) return;
-
-  const videoElem = document.querySelector("#reader video");
-  if (!videoElem) return;
-
-  stream = videoElem.srcObject;
-  if (!stream) return;
-
-  videoTrack = stream.getVideoTracks()[0];
-  if (!videoTrack || !videoTrack.getCapabilities) return;
-
-  const capabilities = videoTrack.getCapabilities();
-  if (!capabilities.torch) return; // Torcia non supportata
-
-  addTorchBtn();
-}
-
-function addTorchBtn() {
-  if (torchBtn) return; // già presente
-
-  torchBtn = document.createElement("button");
-  torchBtn.textContent = "🔦 Torcia OFF";
-  torchBtn.className = "btn-orange";
-  torchBtn.style.margin = "10px auto";
-  torchBtn.style.display = "block";
-  torchBtn.onclick = toggleTorch;
-
-  reader.appendChild(torchBtn);
-}
-
-function removeTorchBtn() {
-  if (torchBtn) {
-    torchBtn.remove();
-    torchBtn = null;
-    torchOn = false;
-  }
-}
-
-function toggleTorch() {
-  if (!videoTrack) return;
-
-  torchOn = !torchOn;
-  videoTrack.applyConstraints({ advanced: [{ torch: torchOn }] }).then(() => {
-    if (torchBtn) {
-      torchBtn.textContent = torchOn ? "🔦 Torcia ON" : "🔦 Torcia OFF";
-    }
-  }).catch(() => {
-    // Errore applicazione torcia
-    torchOn = false;
-    if (torchBtn) torchBtn.textContent = "🔦 Torcia OFF";
-  });
-}
-
-// EVENTI
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
-searchInput.addEventListener("input", () => {
-  renderMacchinariFiltered(searchInput.value);
-});
-
-resetSearchBtn.addEventListener("click", () => {
-  searchInput.value = "";
-  renderMacchinariFiltered("");
-});
-
-// Avvio render iniziale
-renderMacchinariFiltered("");
+renderMacchinari();
