@@ -141,8 +141,8 @@ button {
 }
 
 .macchinario.highlight {
-  box-shadow: 0 0 15px 4px #00ffffaa;
-  border-color: #00ffff;
+  box-shadow: 0 0 15px 4px #ffff0099; /* giallo semi-trasparente */
+  border-color: #ffff00; /* giallo puro */
 }
 
 .macchinario h3 {
