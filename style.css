@@ -81,7 +81,40 @@ button {
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* Bottoni modifica ed elimina note sulla stessa riga, stessa altezza e stile */
+.btns-note {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
   align-items: center;
+}
+
+/* Stile rosso uguale per bottoni modifica nota e rinomina */
+.note-form .btns-macchinario button.btn-rename,
+.btns-note button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 4px 7px !important;
+  font-size: 12px !important;
+  border-radius: 5px;
+  min-width: auto !important;
+  max-width: none !important;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.note-form .btns-macchinario button.btn-rename {
+  margin: 0;
+}
+
+.note-form .btns-macchinario button.btn-rename:hover,
+.btns-note button:hover {
+  background-color: #c0392b;
 }
 
 #btn-chiudi {
@@ -220,14 +253,6 @@ button {
   white-space: pre-wrap;
 }
 
-.btns-note {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  display: flex;
-  gap: 6px;
-}
-
 .btns-note button {
   padding: 4px 7px;
   font-size: 12px;
@@ -271,7 +296,6 @@ button {
   justify-content: center;
   gap: 10px;
   margin-top: 8px;
-  align-items: center;
 }
 
 #search-box {
@@ -284,18 +308,8 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  justify-content: center;
-  box-sizing: border-box;
-  overflow-x: hidden;
-}
-
-#search-box label {
-  font-weight: 600;
-  font-size: 16px;
-  user-select: none;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 #search-input {
@@ -306,31 +320,37 @@ button {
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease;
-  max-width: 280px;
-  box-sizing: border-box;
-  min-width: 0;
+  min-width: 0; /* per evitare overflow */
 }
 
 #search-input:focus {
   border-color: #0056b3;
 }
 
-#reset-search {
+#show-all-btn {
   background-color: #3498db;
   color: white;
-  border: none;
-  padding: 8px 15px;
+  padding: 6px 12px;
   border-radius: 8px;
+  border: none;
   cursor: pointer;
-  font-size: 14px;
   user-select: none;
-  transition: background-color 0.3s ease;
   flex-shrink: 0;
-  white-space: nowrap;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
-#reset-search:hover {
+#show-all-btn:hover {
   background-color: #2980b9;
+}
+
+#search-label {
+  font-weight: 700;
+  margin-right: 10px;
+  color: #007bff;
+  user-select: none;
+  white-space: nowrap;
+  font-size: 16px;
 }
 
 @media (max-width: 400px) {
@@ -353,10 +373,5 @@ button {
   }
   #search-box {
     max-width: 100%;
-    padding: 10px;
-    gap: 8px;
-  }
-  #search-input {
-    max-width: 140px;
   }
 }

@@ -2,17 +2,18 @@ const listContainer = document.getElementById("macchinari-list");
 const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
+const searchInput = document.getElementById("search-input");
+const showAllBtn = document.getElementById("show-all-btn");
 
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
 
-// Renderizza lista macchinari
-function renderMacchinari(highlightId = null) {
+function renderMacchinari(filter = "", highlightId = null) {
   listContainer.innerHTML = "";
 
-  const sorted = Object.entries(savedMacchinari).sort((a, b) =>
-    a[1].nome.localeCompare(b[1].nome)
-  );
+  const sorted = Object.entries(savedMacchinari)
+    .sort((a, b) => a[1].nome.localeCompare(b[1].nome))
+    .filter(([id, data]) => data.nome.toLowerCase().startsWith(filter.toLowerCase()));
 
   sorted.forEach(([id, data]) => {
     const expanded = data.expanded;
@@ -30,6 +31,7 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
+      // note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
@@ -43,13 +45,14 @@ function renderMacchinari(highlightId = null) {
           <span class="nota-data">${formatData(nota.data)}</span><br>
           <span class="nota-desc">${nota.desc}</span>
           <div class="btns-note">
-            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+            <button class="btns-note" onclick="modificaNota('${id}', ${index})">✏️</button>
+            <button class="btns-note" onclick="eliminaNota('${id}', ${index})">🗑️</button>
           </div>
         `;
         noteList.appendChild(li);
       });
 
+      // form note con nuovo layout bottoni
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -61,8 +64,8 @@ function renderMacchinari(highlightId = null) {
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
         <div class="btns-macchinario" style="justify-content:center; margin-top:8px; gap:10px;">
-          <button class="btn-red" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
-          <button id="btn-chiudi" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+          <button class="btn-rename" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+          <button id="btn-chiudi" class="btn-red" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
           <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
         </div>
       `;
@@ -74,6 +77,7 @@ function renderMacchinari(highlightId = null) {
     listContainer.appendChild(box);
   });
 
+  // Highlight se richiesto
   if (highlightId) {
     const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
     if (highlightBox) {
@@ -81,77 +85,55 @@ function renderMacchinari(highlightId = null) {
       setTimeout(() => {
         highlightBox.classList.remove("highlight");
       }, 2500);
+      // Scrolla in mezzo allo schermo
       highlightBox.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
 }
 
 function salvaMacchinario(id, nome) {
-  const nomeUpper = nome.toUpperCase();
-  const nomeEsiste = Object.values(savedMacchinari).some(
-    m => m.nome.toUpperCase() === nomeUpper
-  );
-  if (nomeEsiste) {
-    alert("Nome già esistente, scegli un altro nome");
-    return false;
+  if (!nome) return false;
+
+  const nomeUpper = nome.trim().toUpperCase();
+
+  // controllo duplicati insensitive
+  for (const key in savedMacchinari) {
+    if (savedMacchinari[key].nome.toUpperCase() === nomeUpper && key !== id) {
+      alert("Errore: nome macchinario già esistente.");
+      // lascia aperto il form per reinserire
+      savedMacchinari[id].expanded = true;
+      renderMacchinari(searchInput.value, id);
+      return false;
+    }
   }
 
   if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: true };
+    savedMacchinari[id] = { nome: nomeUpper, note: [], expanded: false };
   } else {
-    savedMacchinari[id].nome = nome;
-    savedMacchinari[id].expanded = true;
+    savedMacchinari[id].nome = nomeUpper;
   }
-
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari(id);
+  renderMacchinari(searchInput.value, id);
   return true;
-}
-
-function chiediNomeERegistra(id) {
-  const nome = prompt("Nome del macchinario:");
-  if (!nome) return;
-
-  const nomeUpper = nome.toUpperCase();
-  const nomeEsiste = Object.values(savedMacchinari).some(
-    m => m.nome.toUpperCase() === nomeUpper
-  );
-
-  if (nomeEsiste) {
-    alert("Nome già esistente, inserisci un nome diverso");
-    chiediNomeERegistra(id);
-  } else {
-    salvaMacchinario(id, nome);
-  }
 }
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinari(searchInput.value);
 }
 
 function rinominaMacchinario(id) {
   const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome);
   if (nuovoNome) {
-    const nomeUpper = nuovoNome.toUpperCase();
-    const nomeEsiste = Object.values(savedMacchinari).some(
-      (m, key) => m.nome.toUpperCase() === nomeUpper && key !== id
-    );
-    if (nomeEsiste) {
-      alert("Nome già esistente, scegli un altro nome");
-      return;
-    }
-    savedMacchinari[id].nome = nuovoNome;
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
+    salvaMacchinario(id, nuovoNome);
   }
 }
 
 function eliminaMacchinario(id) {
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinari(searchInput.value);
 }
 
 function aggiungiNota(id) {
@@ -161,7 +143,7 @@ function aggiungiNota(id) {
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
     localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
+    renderMacchinari(searchInput.value);
   }
 }
 
@@ -174,9 +156,11 @@ function modificaNota(id, index) {
     dataInput.value === nota.data &&
     descInput.value === nota.desc
   ) {
+    // se già i dati sono uguali, svuota i campi
     dataInput.value = "";
     descInput.value = "";
   } else {
+    // altrimenti mette i dati della nota
     dataInput.value = nota.data;
     descInput.value = nota.desc;
   }
@@ -185,7 +169,7 @@ function modificaNota(id, index) {
 function eliminaNota(id, index) {
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  renderMacchinari(searchInput.value);
 }
 
 function formatData(d) {
@@ -193,23 +177,7 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// Funzione ricerca
-function filtraMacchinari() {
-  const query = document.getElementById("search-input").value.toLowerCase();
-  const boxes = document.querySelectorAll(".macchinario");
-  boxes.forEach(box => {
-    const nome = box.querySelector("h3").textContent.toLowerCase();
-    box.style.display = nome.startsWith(query) ? "block" : "none";
-  });
-}
-
-function mostraTutti() {
-  document.getElementById("search-input").value = "";
-  filtraMacchinari();
-}
-
 // QR CAM
-
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -230,10 +198,21 @@ function startScan() {
         stopBtn.disabled = true;
       });
       if (!savedMacchinari[qrCodeMessage]) {
-        chiediNomeERegistra(qrCodeMessage);
+        const nome = prompt("Nome del macchinario:");
+        if (nome) {
+          const saved = salvaMacchinario(qrCodeMessage, nome);
+          if (saved) {
+            // Apri e highlighta il nuovo
+            savedMacchinari[qrCodeMessage].expanded = true;
+            renderMacchinari(searchInput.value, qrCodeMessage);
+          }
+        } else {
+          renderMacchinari(searchInput.value);
+        }
       } else {
+        // Espandi, mostra e highlighta il macchinario già salvato
         savedMacchinari[qrCodeMessage].expanded = true;
-        renderMacchinari(qrCodeMessage);
+        renderMacchinari(searchInput.value, qrCodeMessage);
       }
     }
   ).catch((err) => {
@@ -253,7 +232,18 @@ function stopScan() {
   }
 }
 
+function aggiornaRicerca() {
+  renderMacchinari(searchInput.value);
+}
+
+function mostraTutti() {
+  searchInput.value = "";
+  renderMacchinari();
+}
+
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
+searchInput.addEventListener("input", aggiornaRicerca);
+showAllBtn.addEventListener("click", mostraTutti);
 
 renderMacchinari();
