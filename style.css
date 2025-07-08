@@ -315,6 +315,6 @@ button {
     max-width: 100%;
   }
   #search-box {
-    max-width: 95%;
+    max-width: 120px;
   }
 }
