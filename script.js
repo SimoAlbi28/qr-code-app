@@ -89,8 +89,9 @@ function salvaMacchinario(id, nome) {
     savedMacchinari[id].nome = nome;
   }
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinariFiltered();
+  renderMacchinariFiltered(""); // FORZA senza filtro per mostrare tutti dopo il salvataggio
 }
+
 
 function toggleDettagli(id) {
   savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
