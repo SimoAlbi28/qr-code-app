@@ -9,6 +9,12 @@ let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
 
+function createLineSeparator() {
+  const line = document.createElement("div");
+  line.className = "line-separator";
+  return line;
+}
+
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
@@ -26,7 +32,6 @@ function renderMacchinari(highlightId = null) {
     const box = document.createElement("div");
     box.className = "macchinario";
     box.setAttribute("data-id", id);
-
     box.innerHTML = `
       <h3>${data.nome}</h3>
       <div class="nome-e-btn">
@@ -37,52 +42,52 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
-      const notes = data.note || [];
+      // Linea separazione 1
+      box.appendChild(createLineSeparator());
+
+      // Titolo Note (solo se ci sono note)
+      if (data.note && data.note.length > 0) {
+        const noteTitle = document.createElement("h4");
+        noteTitle.textContent = "Note";
+        noteTitle.className = "titolo-note";
+        box.appendChild(noteTitle);
+      }
+
+      // Lista note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
-      if (notes.length > 0) {
-        const noteTitle = document.createElement("h4");
-        noteTitle.textContent = "Note";
-        noteTitle.style.borderBottom = "1px solid black";
-        noteTitle.style.paddingBottom = "4px";
-        noteTitle.style.marginTop = "15px";
-        box.appendChild(noteTitle);
+      const notesSorted = (data.note || []).sort((a, b) =>
+        b.data.localeCompare(a.data)
+      );
 
-        const notesSorted = notes.sort((a, b) =>
-          b.data.localeCompare(a.data)
-        );
+      notesSorted.forEach((nota, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span class="nota-data">${formatData(nota.data)}</span><br>
+          <span class="nota-desc">${nota.desc}</span>
+          <div class="btns-note">
+            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+          </div>
+        `;
+        noteList.appendChild(li);
+      });
 
-        notesSorted.forEach((nota, index) => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <span class="nota-data">${formatData(nota.data)}</span><br>
-            <span class="nota-desc">${nota.desc}</span>
-            <div class="btns-note">
-              <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-              <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-            </div>
-          `;
-          noteList.appendChild(li);
-        });
-        box.appendChild(noteList);
+      box.appendChild(noteList);
 
-        // linea nera tra note e inserimento
-        const divider1 = document.createElement("hr");
-        divider1.style.border = "none";
-        divider1.style.borderTop = "1px solid black";
-        divider1.style.margin = "15px 0";
-        box.appendChild(divider1);
+      // Linea separazione 2 (solo se ci sono note)
+      if (data.note && data.note.length > 0) {
+        box.appendChild(createLineSeparator());
       }
 
-      // Titolo inserimento note sempre visibile
-      const inserimentoTitle = document.createElement("h4");
-      inserimentoTitle.textContent = "Inserimento Note";
-      inserimentoTitle.style.borderBottom = "1px solid black";
-      inserimentoTitle.style.paddingBottom = "4px";
-      inserimentoTitle.style.marginTop = notes.length > 0 ? "0" : "15px";
-      box.appendChild(inserimentoTitle);
+      // Titolo Inserimento Note
+      const insertNoteTitle = document.createElement("h4");
+      insertNoteTitle.textContent = "Inserimento Note";
+      insertNoteTitle.className = "titolo-note";
+      box.appendChild(insertNoteTitle);
 
+      // Form inserimento note
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -93,20 +98,23 @@ function renderMacchinari(highlightId = null) {
         <div style="text-align:center; margin-top:10px;">
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
-        <div class="btns-macchinario" style="margin-top:8px;">
-          <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
-          <button id="btn-chiudi" class="btn-orange" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
-          <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
-        </div>
       `;
+
       box.appendChild(noteForm);
 
-      // linea nera tra inserimento note e bottoni finali
-      const divider2 = document.createElement("hr");
-      divider2.style.border = "none";
-      divider2.style.borderTop = "1px solid black";
-      divider2.style.margin = "15px 0 0";
-      box.appendChild(divider2);
+      // Linea separazione 3
+      box.appendChild(createLineSeparator());
+
+      // Bottoni ultimi 3
+      const btnsContainer = document.createElement("div");
+      btnsContainer.className = "btns-macchinario";
+      btnsContainer.innerHTML = `
+        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+        <button id="btn-chiudi" class="btn-orange" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
+        <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
+      `;
+
+      box.appendChild(btnsContainer);
     }
 
     listContainer.appendChild(box);
@@ -260,7 +268,21 @@ function stopScan() {
   }
 }
 
-// CREA MANUALE MACCHINARIO
+// Pulsanti eventi
+startBtn.addEventListener("click", startScan);
+stopBtn.addEventListener("click", stopScan);
+
+searchInput.addEventListener("input", () => {
+  searchFilter = searchInput.value.trim();
+  renderMacchinari();
+});
+
+showAllBtn.addEventListener("click", () => {
+  searchFilter = "";
+  searchInput.value = "";
+  renderMacchinari();
+});
+
 function creaMacchinarioManuale() {
   const nome = prompt("Inserisci il nome del nuovo macchinario:")?.trim().toUpperCase();
   if (!nome) return;
@@ -279,18 +301,6 @@ function creaMacchinarioManuale() {
   renderMacchinari(id);
 }
 
-// Eventi
-startBtn.addEventListener("click", startScan);
-stopBtn.addEventListener("click", stopScan);
-searchInput.addEventListener("input", () => {
-  searchFilter = searchInput.value.trim();
-  renderMacchinari();
-});
-showAllBtn.addEventListener("click", () => {
-  searchFilter = "";
-  searchInput.value = "";
-  renderMacchinari();
-});
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
 
 // All'avvio, chiudi tutti i macchinari

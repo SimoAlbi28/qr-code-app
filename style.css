@@ -39,6 +39,25 @@ h2 {
   max-width: 400px;
 }
 
+#btn-create-manual {
+  margin-top: 12px;
+  background-color: #3498db;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  min-width: 130px;
+  max-width: 130px;
+  font-size: 13px;
+  transition: background-color 0.3s ease;
+}
+
+#btn-create-manual:hover {
+  background-color: #2980b9;
+}
+
 button {
   display: inline-block;
   margin: 0 auto;
@@ -132,7 +151,7 @@ button {
   margin: 10px auto;
   max-width: 400px;
   background: white;
-  border: 3px solid black;
+  border: 3px solid black; /* bordo nero */
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -145,7 +164,7 @@ button {
   border-color: #ffff00; /* giallo puro */
 }
 
-.macchinario h3 {
+.macchinario > h3 {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
@@ -153,9 +172,9 @@ button {
   color: black;
   text-transform: uppercase;
   text-align: center;
-  border: 1px solid black;
-  padding: 5px;
+  padding: 5px 10px;
   border-radius: 6px;
+  border: 1px solid black; /* bordo nero */
 }
 
 .nome-e-btn {
@@ -182,10 +201,9 @@ button {
 .note-list {
   list-style: none;
   padding: 0;
-  margin: 10px 0 15px; /* margin-top:10px; margin-bottom:15px */
+  margin: 0 0 15px 0;
   text-align: left;
 }
-
 
 .note-list li {
   position: relative;
@@ -383,36 +401,17 @@ button {
   min-width: 90px;
 }
 
-#buttons-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 25px;
-  width: 100%;
-  max-width: 400px;
+/* Linea di separazione */
+.line-separator {
+  height: 2px;
+  background-color: black;
+  margin: 12px 0;
 }
 
-.row-btns {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.separatore {
-  border: none;
-  border-top: 2px solid black;
-  margin: 18px 0;
-}
-
-.note-form-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.spazio-btn {
-  text-align: center;
-  margin-top: 10px;
+/* Titoli note arancioni */
+.titolo-note {
+  color: orange;
+  margin: 5px 0 10px 0;
+  font-weight: 700;
+  text-align: left;
 }
