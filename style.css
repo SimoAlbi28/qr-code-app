@@ -398,3 +398,20 @@ button {
   flex-wrap: wrap;
   justify-content: center;
 }
+
+.separatore {
+  border: none;
+  border-top: 2px solid black;
+  margin: 18px 0;
+}
+
+.note-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spazio-btn {
+  text-align: center;
+  margin-top: 10px;
+}
