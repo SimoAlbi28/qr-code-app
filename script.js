@@ -56,21 +56,24 @@ function renderMacchinari(highlightId = null) {
         noteList.appendChild(li);
       });
 
+      const noteCount = notesSorted.length;
+
       const noteForm = document.createElement("div");
+
       noteForm.innerHTML = `
         <hr class="separatore">
-        <ul class="note-list">${noteList.innerHTML}</ul>
-        <hr class="separatore">
+        ${noteList.outerHTML}
+        ${noteCount > 0 ? '<hr class="separatore">' : ''}
         <div class="note-form-inner">
           <label>Data:</label>
           <input type="date" id="data-${id}">
           <label>Descrizione (max 300):</label>
           <input type="text" id="desc-${id}" maxlength="300">
-          <div class="spazio-btn">
+          <div class="spazio-btn" style="text-align:center; margin-top:10px;">
             <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
           </div>
           <hr class="separatore">
-          <div class="btns-macchinario">
+          <div class="btns-macchinario" style="margin-top:8px;">
             <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
             <button id="btn-chiudi" class="btn-orange" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
             <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
