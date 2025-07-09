@@ -5,49 +5,9 @@ const stopBtn = document.getElementById("stop-scan");
 const searchInput = document.getElementById("search-input");
 const showAllBtn = document.getElementById("show-all-btn");
 
-const nomeModal = document.getElementById("nomeModal");
-const nomeInput = document.getElementById("nomeInput");
-const btnConferma = document.getElementById("btnConferma");
-const btnAnnulla = document.getElementById("btnAnnulla");
-const erroreNome = document.getElementById("erroreNome");
-
 let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
-
-// Funzione per mostrare modal inserimento nome
-function chiediNomeModal(onSuccess, onCancel) {
-  nomeModal.classList.remove("hidden");
-  nomeInput.value = "";
-  erroreNome.style.display = "none";
-  nomeInput.focus();
-
-  function confermaHandler() {
-    const val = nomeInput.value.trim().toUpperCase();
-    if (!val) return;
-    if (Object.values(savedMacchinari).some(m => m.nome === val)) {
-      erroreNome.style.display = "block";
-      nomeInput.focus();
-      return;
-    }
-    cleanup();
-    onSuccess(val);
-  }
-
-  function annullaHandler() {
-    cleanup();
-    if (onCancel) onCancel();
-  }
-
-  function cleanup() {
-    btnConferma.removeEventListener("click", confermaHandler);
-    btnAnnulla.removeEventListener("click", annullaHandler);
-    nomeModal.classList.add("hidden");
-  }
-
-  btnConferma.addEventListener("click", confermaHandler);
-  btnAnnulla.addEventListener("click", annullaHandler);
-}
 
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
@@ -76,7 +36,6 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
-      // Note list
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
@@ -97,14 +56,13 @@ function renderMacchinari(highlightId = null) {
         noteList.appendChild(li);
       });
 
-      // Form note
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
         <label>Data:</label>
         <input type="date" id="data-${id}">
-        <label>Descrizione (max 100):</label>
-        <input type="text" id="desc-${id}" maxlength="100">
+        <label>Descrizione (max 300):</label>
+        <input type="text" id="desc-${id}" maxlength="300">
         <div style="text-align:center; margin-top:10px;">
           <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
         </div>
@@ -122,7 +80,6 @@ function renderMacchinari(highlightId = null) {
     listContainer.appendChild(box);
   });
 
-  // Highlight se richiesto
   if (highlightId) {
     const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
     if (highlightBox) {
@@ -151,23 +108,21 @@ function toggleDettagli(id) {
 }
 
 function rinominaMacchinario(id) {
-  chiediNomeModal(
-    (nuovoNome) => {
-      const esisteGia = Object.values(savedMacchinari).some(
-        m => m.nome.toUpperCase() === nuovoNome && m !== savedMacchinari[id]
-      );
+  const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome)?.trim().toUpperCase();
+  if (!nuovoNome) return;
 
-      if (esisteGia) {
-        alert("⚠️ Nome già esistente.");
-        return;
-      }
-
-      savedMacchinari[id].nome = nuovoNome;
-      localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-      renderMacchinari();
-    },
-    () => {}
+  const esisteGia = Object.values(savedMacchinari).some(
+    m => m.nome.toUpperCase() === nuovoNome && m !== savedMacchinari[id]
   );
+
+  if (esisteGia) {
+    alert("⚠️ Nome già esistente.");
+    return;
+  }
+
+  savedMacchinari[id].nome = nuovoNome;
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
 }
 
 function eliminaMacchinario(id) {
@@ -234,16 +189,23 @@ function startScan() {
       });
 
       if (!savedMacchinari[qrCodeMessage]) {
-        chiediNomeModal(
-          (nome) => {
+        function chiediNome() {
+          const nome = prompt("Nome del macchinario:")?.trim().toUpperCase();
+          if (!nome) return;
+
+          const esisteGia = Object.values(savedMacchinari).some(
+            m => m.nome.toUpperCase() === nome
+          );
+
+          if (esisteGia) {
+            alert("⚠️ Nome già esistente. Inserisci un nome diverso.");
+            chiediNome();
+          } else {
             salvaMacchinario(qrCodeMessage, nome);
-            savedMacchinari[qrCodeMessage].expanded = true;
             renderMacchinari(qrCodeMessage);
-          },
-          () => {
-            // utente annulla, non chiudo scansione ma non salvo
           }
-        );
+        }
+        chiediNome();
       } else {
         savedMacchinari[qrCodeMessage].expanded = true;
         renderMacchinari(qrCodeMessage);
@@ -286,11 +248,3 @@ Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 
 renderMacchinari();
-
-// Esporta alcune funzioni per onclick inline nel render
-window.toggleDettagli = toggleDettagli;
-window.modificaNota = modificaNota;
-window.eliminaNota = eliminaNota;
-window.aggiungiNota = aggiungiNota;
-window.rinominaMacchinario = rinominaMacchinario;
-window.eliminaMacchinario = eliminaMacchinario;
