@@ -151,7 +151,7 @@ button {
   margin: 10px auto;
   max-width: 400px;
   background: white;
-  border: 3px solid black; /* bordo nero */
+  border: 3px solid black;
   border-radius: 10px;
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -160,8 +160,8 @@ button {
 }
 
 .macchinario.highlight {
-  box-shadow: 0 0 15px 4px #ffff0099; /* giallo semi-trasparente */
-  border-color: #ffff00; /* giallo puro */
+  box-shadow: 0 0 15px 4px #ffff0099;
+  border-color: #ffff00;
 }
 
 .macchinario > h3 {
@@ -174,7 +174,7 @@ button {
   text-align: center;
   padding: 5px 10px;
   border-radius: 6px;
-  border: 1px solid black; /* bordo nero */
+  border: 1px solid black;
 }
 
 .nome-e-btn {
@@ -267,6 +267,9 @@ button {
 .note-form label {
   font-weight: 600;
   margin-bottom: 4px;
+  text-align: center;
+  width: 100%;
+  display: block;
 }
 
 .note-form input[type="date"] {
@@ -276,6 +279,9 @@ button {
   font-size: 14px;
   width: 120px;
   box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .note-form input[type="text"] {
@@ -285,6 +291,9 @@ button {
   font-size: 16px;
   width: 100%;
   box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .btns-macchinario {
@@ -346,7 +355,6 @@ button {
   background-color: #2980b9;
 }
 
-/* Modal */
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -401,14 +409,12 @@ button {
   min-width: 90px;
 }
 
-/* Linea di separazione */
 .line-separator {
   height: 2px;
   background-color: black;
   margin: 12px 0;
 }
 
-/* Titoli note arancioni */
 .titolo-note {
   color: orange;
   background: black;
@@ -420,4 +426,3 @@ button {
   width: fit-content;
   margin: 10px auto 10px auto;
 }
-
