@@ -62,9 +62,11 @@ function renderMacchinari(highlightId = null) {
 
       noteForm.innerHTML = `
         <hr class="separatore">
+        <h4>Note</h4>
         ${noteList.outerHTML}
         ${noteCount > 0 ? '<hr class="separatore">' : ''}
         <div class="note-form-inner">
+          <h4>Inserimento Note</h4>
           <label>Data:</label>
           <input type="date" id="data-${id}">
           <label>Descrizione (max 300):</label>
@@ -235,21 +237,6 @@ function stopScan() {
   }
 }
 
-// Eventi
-startBtn.addEventListener("click", startScan);
-stopBtn.addEventListener("click", stopScan);
-
-searchInput.addEventListener("input", () => {
-  searchFilter = searchInput.value.trim();
-  renderMacchinari();
-});
-
-showAllBtn.addEventListener("click", () => {
-  searchFilter = "";
-  searchInput.value = "";
-  renderMacchinari();
-});
-
 function creaMacchinarioManuale() {
   const nome = prompt("Inserisci il nome del nuovo macchinario:")?.trim().toUpperCase();
   if (!nome) return;
@@ -268,7 +255,22 @@ function creaMacchinarioManuale() {
   renderMacchinari(id);
 }
 
+// Eventi
+startBtn.addEventListener("click", startScan);
+stopBtn.addEventListener("click", stopScan);
+
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
+
+searchInput.addEventListener("input", () => {
+  searchFilter = searchInput.value.trim();
+  renderMacchinari();
+});
+
+showAllBtn.addEventListener("click", () => {
+  searchFilter = "";
+  searchInput.value = "";
+  renderMacchinari();
+});
 
 // All'avvio, chiudi tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
