@@ -20,6 +20,23 @@ body {
   width: 100%;
   max-width: 480px;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title-top {
+  font-weight: 700;
+  font-size: 26px; /* più grande */
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+.title-bottom {
+  font-weight: 900;
+  font-size: 20px; /* più piccolo */
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 h2 {
