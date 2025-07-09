@@ -12,8 +12,11 @@
   <h1 id="tit1">📷 QR-Code 📷</h1>
 
   <div id="buttons-container">
-    <button id="start-scan" class="btn-green">📷 Avvia Scansione</button>
-    <button id="stop-scan" class="btn-red" disabled>❌ Chiudi Scansione</button>
+    <div class="row-btns">
+      <button id="start-scan" class="btn-green">📷 Avvia Scansione</button>
+      <button id="stop-scan" class="btn-red" disabled>❌ Chiudi Scansione</button>
+    </div>
+    <button id="create-macchinario" class="btn-blue">➕ Crea Macchinario</button>
   </div>
 
   <div id="reader" class="hidden"></div>
@@ -27,7 +30,6 @@
   <h2>⚙️ Macchinari ⚙️</h2>
   <div id="macchinari-list"></div>
 
-  <!-- Modal per inserire nome macchinario -->
   <div id="nomeModal" class="modal hidden">
     <div class="modal-content">
       <label for="nomeInput">Nome macchinario:</label>

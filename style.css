@@ -381,3 +381,20 @@ button {
 .modal-buttons button {
   min-width: 90px;
 }
+
+#buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.row-btns {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

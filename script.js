@@ -243,6 +243,26 @@ showAllBtn.addEventListener("click", () => {
   renderMacchinari();
 });
 
+function creaMacchinarioManuale() {
+  const nome = prompt("Inserisci il nome del nuovo macchinario:")?.trim().toUpperCase();
+  if (!nome) return;
+
+  const esisteGia = Object.values(savedMacchinari).some(
+    m => m.nome.toUpperCase() === nome
+  );
+
+  if (esisteGia) {
+    alert("⚠️ Nome già esistente. Inserisci un nome diverso.");
+    return;
+  }
+
+  const id = "custom-" + Math.random().toString(36).substr(2, 9);
+  salvaMacchinario(id, nome);
+  renderMacchinari(id);
+}
+
+document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
+
 // All'avvio, chiudi tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
