@@ -217,16 +217,22 @@ button {
   gap: 6px;
 }
 
-.btns-note button {
-  padding: 4px 7px;
-  font-size: 12px;
-  border-radius: 5px;
-  background-color: red;
+.btns-note button.btn-blue {
+  background-color: #3498db;
   color: white;
 }
 
-.btns-note button:hover {
-  background-color:red;
+.btns-note button.btn-blue:hover {
+  background-color: #2980b9;
+}
+
+.btns-note button.btn-red {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btns-note button.btn-red:hover {
+  background-color: #c0392b;
 }
 
 .note-form {
