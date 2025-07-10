@@ -201,7 +201,6 @@ function renderMacchinari(highlightId = null) {
         noteTitle.className = "titolo-note";
         box.appendChild(noteTitle);
 
-        // Lista note con checkbox dentro ogni li
         const noteList = document.createElement("ul");
         noteList.className = "note-list";
 
@@ -213,7 +212,7 @@ function renderMacchinari(highlightId = null) {
           const li = document.createElement("li");
 
           li.innerHTML = `
-            <label style="display:flex; align-items:center; gap: 8px; cursor:pointer;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="checkbox" class="checkbox-copia-note" data-id="${id}" data-index="${index}" />
               <div>
                 <span class="nota-data">${formatData(nota.data)}</span><br>
@@ -233,7 +232,6 @@ function renderMacchinari(highlightId = null) {
 
         box.appendChild(createLineSeparator());
 
-        // Bottone COPIA NOTE visibile solo se ci sono note
         const btnCopiaNote = document.createElement("button");
         btnCopiaNote.className = "btn-copia-note";
         btnCopiaNote.textContent = "📋 Copia note";
@@ -241,7 +239,8 @@ function renderMacchinari(highlightId = null) {
         box.appendChild(btnCopiaNote);
       }
 
-      // resto come prima...
+      // Il resto del rendering espanso (note form, bottoni rinomina, elimina ecc.)
+      // Lo aggiungi come nel tuo codice precedente, se vuoi.
     }
 
     listContainer.appendChild(box);
