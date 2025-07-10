@@ -471,41 +471,24 @@ button {
   background-color: #6a0dad; /* viola */
 }
 
-.btn-copia-note:hover {
-  background-color: #7f24e0; /* viola schiarito */
-}
-
 .btn-seleziona-tutte {
-  background-color: #6a0dad; /* viola */
-}
-
-.btn-seleziona-tutte:hover {
-  background-color: #7f24e0; /* viola schiarito */
+  background-color: #0314ff; /* blu scuro */
 }
 
 .btn-deseleziona-tutte {
-  background-color: #a33224; /* rosso scuro */
+  background-color: #64170d; /* rosso scuro */
 }
 
-.btn-deseleziona-tutte:hover {
-  background-color: #bf3c30; /* rosso più chiaro */
-}
 
 .btn-indietro {
-  background-color: #e67e22; /* arancio */
+  background-color: #f87800; /* arancio */
 }
 
-.btn-indietro:hover {
-  background-color: #f0953a; /* arancio schiarito */
-}
 
 .btn-copia-selezionate {
-  background-color: #2ecc71; /* verde */
+  background-color: #cb08fc; /* rosa */
 }
 
-.btn-copia-selezionate:hover {
-  background-color: #45d182; /* verde schiarito */
-}
 
 /* Checkbox per selezione note */
 .checkbox-copia-note {

@@ -20,11 +20,8 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
-// --- FUNZIONE COPIA NOTE ---
-
-// Mostra area copia note con checkbox e bottoni personalizzati
 function creaAreaCopiaNote(macchinarioBox, id, note) {
-  // Rimuovo eventuale area precedente
+  // Rimuovo area precedente
   const oldArea = macchinarioBox.querySelector(".copia-note-area");
   if (oldArea) oldArea.remove();
 
@@ -43,15 +40,16 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   selezioneDiv.style.display = "none";
   selezioneDiv.style.marginTop = "10px";
 
-  // Lista note con checkbox
-  const listaCheckbox = document.createElement("div");
-  listaCheckbox.style.marginBottom = "8px";
+  // Lista note con checkbox dentro ogni nota (stessa lista delle note visibili)
+  const listaCheckbox = document.createElement("ul");
+  listaCheckbox.className = "note-list";
+
   note.forEach((nota, idx) => {
-    const label = document.createElement("label");
-    label.style.display = "flex";
-    label.style.alignItems = "center";
-    label.style.justifyContent = "center";
-    label.style.margin = "4px 0";
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+    li.style.justifyContent = "center";
+    li.style.gap = "8px";
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -59,11 +57,13 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
     checkbox.value = idx;
     checkbox.checked = false;
 
-    const text = document.createTextNode(` [${formatData(nota.data)}] ${nota.desc}`);
+    const testoNota = document.createElement("span");
+    testoNota.textContent = `[${formatData(nota.data)}] ${nota.desc}`;
 
-    label.appendChild(checkbox);
-    label.appendChild(text);
-    listaCheckbox.appendChild(label);
+    li.appendChild(checkbox);
+    li.appendChild(testoNota);
+
+    listaCheckbox.appendChild(li);
   });
 
   // Bottoni sotto checkbox
@@ -133,7 +133,7 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
 
     const testoDaCopiare = checkedIndexes.map(i => {
       const n = note[i];
-      return `[${formatData(n.data)}] ${n.desc}`;
+      return `[${formatData(n.data)}] ${n.desc};`;
     }).join("\n");
 
     navigator.clipboard.writeText(testoDaCopiare).then(() => {
@@ -146,37 +146,26 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   });
 }
 
-// Toast semplice per feedback
 function mostraToast(msg) {
-  let toast = document.getElementById("toast-copia-note");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "toast-copia-note";
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.backgroundColor = "rgba(0,0,0,0.8)";
-    toast.style.color = "white";
-    toast.style.padding = "12px 24px";
-    toast.style.borderRadius = "25px";
-    toast.style.fontSize = "14px";
-    toast.style.zIndex = "10000";
-    toast.style.userSelect = "none";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.3s ease";
-    document.body.appendChild(toast);
-  }
-
+  let toast = document.createElement("div");
   toast.textContent = msg;
-  toast.style.opacity = "1";
-
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.backgroundColor = "#2ecc71";
+  toast.style.color = "white";
+  toast.style.padding = "10px 20px";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+  toast.style.zIndex = 10000;
+  toast.style.fontWeight = "700";
+  document.body.appendChild(toast);
   setTimeout(() => {
-    toast.style.opacity = "0";
-  }, 1800);
+    toast.remove();
+  }, 2000);
 }
 
-// MAIN renderMacchinari (esteso con copia note)
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
@@ -238,7 +227,7 @@ function renderMacchinari(highlightId = null) {
 
       box.appendChild(noteList);
 
-      // Bottone copia note sotto lista solo se ci sono note
+      // Area copia note sotto solo se ci sono note
       if (data.note && data.note.length > 0) {
         creaAreaCopiaNote(box, id, notesSorted);
       }
@@ -430,7 +419,7 @@ function stopScan() {
   }
 }
 
-// Eventi
+// Pulsanti eventi
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
@@ -465,7 +454,7 @@ function creaMacchinarioManuale() {
 
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
 
-// All'avvio, chiudo tutti i macchinari
+// All'avvio, chiudi tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 
