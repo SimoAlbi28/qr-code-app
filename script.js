@@ -15,6 +15,168 @@ function createLineSeparator() {
   return line;
 }
 
+function formatData(d) {
+  const [yyyy, mm, dd] = d.split("-");
+  return `${dd}/${mm}/${yyyy.slice(2)}`;
+}
+
+// --- FUNZIONE COPIA NOTE ---
+
+// Mostra area copia note con checkbox e bottoni personalizzati
+function creaAreaCopiaNote(macchinarioBox, id, note) {
+  // Rimuovo eventuale area precedente
+  const oldArea = macchinarioBox.querySelector(".copia-note-area");
+  if (oldArea) oldArea.remove();
+
+  const area = document.createElement("div");
+  area.className = "copia-note-area";
+  area.style.marginTop = "10px";
+  area.style.textAlign = "center";
+
+  // Bottone iniziale: "📋 Copia Note"
+  const btnCopiaNote = document.createElement("button");
+  btnCopiaNote.textContent = "📋 Copia Note";
+  btnCopiaNote.className = "btn-copia-note";
+
+  // Area selezione (hidden all'inizio)
+  const selezioneDiv = document.createElement("div");
+  selezioneDiv.style.display = "none";
+  selezioneDiv.style.marginTop = "10px";
+
+  // Lista note con checkbox
+  const listaCheckbox = document.createElement("div");
+  listaCheckbox.style.marginBottom = "8px";
+  note.forEach((nota, idx) => {
+    const label = document.createElement("label");
+    label.style.display = "flex";
+    label.style.alignItems = "center";
+    label.style.justifyContent = "center";
+    label.style.margin = "4px 0";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "checkbox-copia-note";
+    checkbox.value = idx;
+    checkbox.checked = false;
+
+    const text = document.createTextNode(` [${formatData(nota.data)}] ${nota.desc}`);
+
+    label.appendChild(checkbox);
+    label.appendChild(text);
+    listaCheckbox.appendChild(label);
+  });
+
+  // Bottoni sotto checkbox
+  const btnSelezionaTutte = document.createElement("button");
+  btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
+  btnSelezionaTutte.className = "btn-seleziona-tutte";
+
+  const btnDeselezionaTutte = document.createElement("button");
+  btnDeselezionaTutte.textContent = "❌ Deseleziona tutte";
+  btnDeselezionaTutte.className = "btn-deseleziona-tutte";
+
+  const btnIndietro = document.createElement("button");
+  btnIndietro.textContent = "🔙 Indietro";
+  btnIndietro.className = "btn-indietro";
+
+  const btnCopiaSelezionate = document.createElement("button");
+  btnCopiaSelezionate.textContent = "📋 Copia selezionate";
+  btnCopiaSelezionate.className = "btn-copia-selezionate";
+
+  const btnContainer = document.createElement("div");
+  btnContainer.style.marginTop = "8px";
+  btnContainer.style.display = "flex";
+  btnContainer.style.justifyContent = "center";
+  btnContainer.style.flexWrap = "wrap";
+  btnContainer.style.gap = "6px";
+
+  btnContainer.appendChild(btnSelezionaTutte);
+  btnContainer.appendChild(btnDeselezionaTutte);
+  btnContainer.appendChild(btnIndietro);
+  btnContainer.appendChild(btnCopiaSelezionate);
+
+  selezioneDiv.appendChild(listaCheckbox);
+  selezioneDiv.appendChild(btnContainer);
+
+  area.appendChild(btnCopiaNote);
+  area.appendChild(selezioneDiv);
+
+  macchinarioBox.appendChild(area);
+
+  // Eventi
+
+  btnCopiaNote.addEventListener("click", () => {
+    btnCopiaNote.style.display = "none";
+    selezioneDiv.style.display = "block";
+  });
+
+  btnSelezionaTutte.addEventListener("click", () => {
+    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
+  });
+
+  btnDeselezionaTutte.addEventListener("click", () => {
+    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
+  });
+
+  btnIndietro.addEventListener("click", () => {
+    selezioneDiv.style.display = "none";
+    btnCopiaNote.style.display = "inline-block";
+  });
+
+  btnCopiaSelezionate.addEventListener("click", () => {
+    const checkedIndexes = Array.from(listaCheckbox.querySelectorAll("input[type=checkbox]:checked")).map(cb => parseInt(cb.value));
+
+    if (checkedIndexes.length === 0) {
+      alert("Seleziona almeno una nota da copiare.");
+      return;
+    }
+
+    const testoDaCopiare = checkedIndexes.map(i => {
+      const n = note[i];
+      return `[${formatData(n.data)}] ${n.desc}`;
+    }).join("\n");
+
+    navigator.clipboard.writeText(testoDaCopiare).then(() => {
+      mostraToast("✅ Note copiate!");
+      selezioneDiv.style.display = "none";
+      btnCopiaNote.style.display = "inline-block";
+    }).catch(() => {
+      alert("Errore nella copia degli appunti.");
+    });
+  });
+}
+
+// Toast semplice per feedback
+function mostraToast(msg) {
+  let toast = document.getElementById("toast-copia-note");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast-copia-note";
+    toast.style.position = "fixed";
+    toast.style.bottom = "30px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.backgroundColor = "rgba(0,0,0,0.8)";
+    toast.style.color = "white";
+    toast.style.padding = "12px 24px";
+    toast.style.borderRadius = "25px";
+    toast.style.fontSize = "14px";
+    toast.style.zIndex = "10000";
+    toast.style.userSelect = "none";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.3s ease";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = msg;
+  toast.style.opacity = "1";
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 1800);
+}
+
+// MAIN renderMacchinari (esteso con copia note)
 function renderMacchinari(highlightId = null) {
   listContainer.innerHTML = "";
 
@@ -75,6 +237,11 @@ function renderMacchinari(highlightId = null) {
       });
 
       box.appendChild(noteList);
+
+      // Bottone copia note sotto lista solo se ci sono note
+      if (data.note && data.note.length > 0) {
+        creaAreaCopiaNote(box, id, notesSorted);
+      }
 
       // Linea separazione 2 (solo se ci sono note)
       if (data.note && data.note.length > 0) {
@@ -202,11 +369,6 @@ function eliminaNota(id, index) {
   renderMacchinari();
 }
 
-function formatData(d) {
-  const [yyyy, mm, dd] = d.split("-");
-  return `${dd}/${mm}/${yyyy.slice(2)}`;
-}
-
 // QR CAM
 function startScan() {
   reader.classList.remove("hidden");
@@ -268,7 +430,7 @@ function stopScan() {
   }
 }
 
-// Pulsanti eventi
+// Eventi
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
@@ -303,7 +465,7 @@ function creaMacchinarioManuale() {
 
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
 
-// All'avvio, chiudi tutti i macchinari
+// All'avvio, chiudo tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 

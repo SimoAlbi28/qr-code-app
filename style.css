@@ -444,3 +444,72 @@ button {
   width: fit-content;
   margin: 10px auto 10px auto;
 }
+
+/* ======= STILI BOTTONI COPIA NOTE PERSONALIZZATI ======= */
+
+.btn-copia-note,
+.btn-seleziona-tutte,
+.btn-deseleziona-tutte,
+.btn-indietro,
+.btn-copia-selezionate {
+  color: white;
+  border-radius: 5px;
+  font-size: 13px;
+  padding: 5px 12px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 90px;
+  max-width: 130px;
+  transition: background-color 0.3s ease;
+  margin: 5px 3px;
+  border: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-copia-note {
+  background-color: #6a0dad; /* viola */
+}
+
+.btn-copia-note:hover {
+  background-color: #7f24e0; /* viola schiarito */
+}
+
+.btn-seleziona-tutte {
+  background-color: #6a0dad; /* viola */
+}
+
+.btn-seleziona-tutte:hover {
+  background-color: #7f24e0; /* viola schiarito */
+}
+
+.btn-deseleziona-tutte {
+  background-color: #a33224; /* rosso scuro */
+}
+
+.btn-deseleziona-tutte:hover {
+  background-color: #bf3c30; /* rosso più chiaro */
+}
+
+.btn-indietro {
+  background-color: #e67e22; /* arancio */
+}
+
+.btn-indietro:hover {
+  background-color: #f0953a; /* arancio schiarito */
+}
+
+.btn-copia-selezionate {
+  background-color: #2ecc71; /* verde */
+}
+
+.btn-copia-selezionate:hover {
+  background-color: #45d182; /* verde schiarito */
+}
+
+/* Checkbox per selezione note */
+.checkbox-copia-note {
+  transform: scale(1.3);
+  margin-right: 8px;
+  cursor: pointer;
+}
