@@ -8,6 +8,8 @@ const showAllBtn = document.getElementById("show-all-btn");
 let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
+let copiaNoteActive = false;
+
 
 function createLineSeparator() {
   const line = document.createElement("div");
@@ -183,10 +185,8 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
-      // Linea separazione 1
       box.appendChild(createLineSeparator());
 
-      // Titolo Note (solo se ci sono note)
       if (data.note && data.note.length > 0) {
         const noteTitle = document.createElement("h4");
         noteTitle.textContent = "Note";
@@ -194,7 +194,6 @@ function renderMacchinari(highlightId = null) {
         box.appendChild(noteTitle);
       }
 
-      // Lista note
       const noteList = document.createElement("ul");
       noteList.className = "note-list";
 
@@ -202,58 +201,55 @@ function renderMacchinari(highlightId = null) {
         b.data.localeCompare(a.data)
       );
 
-     notesSorted.forEach((nota, index) => {
-      const li = document.createElement("li");
-      li.style.display = "flex";
-      li.style.alignItems = "center";
-      li.style.justifyContent = "space-between";
-      li.style.gap = "10px";
+      notesSorted.forEach((nota, index) => {
+        const li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.alignItems = "center";
+        li.style.justifyContent = "space-between";
+        li.style.gap = "10px";
 
-      // Checkbox dentro la nota
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.className = "checkbox-copia-note";
-      checkbox.value = index;
+        // Checkbox visibile SOLO se modalità copia attiva
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "checkbox-copia-note";
+        checkbox.value = index;
+        checkbox.style.display = copiaNoteActive ? "inline-block" : "none";
 
-      // Contenuto testo nota
-      const testoNota = document.createElement("div");
-      testoNota.style.flex = "1";
-      testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
+        const testoNota = document.createElement("div");
+        testoNota.style.flex = "1";
+        testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
 
-      // Bottoni modifica/elimina
-      const btns = document.createElement("div");
-      btns.className = "btns-note";
-      btns.innerHTML = `
-        <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-        <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-      `;
+        // Bottoni modifica/elimina visibili SOLO se modalità copia NON attiva
+        const btns = document.createElement("div");
+        btns.className = "btns-note";
+        btns.innerHTML = `
+          <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+          <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+        `;
+        btns.style.display = copiaNoteActive ? "none" : "flex";
 
-      li.appendChild(checkbox);
-      li.appendChild(testoNota);
-      li.appendChild(btns);
+        li.appendChild(checkbox);
+        li.appendChild(testoNota);
+        li.appendChild(btns);
 
-      noteList.appendChild(li);
-    });
+        noteList.appendChild(li);
+      });
 
       box.appendChild(noteList);
 
-      // Area copia note sotto solo se ci sono note
       if (data.note && data.note.length > 0) {
         creaAreaCopiaNote(box, id, notesSorted);
       }
 
-      // Linea separazione 2 (solo se ci sono note)
       if (data.note && data.note.length > 0) {
         box.appendChild(createLineSeparator());
       }
 
-      // Titolo Inserimento Note
       const insertNoteTitle = document.createElement("h4");
       insertNoteTitle.textContent = "Inserimento Note";
       insertNoteTitle.className = "titolo-note";
       box.appendChild(insertNoteTitle);
 
-      // Form inserimento note
       const noteForm = document.createElement("div");
       noteForm.className = "note-form";
       noteForm.innerHTML = `
@@ -268,10 +264,8 @@ function renderMacchinari(highlightId = null) {
 
       box.appendChild(noteForm);
 
-      // Linea separazione 3
       box.appendChild(createLineSeparator());
 
-      // Bottoni ultimi 3
       const btnsContainer = document.createElement("div");
       btnsContainer.className = "btns-macchinario";
       btnsContainer.innerHTML = `

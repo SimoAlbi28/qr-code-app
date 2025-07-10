@@ -506,3 +506,23 @@ button {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* Checkbox note nascosta di default */
+.note-list li input[type="checkbox"] {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%) scale(1.3);
+  cursor: pointer;
+}
+
+/* Quando il contenitore ha classe .modalita-copia attiva: mostra checkbox e nasconde bottoni */
+.macchinario.modalita-copia li input[type="checkbox"] {
+  display: inline-block;
+}
+
+/* Nasconde bottoni modifica/elimina in modalità copia */
+.macchinario.modalita-copia .btns-note {
+  display: none;
+}
