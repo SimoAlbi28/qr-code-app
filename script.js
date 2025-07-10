@@ -212,18 +212,38 @@ function renderMacchinari(highlightId = null) {
         b.data.localeCompare(a.data)
       );
 
-      notesSorted.forEach((nota, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span class="nota-data">${formatData(nota.data)}</span><br>
-          <span class="nota-desc">${nota.desc}</span>
-          <div class="btns-note">
-            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-          </div>
-        `;
-        noteList.appendChild(li);
-      });
+     notesSorted.forEach((nota, index) => {
+      const li = document.createElement("li");
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.justifyContent = "space-between";
+      li.style.gap = "10px";
+
+      // Checkbox dentro la nota
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "checkbox-copia-note";
+      checkbox.value = index;
+
+      // Contenuto testo nota
+      const testoNota = document.createElement("div");
+      testoNota.style.flex = "1";
+      testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
+
+      // Bottoni modifica/elimina
+      const btns = document.createElement("div");
+      btns.className = "btns-note";
+      btns.innerHTML = `
+        <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+        <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+      `;
+
+      li.appendChild(checkbox);
+      li.appendChild(testoNota);
+      li.appendChild(btns);
+
+      noteList.appendChild(li);
+    });
 
       box.appendChild(noteList);
 
