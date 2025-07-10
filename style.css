@@ -465,7 +465,7 @@ button {
 }
 
 .btn-seleziona-tutte {
-  background-color: #0314ff; /* blu scuro */
+  background-color: #0090a3; /* verde-acqua */
 }
 
 .btn-deseleziona-tutte {
@@ -488,4 +488,21 @@ button {
   transform: scale(1.3);
   margin-right: 8px;
   cursor: pointer;
+}
+
+/* Container per i 4 bottoni copia note in colonna 2x2 */
+.btns-copia-note-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 8px 10px;
+  justify-content: center;
+  max-width: 280px;
+  margin: 10px auto 20px auto;
+  /* mantiene il centro e spaziatura */
+}
+
+/* Assicura che i bottoni abbiano la stessa larghezza */
+.btns-copia-note-container button {
+  width: 100%;
+  box-sizing: border-box;
 }
