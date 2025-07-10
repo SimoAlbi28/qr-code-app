@@ -30,17 +30,14 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   area.style.marginTop = "10px";
   area.style.textAlign = "center";
 
-  // Bottone iniziale: "📋 Copia Note"
   const btnCopiaNote = document.createElement("button");
   btnCopiaNote.textContent = "📋 Copia Note";
   btnCopiaNote.className = "btn-copia-note";
 
-  // Area selezione (hidden all'inizio)
   const selezioneDiv = document.createElement("div");
   selezioneDiv.style.display = "none";
   selezioneDiv.style.marginTop = "10px";
 
-  // Lista note con checkbox dentro ogni nota (stessa lista delle note visibili)
   const listaCheckbox = document.createElement("ul");
   listaCheckbox.className = "note-list";
 
@@ -56,17 +53,18 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
     checkbox.className = "checkbox-copia-note";
     checkbox.value = idx;
     checkbox.checked = false;
+    checkbox.style.display = "inline-block"; // default visibile solo in copia mode
 
     const testoNota = document.createElement("span");
     testoNota.textContent = `[${formatData(nota.data)}] ${nota.desc}`;
 
-    li.appendChild(checkbox);
     li.appendChild(testoNota);
+    li.appendChild(checkbox);
 
     listaCheckbox.appendChild(li);
   });
 
-  // Bottoni sotto checkbox
+  // Bottoni selezione
   const btnSelezionaTutte = document.createElement("button");
   btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
   btnSelezionaTutte.className = "btn-seleziona-tutte";
@@ -103,11 +101,27 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
 
   macchinarioBox.appendChild(area);
 
-  // Eventi
+  // Qui controllo i bottoni modifica/elimina e checkbox nelle note della lista principale
+  function updateNoteButtonsAndCheckboxes(showCheckboxes) {
+    const liNotes = macchinarioBox.querySelectorAll(".note-list li");
+    liNotes.forEach((li, i) => {
+      const checkbox = li.querySelector("input[type=checkbox]");
+      const btns = li.querySelector(".btns-note");
+      if (checkbox) checkbox.style.display = showCheckboxes ? "inline-block" : "none";
+      if (btns) btns.style.display = showCheckboxes ? "none" : "flex";
+    });
+  }
 
   btnCopiaNote.addEventListener("click", () => {
     btnCopiaNote.style.display = "none";
     selezioneDiv.style.display = "block";
+    updateNoteButtonsAndCheckboxes(true);
+  });
+
+  btnIndietro.addEventListener("click", () => {
+    selezioneDiv.style.display = "none";
+    btnCopiaNote.style.display = "inline-block";
+    updateNoteButtonsAndCheckboxes(false);
   });
 
   btnSelezionaTutte.addEventListener("click", () => {
@@ -116,11 +130,6 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
 
   btnDeselezionaTutte.addEventListener("click", () => {
     listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
-  });
-
-  btnIndietro.addEventListener("click", () => {
-    selezioneDiv.style.display = "none";
-    btnCopiaNote.style.display = "inline-block";
   });
 
   btnCopiaSelezionate.addEventListener("click", () => {
@@ -140,30 +149,11 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
       mostraToast("✅ Note copiate!");
       selezioneDiv.style.display = "none";
       btnCopiaNote.style.display = "inline-block";
+      updateNoteButtonsAndCheckboxes(false);
     }).catch(() => {
       alert("Errore nella copia degli appunti.");
     });
   });
-}
-
-function mostraToast(msg) {
-  let toast = document.createElement("div");
-  toast.textContent = msg;
-  toast.style.position = "fixed";
-  toast.style.bottom = "20px";
-  toast.style.left = "50%";
-  toast.style.transform = "translateX(-50%)";
-  toast.style.backgroundColor = "#2ecc71";
-  toast.style.color = "white";
-  toast.style.padding = "10px 20px";
-  toast.style.borderRadius = "8px";
-  toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
-  toast.style.zIndex = 10000;
-  toast.style.fontWeight = "700";
-  document.body.appendChild(toast);
-  setTimeout(() => {
-    toast.remove();
-  }, 2000);
 }
 
 function renderMacchinari(highlightId = null) {
