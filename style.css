@@ -33,13 +33,6 @@ body {
   letter-spacing: 4px;
 }
 
-.title-bottom {
-  font-weight: 900;
-  font-size: 20px; /* più piccolo */
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
 h2 {
   font-weight: 700;
   margin: 20px 0 15px;
