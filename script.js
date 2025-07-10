@@ -20,112 +20,43 @@ function formatData(d) {
   return `${dd}/${mm}/${yyyy.slice(2)}`;
 }
 
+// Funzione per avviare la selezione note da copiare
 function avviaSelezioneNote(id) {
-  const box = document.querySelector(`.macchinario[data-id="${id}"]`);
-  if (!box) return;
+  const macchBox = document.querySelector(`.macchinario[data-id="${id}"]`);
+  if (!macchBox) return;
 
-  // Nascondo la lista note e il btn copia originale
-  const noteList = box.querySelector(".note-list");
-  const btnCopiaNote = box.querySelector(".btn-copia-note");
-  if (noteList) noteList.style.display = "none";
+  const listaCheckbox = macchBox.querySelectorAll(".note-list li input[type=checkbox]");
+  if (!listaCheckbox.length) return;
+
+  // Mostra i checkbox (li sono già con checkbox dentro)
+  listaCheckbox.forEach(cb => cb.style.display = "inline-block");
+  
+  // Mostra i bottoni sotto le note per seleziona/deseleziona, indietro, copia selezionate
+  const btnContainer = macchBox.querySelector(".btns-copia-note");
+  if (btnContainer) btnContainer.style.display = "flex";
+
+  // Nascondi bottone "Copia Note"
+  const btnCopiaNote = macchBox.querySelector(".btn-copia-note");
   if (btnCopiaNote) btnCopiaNote.style.display = "none";
+}
 
-  // Creo la lista con checkbox dentro ogni nota
-  const listaCheckbox = document.createElement("ul");
-  listaCheckbox.className = "note-list";
+function terminaSelezioneNote(id) {
+  const macchBox = document.querySelector(`.macchinario[data-id="${id}"]`);
+  if (!macchBox) return;
 
-  const note = savedMacchinari[id].note || [];
+  const listaCheckbox = macchBox.querySelectorAll(".note-list li input[type=checkbox]");
+  if (!listaCheckbox.length) return;
 
-  note.forEach((nota, idx) => {
-    const li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.alignItems = "center";
-    li.style.gap = "8px";
+  // Nascondi checkbox
+  listaCheckbox.forEach(cb => cb.style.display = "none");
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.className = "checkbox-copia-note";
-    checkbox.value = idx;
-    checkbox.checked = false;
+  // Nascondi bottoni seleziona/deseleziona, indietro, copia selezionate
+  const btnContainer = macchBox.querySelector(".btns-copia-note");
+  if (btnContainer) btnContainer.style.display = "none";
 
-    const testoNota = document.createElement("span");
-    testoNota.textContent = `- [${formatData(nota.data)}]: ${nota.desc};`;
-
-    li.appendChild(checkbox);
-    li.appendChild(testoNota);
-
-    listaCheckbox.appendChild(li);
-  });
-
-  box.appendChild(listaCheckbox);
-
-  // Creo contenitore bottoni selezione e copia
-  const btnsCopiaDiv = document.createElement("div");
-  btnsCopiaDiv.style.marginTop = "8px";
-  btnsCopiaDiv.style.display = "flex";
-  btnsCopiaDiv.style.justifyContent = "center";
-  btnsCopiaDiv.style.flexWrap = "wrap";
-  btnsCopiaDiv.style.gap = "6px";
-
-  // Btn seleziona tutte
-  const btnSelezionaTutte = document.createElement("button");
-  btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
-  btnSelezionaTutte.className = "btn-seleziona-tutte";
-  btnSelezionaTutte.onclick = () => {
-    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
-  };
-
-  // Btn deseleziona tutte
-  const btnDeselezionaTutte = document.createElement("button");
-  btnDeselezionaTutte.textContent = "❌ Deseleziona tutte";
-  btnDeselezionaTutte.className = "btn-deseleziona-tutte";
-  btnDeselezionaTutte.onclick = () => {
-    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
-  };
-
-  // Btn indietro (torna alla visualizzazione normale)
-  const btnIndietro = document.createElement("button");
-  btnIndietro.textContent = "🔙 Indietro";
-  btnIndietro.className = "btn-indietro";
-  btnIndietro.onclick = () => {
-    listaCheckbox.remove();
-    btnsCopiaDiv.remove();
-    if (noteList) noteList.style.display = "block";
-    if (btnCopiaNote) btnCopiaNote.style.display = "inline-block";
-  };
-
-  // Btn copia selezionate
-  const btnCopiaSelezionate = document.createElement("button");
-  btnCopiaSelezionate.textContent = "📋 Copia selezionate";
-  btnCopiaSelezionate.className = "btn-copia-selezionate";
-  btnCopiaSelezionate.onclick = () => {
-    const checkedIndexes = Array.from(listaCheckbox.querySelectorAll("input[type=checkbox]:checked")).map(cb => parseInt(cb.value));
-
-    if (checkedIndexes.length === 0) {
-      alert("Seleziona almeno una nota da copiare.");
-      return;
-    }
-
-    const testoDaCopiare = checkedIndexes.map(i => {
-      const n = note[i];
-      return `- [${formatData(n.data)}]: ${n.desc};`;
-    }).join("\n");
-
-    navigator.clipboard.writeText(testoDaCopiare).then(() => {
-      mostraToast("✅ Note copiate!");
-      // Torna alla visualizzazione normale
-      btnIndietro.onclick();
-    }).catch(() => {
-      alert("Errore nella copia degli appunti.");
-    });
-  };
-
-  btnsCopiaDiv.appendChild(btnSelezionaTutte);
-  btnsCopiaDiv.appendChild(btnDeselezionaTutte);
-  btnsCopiaDiv.appendChild(btnIndietro);
-  btnsCopiaDiv.appendChild(btnCopiaSelezionate);
-
-  box.appendChild(btnsCopiaDiv);
+  // Mostra bottone "Copia Note"
+  const btnCopiaNote = macchBox.querySelector(".btn-copia-note");
+  if (btnCopiaNote) btnCopiaNote.style.display = "inline-block";
 }
 
 function mostraToast(msg) {
@@ -171,12 +102,15 @@ function renderMacchinari(highlightId = null) {
         <button class="toggle-btn" onclick="toggleDettagli('${id}')">
           ${expanded ? "🔽" : "🔼"}
         </button>
+        <button class="btn-green" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+        <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
       </div>
     `;
 
     if (expanded) {
       box.appendChild(createLineSeparator());
 
+      // NOTE SECTION
       if (data.note && data.note.length > 0) {
         const noteTitle = document.createElement("h4");
         noteTitle.textContent = "Note";
@@ -186,16 +120,18 @@ function renderMacchinari(highlightId = null) {
         const noteList = document.createElement("ul");
         noteList.className = "note-list";
 
-        const notesSorted = data.note.sort((a, b) =>
+        // Ordina note per data decrescente
+        const notesSorted = data.note.slice().sort((a, b) =>
           b.data.localeCompare(a.data)
         );
 
         notesSorted.forEach((nota, index) => {
           const li = document.createElement("li");
 
+          // Checkbox nascosti di default
           li.innerHTML = `
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="checkbox" class="checkbox-copia-note" data-id="${id}" data-index="${index}" />
+              <input type="checkbox" class="checkbox-copia-note" data-id="${id}" data-index="${index}" style="display:none" />
               <div>
                 <span class="nota-data">${formatData(nota.data)}</span><br>
                 <span class="nota-desc">${nota.desc}</span>
@@ -214,12 +150,100 @@ function renderMacchinari(highlightId = null) {
 
         box.appendChild(createLineSeparator());
 
+        // Bottoni per la selezione e copia note (nascosti di default)
+        const btnsCopiaNote = document.createElement("div");
+        btnsCopiaNote.className = "btns-copia-note";
+        btnsCopiaNote.style.display = "none";
+        btnsCopiaNote.style.justifyContent = "center";
+        btnsCopiaNote.style.gap = "6px";
+        btnsCopiaNote.style.flexWrap = "wrap";
+
+        const btnSelezionaTutte = document.createElement("button");
+        btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
+        btnSelezionaTutte.className = "btn-seleziona-tutte";
+        btnSelezionaTutte.onclick = () => {
+          const checkboxes = box.querySelectorAll(".note-list input[type=checkbox]");
+          checkboxes.forEach(cb => cb.checked = true);
+        };
+
+        const btnDeselezionaTutte = document.createElement("button");
+        btnDeselezionaTutte.textContent = "❌ Deseleziona tutte";
+        btnDeselezionaTutte.className = "btn-deseleziona-tutte";
+        btnDeselezionaTutte.onclick = () => {
+          const checkboxes = box.querySelectorAll(".note-list input[type=checkbox]");
+          checkboxes.forEach(cb => cb.checked = false);
+        };
+
+        const btnIndietro = document.createElement("button");
+        btnIndietro.textContent = "🔙 Indietro";
+        btnIndietro.className = "btn-indietro";
+        btnIndietro.onclick = () => terminaSelezioneNote(id);
+
+        const btnCopiaSelezionate = document.createElement("button");
+        btnCopiaSelezionate.textContent = "📋 Copia selezionate";
+        btnCopiaSelezionate.className = "btn-copia-selezionate";
+        btnCopiaSelezionate.onclick = () => {
+          const checkboxes = box.querySelectorAll(".note-list input[type=checkbox]:checked");
+          if (checkboxes.length === 0) {
+            alert("Seleziona almeno una nota da copiare.");
+            return;
+          }
+          const testoDaCopiare = Array.from(checkboxes).map(cb => {
+            const idx = parseInt(cb.getAttribute("data-index"));
+            const n = data.note[idx];
+            return `- [${formatData(n.data)}]: ${n.desc};`;
+          }).join("\n");
+
+          navigator.clipboard.writeText(testoDaCopiare).then(() => {
+            mostraToast("✅ Note copiate!");
+            terminaSelezioneNote(id);
+          }).catch(() => {
+            alert("Errore nella copia degli appunti.");
+          });
+        };
+
+        btnsCopiaNote.appendChild(btnSelezionaTutte);
+        btnsCopiaNote.appendChild(btnDeselezionaTutte);
+        btnsCopiaNote.appendChild(btnIndietro);
+        btnsCopiaNote.appendChild(btnCopiaSelezionate);
+
+        box.appendChild(btnsCopiaNote);
+
+        // Bottone Copia Note
         const btnCopiaNote = document.createElement("button");
         btnCopiaNote.className = "btn-copia-note";
         btnCopiaNote.textContent = "📋 Copia note";
         btnCopiaNote.onclick = () => avviaSelezioneNote(id);
+
         box.appendChild(btnCopiaNote);
       }
+
+      // FORM per aggiungere nota
+      const formNota = document.createElement("form");
+      formNota.className = "note-form";
+      formNota.onsubmit = (e) => {
+        e.preventDefault();
+        const dataInput = formNota.querySelector("input[type=date]");
+        const descInput = formNota.querySelector("input[type=text]");
+        if (!dataInput.value || !descInput.value.trim()) {
+          alert("Inserisci data e descrizione");
+          return;
+        }
+        savedMacchinari[id].note = savedMacchinari[id].note || [];
+        savedMacchinari[id].note.push({ data: dataInput.value, desc: descInput.value.trim() });
+        localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+        renderMacchinari(id);
+      };
+
+      formNota.innerHTML = `
+        <label for="data-${id}">Data:</label>
+        <input type="date" id="data-${id}" name="data-${id}" required />
+        <label for="desc-${id}">Descrizione:</label>
+        <input type="text" id="desc-${id}" name="desc-${id}" required placeholder="Descrizione nota" />
+        <button type="submit" class="btn-green">➕ Aggiungi Nota</button>
+      `;
+
+      box.appendChild(formNota);
     }
 
     listContainer.appendChild(box);
@@ -271,27 +295,23 @@ function rinominaMacchinario(id) {
 }
 
 function eliminaMacchinario(id) {
+  if (!confirm("Sei sicuro di voler eliminare questo macchinario?")) return;
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
 }
 
-function aggiungiNota(id) {
-  const data = document.getElementById(`data-${id}`).value;
-  const desc = document.getElementById(`desc-${id}`).value.trim();
-  if (data && desc) {
-    savedMacchinari[id].note = savedMacchinari[id].note || [];
-    savedMacchinari[id].note.push({ data, desc });
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
-  }
-}
-
 function modificaNota(id, index) {
+  const nota = savedMacchinari[id].note[index];
+  if (!nota) return;
+
+  // Riempi il form con la nota da modificare
   const dataInput = document.getElementById(`data-${id}`);
   const descInput = document.getElementById(`desc-${id}`);
-  const nota = savedMacchinari[id].note[index];
 
+  if (!dataInput || !descInput) return;
+
+  // Se il form è già compilato con questa nota, svuotalo
   if (dataInput.value === nota.data && descInput.value === nota.desc) {
     dataInput.value = "";
     descInput.value = "";
@@ -302,6 +322,7 @@ function modificaNota(id, index) {
 }
 
 function eliminaNota(id, index) {
+  if (!confirm("Sei sicuro di voler eliminare questa nota?")) return;
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
@@ -403,7 +424,7 @@ function creaMacchinarioManuale() {
 
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
 
-// All'avvio, chiudo tutti i macchinari
+// All'avvio, chiudi tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 
