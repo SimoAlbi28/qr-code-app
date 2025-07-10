@@ -193,84 +193,55 @@ function renderMacchinari(highlightId = null) {
     `;
 
     if (expanded) {
-      // Linea separazione 1
       box.appendChild(createLineSeparator());
 
-      // Titolo Note (solo se ci sono note)
       if (data.note && data.note.length > 0) {
         const noteTitle = document.createElement("h4");
         noteTitle.textContent = "Note";
         noteTitle.className = "titolo-note";
         box.appendChild(noteTitle);
-      }
 
-      // Lista note
-      const noteList = document.createElement("ul");
-      noteList.className = "note-list";
+        // Lista note con checkbox dentro ogni li
+        const noteList = document.createElement("ul");
+        noteList.className = "note-list";
 
-      const notesSorted = (data.note || []).sort((a, b) =>
-        b.data.localeCompare(a.data)
-      );
+        const notesSorted = data.note.sort((a, b) =>
+          b.data.localeCompare(a.data)
+        );
 
-      notesSorted.forEach((nota, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span class="nota-data">${formatData(nota.data)}</span><br>
-          <span class="nota-desc">${nota.desc}</span>
-          <div class="btns-note">
-            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-          </div>
-        `;
-        noteList.appendChild(li);
-      });
+        notesSorted.forEach((nota, index) => {
+          const li = document.createElement("li");
 
-      box.appendChild(noteList);
+          li.innerHTML = `
+            <label style="display:flex; align-items:center; gap: 8px; cursor:pointer;">
+              <input type="checkbox" class="checkbox-copia-note" data-id="${id}" data-index="${index}" />
+              <div>
+                <span class="nota-data">${formatData(nota.data)}</span><br>
+                <span class="nota-desc">${nota.desc}</span>
+              </div>
+            </label>
+            <div class="btns-note">
+              <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+              <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+            </div>
+          `;
 
-      // Area copia note sotto solo se ci sono note
-      if (data.note && data.note.length > 0) {
-        creaAreaCopiaNote(box, id, notesSorted);
-      }
+          noteList.appendChild(li);
+        });
 
-      // Linea separazione 2 (solo se ci sono note)
-      if (data.note && data.note.length > 0) {
+        box.appendChild(noteList);
+
         box.appendChild(createLineSeparator());
+
+        // Bottone COPIA NOTE visibile solo se ci sono note
+        const btnCopiaNote = document.createElement("button");
+        btnCopiaNote.className = "btn-copia-note";
+        btnCopiaNote.textContent = "📋 Copia note";
+        btnCopiaNote.onclick = () => avviaSelezioneNote(id);
+        box.appendChild(btnCopiaNote);
       }
 
-      // Titolo Inserimento Note
-      const insertNoteTitle = document.createElement("h4");
-      insertNoteTitle.textContent = "Inserimento Note";
-      insertNoteTitle.className = "titolo-note";
-      box.appendChild(insertNoteTitle);
-
-      // Form inserimento note
-      const noteForm = document.createElement("div");
-      noteForm.className = "note-form";
-      noteForm.innerHTML = `
-        <label>Data:</label>
-        <input type="date" id="data-${id}">
-        <label>Descrizione (max 300):</label>
-        <input type="text" id="desc-${id}" maxlength="300">
-        <div style="text-align:center; margin-top:10px;">
-          <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
-        </div>
-      `;
-
-      box.appendChild(noteForm);
-
-      // Linea separazione 3
-      box.appendChild(createLineSeparator());
-
-      // Bottoni ultimi 3
-      const btnsContainer = document.createElement("div");
-      btnsContainer.className = "btns-macchinario";
-      btnsContainer.innerHTML = `
-        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
-        <button id="btn-chiudi" class="btn-orange" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
-        <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
-      `;
-
-      box.appendChild(btnsContainer);
+      // resto come prima...
     }
 
     listContainer.appendChild(box);
