@@ -31,7 +31,7 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   area.style.textAlign = "center";
 
   const btnCopiaNote = document.createElement("button");
-  btnCopiaNote.textContent = "📋 Copia Note";
+  btnCopiaNote.textContent = "📋 Copia";
   btnCopiaNote.className = "btn-copia-note";
 
   const selezioneDiv = document.createElement("div");
@@ -51,7 +51,7 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   btnIndietro.className = "btn-indietro";
 
   const btnCopiaSelezionate = document.createElement("button");
-  btnCopiaSelezionate.textContent = "📋 Copia selezionate";
+  btnCopiaSelezionate.textContent = "📋 Copia";
   btnCopiaSelezionate.className = "btn-copia-selezionate";
 
   const btnContainer = document.createElement("div");
