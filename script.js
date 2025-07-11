@@ -296,6 +296,10 @@ function rinominaMacchinario(id) {
 }
 
 function eliminaMacchinario(id) {
+  const nome = savedMacchinari[id].nome;
+  const conferma = confirm(`Sei sicuro di voler eliminare "${nome}"?`);
+  if (!conferma) return;
+
   delete savedMacchinari[id];
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
@@ -327,6 +331,13 @@ function modificaNota(id, index) {
 }
 
 function eliminaNota(id, index) {
+  const nota = savedMacchinari[id].note[index];
+  const parole = nota.desc.trim().split(/\s+/);
+  const descBreve = parole.length > 10 ? parole.slice(0, 10).join(" ") + "..." : nota.desc;
+
+  const conferma = confirm(`Vuoi davvero eliminare la nota del ${formatData(nota.data)}?\n\n"${descBreve}"`);
+  if (!conferma) return;
+
   savedMacchinari[id].note.splice(index, 1);
   localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
   renderMacchinari();
