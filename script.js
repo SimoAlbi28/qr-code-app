@@ -351,7 +351,7 @@ function startScan() {
 
       if (!savedMacchinari[qrCodeMessage]) {
         function chiediNome() {
-          const nome = prompt("Nome del macchinario:")?.trim().toUpperCase();
+          const nome = prompt("Nome:")?.trim().toUpperCase();
           if (!nome) return;
 
           const esisteGia = Object.values(savedMacchinari).some(
@@ -404,7 +404,7 @@ showAllBtn.addEventListener("click", () => {
 });
 
 function creaMacchinarioManuale() {
-  const nome = prompt("Inserisci il nome del nuovo macchinario:")?.trim().toUpperCase();
+  const nome = prompt("Inserire nome:")?.trim().toUpperCase();
   if (!nome) return;
 
   const esisteGia = Object.values(savedMacchinari).some(

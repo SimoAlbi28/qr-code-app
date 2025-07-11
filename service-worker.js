@@ -1,4 +1,4 @@
-const CACHE_NAME = "gestione-macchinari-v2";
+const CACHE_NAME = "Manutenzioni";
 const urlsToCache = [
   "./",
   "./index.html",
