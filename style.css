@@ -209,11 +209,18 @@ button {
   background: #0056b3;
 }
 
-.note-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 15px 0;
-  text-align: left;
+.note-list li {
+  position: relative;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 12px 12px 40px 12px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: break-word;
+  display: block;
 }
 
 .note-list li {
@@ -223,7 +230,12 @@ button {
   border-radius: 8px;
   margin-bottom: 12px;
   padding: 12px 12px 40px 12px;
+  padding-right: 45px; /* spazio per checkbox */
   word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: break-word;
+  display: block;
 }
 
 .nota-data {
