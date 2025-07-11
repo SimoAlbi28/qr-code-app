@@ -8,7 +8,82 @@ const showAllBtn = document.getElementById("show-all-btn");
 let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
-let copiaNoteActive = false;let notaInModifica = null;
+let copiaNoteActive = false;
+let notaInModifica = null;
+
+// --- MODAL PERSONALIZZATO PER CONFERME ---
+function mostraModalConferma(messaggio, onConferma, onAnnulla) {
+  let oldModal = document.getElementById("custom-confirm-modal");
+  if (oldModal) oldModal.remove();
+
+  const overlay = document.createElement("div");
+  overlay.id = "custom-confirm-modal";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "10000";
+
+  const box = document.createElement("div");
+  box.style.backgroundColor = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "8px";
+  box.style.width = "320px";
+  box.style.maxWidth = "90%";
+  box.style.textAlign = "center";
+  box.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+  box.style.fontFamily = "Segoe UI, Tahoma, Geneva, Verdana, sans-serif";
+
+  const msg = document.createElement("p");
+  msg.style.marginBottom = "20px";
+  msg.style.whiteSpace = "pre-wrap";
+  msg.textContent = messaggio;
+  box.appendChild(msg);
+
+  const btnContainer = document.createElement("div");
+  btnContainer.style.display = "flex";
+  btnContainer.style.justifyContent = "center";
+  btnContainer.style.gap = "15px";
+
+  const btnAnnulla = document.createElement("button");
+  btnAnnulla.textContent = "Annulla";
+  btnAnnulla.style.padding = "8px 16px";
+  btnAnnulla.style.border = "none";
+  btnAnnulla.style.backgroundColor = "#f44336";
+  btnAnnulla.style.color = "white";
+  btnAnnulla.style.borderRadius = "4px";
+  btnAnnulla.style.cursor = "pointer";
+  btnAnnulla.onclick = () => {
+    document.body.removeChild(overlay);
+    if (onAnnulla) onAnnulla();
+  };
+
+  const btnConferma = document.createElement("button");
+  btnConferma.textContent = "Conferma";
+  btnConferma.style.padding = "8px 16px";
+  btnConferma.style.border = "none";
+  btnConferma.style.backgroundColor = "#4CAF50";
+  btnConferma.style.color = "white";
+  btnConferma.style.borderRadius = "4px";
+  btnConferma.style.cursor = "pointer";
+  btnConferma.onclick = () => {
+    document.body.removeChild(overlay);
+    if (onConferma) onConferma();
+  };
+
+  btnContainer.appendChild(btnAnnulla);
+  btnContainer.appendChild(btnConferma);
+  box.appendChild(btnContainer);
+  overlay.appendChild(box);
+
+  document.body.appendChild(overlay);
+}
+// --- FINE MODAL ---
 
 function createLineSeparator() {
   const line = document.createElement("div");
@@ -297,12 +372,17 @@ function rinominaMacchinario(id) {
 
 function eliminaMacchinario(id) {
   const nome = savedMacchinari[id].nome;
-  const conferma = confirm(`Sei sicuro di voler eliminare "${nome}"?`);
-  if (!conferma) return;
-
-  delete savedMacchinari[id];
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  mostraModalConferma(
+    `Sei sicuro di voler eliminare "${nome}"?`,
+    () => {
+      delete savedMacchinari[id];
+      localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+      renderMacchinari();
+    },
+    () => {
+      // Annullato: niente
+    }
+  );
 }
 
 function aggiungiNota(id) {
@@ -344,18 +424,22 @@ function modificaNota(id, index) {
   }
 }
 
-
 function eliminaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
   const parole = nota.desc.trim().split(/\s+/);
   const descBreve = parole.length > 10 ? parole.slice(0, 10).join(" ") + "..." : nota.desc;
 
-  const conferma = confirm(`Vuoi davvero eliminare la nota del ${formatData(nota.data)}?\n\n"${descBreve}"`);
-  if (!conferma) return;
-
-  savedMacchinari[id].note.splice(index, 1);
-  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-  renderMacchinari();
+  mostraModalConferma(
+    `Vuoi davvero eliminare la nota del ${formatData(nota.data)}?\n\n"${descBreve}"`,
+    () => {
+      savedMacchinari[id].note.splice(index, 1);
+      localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+      renderMacchinari();
+    },
+    () => {
+      // Annullato: niente
+    }
+  );
 }
 
 function startScan() {

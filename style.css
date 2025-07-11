@@ -373,7 +373,7 @@ button {
   font-size: 14px;
   padding: 6px 10px;
   border-radius: 8px;
-  background-color: #3498db;
+  background-color: rgb(116, 57, 255);
   color: white;
   cursor: pointer;
   user-select: none;
