@@ -539,21 +539,23 @@ button {
   display: none;
 }
 
+.note-list li {
+  border: 1px solid #ccc; /* bordo default */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
 .note-list li input[type="checkbox"]:checked {
-  /* serve per attivare lo stile sul genitore */
+  /* serve solo a triggerare il selettore */
 }
 
-/* Usa il selettore sibling per cambiare stile del li quando checkbox è checked */
-.note-list li input[type="checkbox"]:checked + div {
-  border: 2px solid #555; /* bordo più scuro */
-  border-radius: 8px;
+/* Usa un trucco CSS per cambiare stile del li quando checkbox è checked */
+.note-list li input[type="checkbox"]:checked ~ div,
+.note-list li input[type="checkbox"]:checked ~ .btns-note {
+  /* opzionale se vuoi stilizzare testo o bottoni */
+}
+
+/* Il vero cambio di bordo esterno al li con :has() se browser supporta */
+.note-list li:has(input[type="checkbox"]:checked) {
+  border-color: #444;
   box-shadow: 0 0 8px rgba(0,0,0,0.3);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Assicurati che il div testoNota abbia un bordo di default */
-.note-list li div {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
