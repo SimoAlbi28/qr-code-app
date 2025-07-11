@@ -110,10 +110,14 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
       return;
     }
 
-    const testoDaCopiare = checkedIndexes.map(i => {
-      const n = note[i];
-      return `[${formatData(n.data)}] ${n.desc};`;
-    }).join("\n");
+    const nomeMacchinario = savedMacchinari[id].nome;
+
+    const testoDaCopiare = `${nomeMacchinario.toUpperCase()}\n\n` + 
+      checkedIndexes.map(i => {
+        const n = note[i];
+        return `- [${formatData(n.data)}]: ${n.desc};`;
+      }).join("\n");
+
 
     navigator.clipboard.writeText(testoDaCopiare).then(() => {
       alert("✅ Note copiate!");
