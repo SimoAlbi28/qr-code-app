@@ -8,7 +8,7 @@ const showAllBtn = document.getElementById("show-all-btn");
 let searchFilter = "";
 let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
-let copiaNoteActive = false;
+let copiaNoteActive = false;let notaInModifica = null;
 
 function createLineSeparator() {
   const line = document.createElement("div");
@@ -308,12 +308,22 @@ function eliminaMacchinario(id) {
 function aggiungiNota(id) {
   const data = document.getElementById(`data-${id}`).value;
   const desc = document.getElementById(`desc-${id}`).value.trim();
-  if (data && desc) {
+  if (!data || !desc) return;
+
+  if (notaInModifica && notaInModifica.id === id) {
+    // MODIFICA
+    savedMacchinari[id].note[notaInModifica.index] = { data, desc };
+    notaInModifica = null;
+  } else {
+    // AGGIUNGI NUOVA
     savedMacchinari[id].note = savedMacchinari[id].note || [];
     savedMacchinari[id].note.push({ data, desc });
-    localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
-    renderMacchinari();
   }
+
+  document.getElementById(`data-${id}`).value = "";
+  document.getElementById(`desc-${id}`).value = "";
+  localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
+  renderMacchinari();
 }
 
 function modificaNota(id, index) {
@@ -321,13 +331,9 @@ function modificaNota(id, index) {
   const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
 
-  if (dataInput.value === nota.data && descInput.value === nota.desc) {
-    dataInput.value = "";
-    descInput.value = "";
-  } else {
-    dataInput.value = nota.data;
-    descInput.value = nota.desc;
-  }
+  dataInput.value = nota.data;
+  descInput.value = nota.desc;
+  notaInModifica = { id, index }; // segna che stai modificando
 }
 
 function eliminaNota(id, index) {
