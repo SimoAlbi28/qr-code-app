@@ -39,11 +39,11 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   selezioneDiv.style.marginTop = "10px";
 
   const btnSelezionaTutte = document.createElement("button");
-  btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
+  btnSelezionaTutte.textContent = "✔️ Tutte";
   btnSelezionaTutte.className = "btn-seleziona-tutte";
 
   const btnDeselezionaTutte = document.createElement("button");
-  btnDeselezionaTutte.textContent = "❌ Deseleziona tutte";
+  btnDeselezionaTutte.textContent = "❌ Tutte";
   btnDeselezionaTutte.className = "btn-deseleziona-tutte";
 
   const btnIndietro = document.createElement("button");
@@ -228,7 +228,7 @@ function renderMacchinari(highlightId = null) {
         <label>Descrizione (max 300):</label>
         <input type="text" id="desc-${id}" maxlength="300">
         <div style="text-align:center; margin-top:10px;">
-          <button class="btn-green" onclick="aggiungiNota('${id}')">➕ Aggiungi Nota</button>
+          <button class="btn-green" onclick="aggiungiNota('${id}')">Conferma</button>
         </div>
       `;
 
