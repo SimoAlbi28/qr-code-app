@@ -1,11 +1,11 @@
 {
-  "name": "Gestione Macchinari",
-  "short_name": "Macchinari",
+  "name": "Manutenzione",
+  "short_name": "Manutenzione",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#d0e7ff",
   "theme_color": "#007bff",
-  "description": "App per gestire macchinari tramite QR code con note",
+  "description": "App per Manutenzione",
   "icons": [
     {
       "src": "img/icon-192.png",
