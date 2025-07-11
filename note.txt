@@ -1,3 +1,0 @@
-PROSSIMI AGGIORNAMENTI:
-
-- creare un ulteriore pulsante nelle note che permette di selezionarle e creare un PDF con quelle selzionate;

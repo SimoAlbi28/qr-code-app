@@ -10,7 +10,6 @@ let savedMacchinari = JSON.parse(localStorage.getItem("macchinari") || "{}");
 let html5QrCode;
 let copiaNoteActive = false;
 
-
 function createLineSeparator() {
   const line = document.createElement("div");
   line.className = "line-separator";
@@ -23,7 +22,6 @@ function formatData(d) {
 }
 
 function creaAreaCopiaNote(macchinarioBox, id, note) {
-  // Rimuovo area precedente
   const oldArea = macchinarioBox.querySelector(".copia-note-area");
   if (oldArea) oldArea.remove();
 
@@ -40,33 +38,6 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   selezioneDiv.style.display = "none";
   selezioneDiv.style.marginTop = "10px";
 
-  const listaCheckbox = document.createElement("ul");
-  listaCheckbox.className = "note-list";
-
-  note.forEach((nota, idx) => {
-    const li = document.createElement("li");
-    li.style.display = "flex";
-    li.style.alignItems = "center";
-    li.style.justifyContent = "center";
-    li.style.gap = "8px";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.className = "checkbox-copia-note";
-    checkbox.value = idx;
-    checkbox.checked = false;
-    checkbox.style.display = "inline-block"; // default visibile solo in copia mode
-
-    const testoNota = document.createElement("span");
-    testoNota.textContent = `[${formatData(nota.data)}] ${nota.desc}`;
-
-    li.appendChild(testoNota);
-    li.appendChild(checkbox);
-
-    listaCheckbox.appendChild(li);
-  });
-
-  // Bottoni selezione
   const btnSelezionaTutte = document.createElement("button");
   btnSelezionaTutte.textContent = "✔️ Seleziona tutte";
   btnSelezionaTutte.className = "btn-seleziona-tutte";
@@ -95,15 +66,11 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   btnContainer.appendChild(btnIndietro);
   btnContainer.appendChild(btnCopiaSelezionate);
 
-  selezioneDiv.appendChild(listaCheckbox);
   selezioneDiv.appendChild(btnContainer);
-
   area.appendChild(btnCopiaNote);
   area.appendChild(selezioneDiv);
-
   macchinarioBox.appendChild(area);
 
-  // Qui controllo i bottoni modifica/elimina e checkbox nelle note della lista principale
   function updateNoteButtonsAndCheckboxes(showCheckboxes) {
     const liNotes = macchinarioBox.querySelectorAll(".note-list li");
     liNotes.forEach((li, i) => {
@@ -127,15 +94,16 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   });
 
   btnSelezionaTutte.addEventListener("click", () => {
-    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
+    macchinarioBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = true);
   });
 
   btnDeselezionaTutte.addEventListener("click", () => {
-    listaCheckbox.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
+    macchinarioBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = false);
   });
 
   btnCopiaSelezionate.addEventListener("click", () => {
-    const checkedIndexes = Array.from(listaCheckbox.querySelectorAll("input[type=checkbox]:checked")).map(cb => parseInt(cb.value));
+    const checkboxes = macchinarioBox.querySelectorAll(".note-list input[type=checkbox]:checked");
+    const checkedIndexes = Array.from(checkboxes).map(cb => parseInt(cb.value));
 
     if (checkedIndexes.length === 0) {
       alert("Seleziona almeno una nota da copiare.");
@@ -148,7 +116,7 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
     }).join("\n");
 
     navigator.clipboard.writeText(testoDaCopiare).then(() => {
-      mostraToast("✅ Note copiate!");
+      alert("✅ Note copiate!");
       selezioneDiv.style.display = "none";
       btnCopiaNote.style.display = "inline-block";
       updateNoteButtonsAndCheckboxes(false);
@@ -208,7 +176,6 @@ function renderMacchinari(highlightId = null) {
         li.style.justifyContent = "space-between";
         li.style.gap = "10px";
 
-        // Checkbox visibile SOLO se modalità copia attiva
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.className = "checkbox-copia-note";
@@ -219,7 +186,6 @@ function renderMacchinari(highlightId = null) {
         testoNota.style.flex = "1";
         testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
 
-        // Bottoni modifica/elimina visibili SOLO se modalità copia NON attiva
         const btns = document.createElement("div");
         btns.className = "btns-note";
         btns.innerHTML = `
@@ -362,7 +328,6 @@ function eliminaNota(id, index) {
   renderMacchinari();
 }
 
-// QR CAM
 function startScan() {
   reader.classList.remove("hidden");
   startBtn.disabled = true;
@@ -372,10 +337,7 @@ function startScan() {
 
   html5QrCode.start(
     { facingMode: { exact: "environment" } },
-    {
-      fps: 10,
-      qrbox: 250
-    },
+    { fps: 10, qrbox: 250 },
     (qrCodeMessage) => {
       html5QrCode.stop().then(() => {
         reader.classList.add("hidden");
@@ -423,7 +385,6 @@ function stopScan() {
   }
 }
 
-// Pulsanti eventi
 startBtn.addEventListener("click", startScan);
 stopBtn.addEventListener("click", stopScan);
 
@@ -458,7 +419,6 @@ function creaMacchinarioManuale() {
 
 document.getElementById("create-macchinario").addEventListener("click", creaMacchinarioManuale);
 
-// All'avvio, chiudi tutti i macchinari
 Object.values(savedMacchinari).forEach(macch => macch.expanded = false);
 localStorage.setItem("macchinari", JSON.stringify(savedMacchinari));
 
