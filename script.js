@@ -331,10 +331,19 @@ function modificaNota(id, index) {
   const descInput = document.getElementById(`desc-${id}`);
   const nota = savedMacchinari[id].note[index];
 
-  dataInput.value = nota.data;
-  descInput.value = nota.desc;
-  notaInModifica = { id, index }; // segna che stai modificando
+  // Se stai già modificando questa stessa nota → svuota e annulla
+  if (notaInModifica && notaInModifica.id === id && notaInModifica.index === index) {
+    dataInput.value = "";
+    descInput.value = "";
+    notaInModifica = null;
+  } else {
+    // Altrimenti avvia modifica
+    dataInput.value = nota.data;
+    descInput.value = nota.desc;
+    notaInModifica = { id, index };
+  }
 }
+
 
 function eliminaNota(id, index) {
   const nota = savedMacchinari[id].note[index];
