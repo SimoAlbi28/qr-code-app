@@ -177,8 +177,6 @@ button {
   background-repeat: no-repeat;
   background-size: cover;      /* Riempie tutto il riquadro */
   background-position: center; /* Centra l'immagine */
-  background-blend-mode: multiply; /* Mescola con il colore di sfondo se vuoi */
-  background-color: rgba(240, 230, 210, 0.6); /* Colore semi-trasparente sopra per attenuare il contrasto */
   max-width: 400px;
   border: 3px solid black;
   border-radius: 10px;
