@@ -57,7 +57,7 @@ h2 {
   gap: 15px;
 }
 
-#buttons-container > button# create-macchinario {
+#buttons-container > button #create-macchinario {
   order: 0; /* prima */
   margin: 0 20px; /* margine a sx e dx per spaziarlo */
 }
@@ -68,7 +68,7 @@ h2 {
   color: white;
   padding: 5px 10px;
   border-radius: 5px;
-  border: none;
+  border: 1px solid ;
   cursor: pointer;
   user-select: none;
   min-width: 130px;
