@@ -205,8 +205,8 @@ button {
   font-size: 16px;
   padding: 4px 8px;
   cursor: pointer;
-  border: none;
-  background: #007bff;
+  border: 2px solid black;
+  background: none;
   color: white;
   border-radius: 6px;
   user-select: none;
