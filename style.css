@@ -583,3 +583,14 @@ button {
   border-color: #444;
   box-shadow: 0 0 8px rgba(0,0,0,0.3);
 }
+
+#start-scan,
+#stop-scan,
+#create-macchinario {
+  font-size: 13px;
+  padding: 6px 12px;
+  min-width: 90px;
+  max-width: 130px;
+  height: 36px;
+  box-sizing: border-box;
+}
