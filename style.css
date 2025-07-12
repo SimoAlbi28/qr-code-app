@@ -174,7 +174,6 @@ button {
 .macchinario {
   margin: 10px auto;
   background-image: url(/img/pergamena.jpg);
-  background-image: url("URL-diretto-immagine.jpg");
   background-repeat: no-repeat;
   background-size: cover;      /* Riempie tutto il riquadro */
   background-position: center; /* Centra l'immagine */
