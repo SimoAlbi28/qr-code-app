@@ -88,7 +88,6 @@ button {
   padding: 5px 10px;
   font-size: 13px;
   border-radius: 5px;
-  border: none;
   cursor: pointer;
   user-select: none;
   flex: none;
@@ -174,10 +173,10 @@ button {
 
 .macchinario {
   margin: 10px auto;
-  background-image: url(/img/pergamena.jpg);
+  background-image: url("img/pergamena.jpg");
   background-repeat: no-repeat;
-  background-size: cover;      /* Riempie tutto il riquadro */
-  background-position: center; /* Centra l'immagine */
+  background-size: cover;
+  background-position: center;
   max-width: 400px;
   border: 3px solid black;
   border-radius: 10px;
