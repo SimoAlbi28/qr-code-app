@@ -60,6 +60,7 @@ h2 {
 #buttons-container > button #create-macchinario {
   order: 0; /* prima */
   margin: 0 20px; /* margine a sx e dx per spaziarlo */
+  border: 1px solid black;
 }
 
 #btn-create-manual {
