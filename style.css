@@ -23,12 +23,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 20px; /* spazio sotto il titolo */
+  margin-bottom: 40px; /* spazio aumentato sotto il titolo */
 }
 
 .title-top {
   font-weight: 700;
-  font-size: 26px; /* più grande */
+  font-size: 26px;
   text-transform: uppercase;
   letter-spacing: 4px;
 }
@@ -44,12 +44,13 @@ h2 {
   display: flex;
   justify-content: center;
   gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 25px;
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
-  flex-wrap: wrap;
-  align-items: center;
+  position: relative;
 }
 
 .row-btns {
@@ -57,10 +58,21 @@ h2 {
   gap: 15px;
 }
 
-#buttons-container > button #create-macchinario {
-  order: 0; /* prima */
-  margin: 0 20px; /* margine a sx e dx per spaziarlo */
-  border: 1px solid black;
+/* Fix visivo per centrare il bottone Crea */
+#buttons-container > #create-macchinario {
+  order: 1;
+  border: 1px solid black !important;
+  background-color: #3498db;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 90px;
+  max-width: 130px;
+  font-size: 13px;
+  transition: background-color 0.3s ease;
+  margin: 0 auto;
 }
 
 #btn-create-manual {
@@ -84,13 +96,12 @@ h2 {
 
 button {
   display: inline-block;
-  margin: 0 auto;
   padding: 5px 10px;
   font-size: 13px;
   border-radius: 5px;
+  border: none;
   cursor: pointer;
   user-select: none;
-  flex: none;
   min-width: 60px;
   max-width: 130px;
   transition: background-color 0.3s ease;
@@ -126,6 +137,7 @@ button {
 .btn-red {
   background-color: #e74c3c;
   color: white;
+  border: 1px solid black;
 }
 
 .btn-red:hover {
@@ -135,6 +147,7 @@ button {
 .btn-green {
   background-color: #2ecc71;
   color: white;
+  border: 1px solid black;
 }
 
 .btn-green:hover {
@@ -173,7 +186,7 @@ button {
 
 .macchinario {
   margin: 10px auto;
-  background-image: url("img/pergamena.jpg");
+  background-image: url('/img/pergamena.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -184,6 +197,8 @@ button {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  color: black;
+  backdrop-filter: brightness(1.1);
 }
 
 .macchinario.highlight {
