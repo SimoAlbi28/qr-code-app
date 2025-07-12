@@ -213,10 +213,6 @@ button {
   transition: background-color 0.2s ease;
 }
 
-.toggle-btn:hover {
-  background: #0056b3;
-}
-
 .note-list {
   list-style: none;
   padding: 0;
@@ -359,7 +355,7 @@ button {
   max-width: 200px;
   font-size: 15px;
   padding: 7px 10px;
-  border: 2px solid #007bff;
+  border: 2px solid rgb(116, 57, 255);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease;
