@@ -42,20 +42,26 @@ h2 {
 
 #buttons-container {
   display: flex;
-  flex-direction: column; /* colonna, così i btn sono verticali */
-  align-items: center; /* centra in orizzontale */
-  gap: 15px;
-  margin-bottom: 25px;
-  width: 100%;
+  justify-content: center;
+  gap: 30px; /* spazio tra i bottoni */
+  margin-bottom: 30px; /* spazio sotto il titolo */
   max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 10px;
+  flex-wrap: wrap; /* così se serve va a capo */
 }
 
+/* fai diventare row-btns un flex-row anche */
 .row-btns {
   display: flex;
-  gap: 15px;
-  justify-content: center;
-  width: 100%;
-  max-width: 400px;
+  gap: 30px;
+}
+
+#create-macchinario {
+  align-self: center; /* centra verticalmente rispetto agli altri */
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 #btn-create-manual {
@@ -101,7 +107,7 @@ button {
   font-size: 12px;
   min-width: 50px;
   max-width: 110px;
-  border
+  border: 1px solid black;
 }
 
 .btns-note,
