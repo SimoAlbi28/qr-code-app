@@ -185,7 +185,7 @@ button {
 }
 
 .macchinario {
-  background-color: #00885f;
+  background-color: #30c470;
   max-width: 400px;
   border: 3px solid black;
   border-radius: 10px;
@@ -204,7 +204,7 @@ button {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
-  background-color: rgb(116, 57, 255);
+  background-color: rgb(35, 163, 255);
   color: white;
   text-transform: uppercase;
   text-align: center;
