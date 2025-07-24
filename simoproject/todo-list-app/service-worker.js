@@ -1,14 +1,16 @@
-const BASE_PATH = '/simoproject/todo-list-app/';
+const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-const CACHE_NAME = 'todo-cache-v1';
+const BASE_PATH = isLocalhost ? './' : '/TODO-LIST-APP/';
+
+const CACHE_NAME = 'todo-cache-v6';
 const FILES_TO_CACHE = [
   BASE_PATH,
   BASE_PATH + 'index.html',
   BASE_PATH + 'style.css',
   BASE_PATH + 'script.js',
   BASE_PATH + 'manifest.json',
-  BASE_PATH + 'icons/icon-192.png',
-  BASE_PATH + 'icons/icon-512.png'
+  BASE_PATH + 'img/icon-192.png',
+  BASE_PATH + 'img/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -48,8 +50,8 @@ self.addEventListener('push', event => {
   const title = data.title || 'Promemoria Attività';
   const options = {
     body: data.body || 'Hai un’attività programmata!',
-    icon: BASE_PATH + 'icons/icon-192.png',
-    badge: BASE_PATH + 'icons/icon-192.png',
+    icon: BASE_PATH + 'img/icon-192.png',
+    badge: BASE_PATH + 'img/icon-192.png',
     tag: data.tag || 'todo-reminder'
   };
   event.waitUntil(

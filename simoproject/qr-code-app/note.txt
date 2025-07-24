@@ -1,0 +1,5 @@
+Aggiornamenti da fare:
+
+- Ricerca note per data;
+- Scegliere colere bello sfondo riquadri;
+- Aggiungere bordi neri a tutti i btn;

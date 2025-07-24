@@ -1,11 +1,11 @@
 {
-  "name": "To-Do List",
-  "short_name": "To-Do",
-  "description": "App to-do list con notifiche e gestione avanzata",
-  "start_url": "/TODO-LIST-APP/",
+  "name": "Manutenzione",
+  "short_name": "Manutenzione",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#e0f7fa",
-  "theme_color": "#00796b",
+  "background_color": "#d0e7ff",
+  "theme_color": "#007bff",
+  "description": "App per Manutenzione",
   "icons": [
     {
       "src": "img/icon-192.png",

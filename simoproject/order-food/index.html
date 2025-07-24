@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ordina Cibo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="home">
+    <h1>🍽️ Scegli la tua lingua</h1>
+    <div class="flags">
+      <img src="img/it.jpg" alt="Italiano" />
+      <img src="img/en.jpg" alt="English" />
+      <img src="img/es.png" alt="Español" />
+      <img src="img/de.webp" alt="Deutsch" />
+      <img src="img/fr.jpg" alt="Français" />
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="top-buttons">
+      <button id="btnChangeLanguage" class="btn">🌐 Cambia lingua</button>
+      <button id="btnViewCart" class="btn">🛒 Carrello</button>
+      <button id="btnShowOrders" class="btn">📦 Ordini Confermati</button>
+    </div>
+
+    <div id="categories-section">
+      <h2 id="categories-title"></h2>
+      <div id="categories-list" class="list"></div>
+    </div>
+
+    <div id="products-section" class="hidden">
+      <h2 id="products-title"></h2>
+      <div id="products-list" class="list"></div>
+      <br><button id="btnBackToCategories" class="btn">🔙 Indietro</button>
+    </div>
+
+    <div id="cart-section" class="hidden">
+      <h2>🛒 Carrello</h2>
+      <div class="cart-header">
+        <div>Prodotto</div>
+        <div>−</div>
+        <div>Q.tà</div>
+        <div>＋</div>
+        <div>✖</div>
+      </div>
+      <div id="cart-list"></div>
+      <div id="cart-total"></div><br>
+      <button id="btnConfirmOrder" class="btn">✅ Conferma Ordine</button>
+      <button id="btnCancelOrder" class="btn btn-cancel">❌ Annulla Ordine</button>
+      <button id="btnContinueOrdering" class="btn hidden">🔄 Continua a ordinare</button>
+    </div>
+
+    <div id="orders-section" class="hidden">
+      <h2>📦 Ordini Confermati</h2>
+      <div id="orders-list"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
