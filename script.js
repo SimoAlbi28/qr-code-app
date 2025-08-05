@@ -234,62 +234,9 @@ function renderMacchinari(highlightId = null) {
     if (expanded) {
       box.appendChild(createLineSeparator());
 
-      if (data.note && data.note.length > 0) {
-        const noteTitle = document.createElement("h4");
-        noteTitle.textContent = "Note";
-        noteTitle.className = "titolo-note";
-        box.appendChild(noteTitle);
-      }
+      // Qui invertito: prima inserimento note poi lista note
 
-      const noteList = document.createElement("ul");
-      noteList.className = "note-list";
-
-      const notesSorted = (data.note || []).sort((a, b) =>
-        b.data.localeCompare(a.data)
-      );
-
-      notesSorted.forEach((nota, index) => {
-        const li = document.createElement("li");
-        li.style.display = "flex";
-        li.style.alignItems = "center";
-        li.style.justifyContent = "space-between";
-        li.style.gap = "10px";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "checkbox-copia-note";
-        checkbox.value = index;
-        checkbox.style.display = copiaNoteActive ? "inline-block" : "none";
-
-        const testoNota = document.createElement("div");
-        testoNota.style.flex = "1";
-        testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
-
-        const btns = document.createElement("div");
-        btns.className = "btns-note";
-        btns.innerHTML = `
-          <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
-          <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
-        `;
-        btns.style.display = copiaNoteActive ? "none" : "flex";
-
-        li.appendChild(checkbox);
-        li.appendChild(testoNota);
-        li.appendChild(btns);
-
-        noteList.appendChild(li);
-      });
-
-      box.appendChild(noteList);
-
-      if (data.note && data.note.length > 0) {
-        creaAreaCopiaNote(box, id, notesSorted);
-      }
-
-      if (data.note && data.note.length > 0) {
-        box.appendChild(createLineSeparator());
-      }
-
+      // Inserimento note
       const insertNoteTitle = document.createElement("h4");
       insertNoteTitle.textContent = "Inserimento Note";
       insertNoteTitle.className = "titolo-note";
@@ -311,10 +258,63 @@ function renderMacchinari(highlightId = null) {
 
       box.appendChild(createLineSeparator());
 
+      // Lista note e area copia note solo se ci sono note
+      if (data.note && data.note.length > 0) {
+        const noteTitle = document.createElement("h4");
+        noteTitle.textContent = "Note";
+        noteTitle.className = "titolo-note";
+        box.appendChild(noteTitle);
+
+        const noteList = document.createElement("ul");
+        noteList.className = "note-list";
+
+        const notesSorted = (data.note || []).sort((a, b) =>
+          b.data.localeCompare(a.data)
+        );
+
+        notesSorted.forEach((nota, index) => {
+          const li = document.createElement("li");
+          li.style.display = "flex";
+          li.style.alignItems = "center";
+          li.style.justifyContent = "space-between";
+          li.style.gap = "10px";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "checkbox-copia-note";
+          checkbox.value = index;
+          checkbox.style.display = copiaNoteActive ? "inline-block" : "none";
+
+          const testoNota = document.createElement("div");
+          testoNota.style.flex = "1";
+          testoNota.innerHTML = `<span class="nota-data">${formatData(nota.data)}</span><br><span class="nota-desc">${nota.desc}</span>`;
+
+          const btns = document.createElement("div");
+          btns.className = "btns-note";
+          btns.innerHTML = `
+            <button class="btn-blue" onclick="modificaNota('${id}', ${index})">✏️</button>
+            <button class="btn-red" onclick="eliminaNota('${id}', ${index})">🗑️</button>
+          `;
+          btns.style.display = copiaNoteActive ? "none" : "flex";
+
+          li.appendChild(checkbox);
+          li.appendChild(testoNota);
+          li.appendChild(btns);
+
+          noteList.appendChild(li);
+        });
+
+        box.appendChild(noteList);
+
+        creaAreaCopiaNote(box, id, notesSorted);
+
+        box.appendChild(createLineSeparator());
+      }
+
       const btnsContainer = document.createElement("div");
       btnsContainer.className = "btns-macchinario";
       btnsContainer.innerHTML = `
-        <button class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
+        <button id="btn-rin" class="btn-blue" onclick="rinominaMacchinario('${id}')">✏️ Rinomina</button>
         <button id="btn-chiudi" class="btn-orange" onclick="toggleDettagli('${id}')">❌ Chiudi</button>
         <button class="btn-red" onclick="eliminaMacchinario('${id}')">🗑️ Elimina</button>
       `;
