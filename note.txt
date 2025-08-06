@@ -5,3 +5,4 @@ Aggiornamenti da fare:
 - Ogni cartella aperta avrà lo schema classico uguale per tutte con l'aggiunta dell'anno della cartella in questione sotto al titolo;
 - Aggiunta btn copia tutto;
 
+.
