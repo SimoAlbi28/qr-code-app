@@ -7,3 +7,4 @@ Aggiornamenti da fare:
 - ogni cartellà salverà all'internodi essa delle cose, quindi ogni cartella avrà le sue cose che saranno salvate una volta chiusa l'app;
 
 
+v
