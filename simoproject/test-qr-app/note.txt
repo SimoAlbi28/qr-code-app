@@ -1,0 +1,9 @@
+Aggiornamenti da fare:
+
+- home.html sarà il punto di partenza ogni volta che si aprirà l'app;
+- HomePage con cartelle ben suddivise graficamente (ognuna con il suo anno da inserire che rimarrà salvato una volta chiusa e riaperta l'app);
+- se cliccata una cartella porterà all'index che avevo prima (dove si possono creare macchinari ecc...);
+- btn + per creare cartelle, dove verà richiesto l'anno, e ogni cartella avrà i 3 puntini che se cliccati: rinomina; elimina (sicuro di voler eliminare?); copia tutto (tutte le i nomi delle manutenzioni e tutte le note [come se facessi copia tutte le note per ogni singolo macchinario, ma di tutti i macchinari]);
+- ogni cartellà salverà all'internodi essa delle cose, quindi ogni cartella avrà le sue cose che saranno salvate una volta chiusa l'app;
+
+
