@@ -1,4 +1,7 @@
 Aggiornamenti da fare:
 
-- Ricerca note per data;
+- HomePage con cartelle (ognuna con il suo anno);
+- btn + per creare cartelle, dove verà richiesto l'anno, e ogni cartella avrà i 3 puntini che se cliccati: rinomina; elimina (sicuro di voler eliminare?); copia tutto (tutte le i nomi delle manutenzioni e tutte le note);
+- Ogni cartella aperta avrà lo schema classico uguale per tutte con l'aggiunta dell'anno della cartella in questione sotto al titolo;
+- Aggiunta btn copia tutto;
 
