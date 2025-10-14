@@ -1,4 +1,12 @@
+Note:
+
+- prova finale qr: file di prova per l'app attuale.
+- test qr app: file per il prossimo aggiornamento 2026 (mancato recupero manutenzioni attuali per il 2026)
+
 Aggiornamenti da fare:
+
+- fare in modo che quando si scrive nelle note l'area di scrittura si espanda in altezza in base al contenuto; 
+- stessa cosa anche quando si preme il tasto modifica
 
 
 
