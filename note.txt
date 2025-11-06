@@ -5,8 +5,7 @@ Note:
 
 Aggiornamenti da fare:
 
-- fare in modo che quando si scrive nelle note l'area di scrittura si espanda in altezza in base al contenuto; 
-- stessa cosa anche quando si preme il tasto modifica
+
 
 
 
