@@ -44,8 +44,8 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - Sono presenti le Card con tutti i macchinari creati;
 - Ogni manutenzione può essere rinominata, espansa, chiusa ed eliminata;
 - Inserimento e registrazione di note (data e descrizione);
-- modifica e eliminazione di note create;
-- possibilità di copiare singolarmente o tutte, le note di una manutenzione.
+- Modifica e eliminazione di note create;
+- Possibilità di copiare singolarmente o tutte, le note di una manutenzione.
   
 5️⃣ **ORDINAMENTO**
 - Cartelle nella home ordinate con la data più recente in alto;
