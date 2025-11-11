@@ -25,15 +25,26 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 ### ⚡ FUNZIONI DELL'APP
 
 1️⃣ **HOME PAGE**
-- Creazione di cartelle (es: una per ogni anno);
+- Creazione di cartelle (come nome obbligatorio inserire un anno (4 cifre));
 - *3 Funzionalità* x ogni cartella: **✏️** per cambiare il nome di una cartella, **🗑️** per eliminare una cartella, e **📋** per copiare tutte le manutenzioni di una cartella, ognuna con tutte le proprie note;
 - Ogni cartella è a se, riuscendo a mantenere separate le manutenzioni dei vari anni;
 - Cliccare una cartella per vedere / inserirci le manutenzioni.
   
 2️⃣ **PAGINA MANUTENZIONI**
-- 
-3️⃣  
-4️⃣  
+- Visione dell'anno inserito durante la creazione;
+- **Home**: per tornare alla HomePage;
+- **Avvia - Chiudi**: avviare / terminare scansione per eventuale QR-Code (fotocamera posteriore);
+- **Crea**: creazione manutenzione (inserire nome) --> Creazione Card di quel macchinario.
+  
+3️⃣ **RICERCA AVANZATA**
+- Ricerca per nome manutenzione;
+- **Mostra Tutti**: resetta ricerca.
+
+4️⃣  **REGISTRO MANUTENZIONI**
+- Sono presenti le Card con tutti i macchinari creati;
+- Ogni macchinario può essere rinominato, espanso, chiuso ed eliminato;
+- Inserimento e registrazione di note (data e descrizione);
+- modifica e eliminazione di note create;
 5️⃣  
 6️⃣  
 7️⃣  
