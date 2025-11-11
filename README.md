@@ -6,7 +6,7 @@
 ### 🔗 ACCESSO ALL'APP
 
 Apri questo link sul tuo browser:  
-(https://simoalbi28.github.io/test-qr-app/home.html)  
+(https://simoalbi28.github.io/qr-code-app/index.html)  
 
 ---
 
