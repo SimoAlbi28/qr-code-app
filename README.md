@@ -31,7 +31,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - Cliccare una cartella per vedere / inserirci le manutenzioni.
   
 2️⃣ **PAGINA MANUTENZIONI**
-- Visione dell'anno inserito durante la creazione;
+- Visione dell'anno inserito durante la creazione della cartella;
 - **Home**: per tornare alla HomePage;
 - **Avvia - Chiudi**: avviare / terminare scansione per eventuale QR-Code (fotocamera posteriore);
 - **Crea**: creazione manutenzione (inserire nome) --> Creazione Card di quella manutenzione.
