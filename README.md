@@ -48,6 +48,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - possibilità di copiare singolarmente o tutte, le note di una manutenzione.
   
 5️⃣ **ORDINAMENTO**
+- Cartelle nella home ordinate con la data più recente in alto;
 - Lista manutenzioni in ordine alfabetico;
 - Note registrate --> in alto la data piu recente inserita;
 - HomePage --> Copia Cartella --> verranno incollate sia le note che le manutenzioni nell'ordine in cui sono salvate all'interno della cartella.
@@ -91,5 +92,9 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 
 ---
 
+<img width="298" height="795" alt="image" src="https://github.com/user-attachments/assets/1faffdb6-734e-4111-bd8d-780a9a4b2a47" />
 
+---
+
+<img width="656" height="855" alt="image" src="https://github.com/user-attachments/assets/d62642d2-9a8a-4c23-b6b0-c5fcdf34ce05" />
 
