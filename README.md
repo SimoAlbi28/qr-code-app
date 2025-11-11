@@ -34,7 +34,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - Visione dell'anno inserito durante la creazione;
 - **Home**: per tornare alla HomePage;
 - **Avvia - Chiudi**: avviare / terminare scansione per eventuale QR-Code (fotocamera posteriore);
-- **Crea**: creazione manutenzione (inserire nome) --> Creazione Card di quel macchinario.
+- **Crea**: creazione manutenzione (inserire nome) --> Creazione Card di quella manutenzione.
   
 3️⃣ **RICERCA AVANZATA**
 - Ricerca per nome manutenzione;
@@ -42,42 +42,54 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 
 4️⃣  **REGISTRO MANUTENZIONI**
 - Sono presenti le Card con tutti i macchinari creati;
-- Ogni macchinario può essere rinominato, espanso, chiuso ed eliminato;
+- Ogni manutenzione può essere rinominata, espansa, chiusa ed eliminata;
 - Inserimento e registrazione di note (data e descrizione);
 - modifica e eliminazione di note create;
-5️⃣  
-6️⃣  
-7️⃣  
-8️⃣  
-9️⃣  
-🔟  
-
-**STILE E INTERFACCIA**  
-- App mobile-friendly, colori chiari e pulsanti intuitivi  
-- Macchinari evidenziati quando selezionati o in modalità copia  
-- Tutto centrato e leggibile anche su smartphone piccoli  
+- possibilità di copiare singolarmente o tutte, le note di una manutenzione.
+  
+5️⃣ **ORDINAMENTO**
+- Lista manutenzioni in ordine alfabetico;
+- Note registrate --> in alto la data piu recente inserita;
+- HomePage --> Copia Cartella --> verranno incollate sia le note che le manutenzioni nell'ordine in cui sono salvate all'interno della cartella.
+  
+6️⃣ **FUNZIONALITÀ & QR-CODE**
+- Stampa manuale di QR-Code per poterli mettere/incollare... sulle varie manutenzioni, macchinari ecc;
+- Entra in una cartella --> Avvia scansione --> inquadra QR-Code;
+- Automaticamente l'app valuterà se esiste una manutenzione collegata a quel QR-Code;
+- Se esiste verrai automaticamente portato/a alla manutenzione abbinata;
+- Se non esiste ci darà la possibilità di creare l'abbinamento tra quel QR-Code e il nome della manutenzione che inseriremo;
+  
+*(L'app può essere usata anche senza l'uso dei QR-Code)*.
+  
+7️⃣ **STILE E INTERFACCIA**  
+- App mobile-friendly, colori chiari e pulsanti intuitivi;    
+- Tutto centrato e leggibile;
+- Adatto a tutti i tipi di smartphone. 
 
 ---
 
 ### ⚙️ IMPOSTAZIONI E NOTIFICHE
-- L’app salva tutte le modifiche in locale tramite **LocalStorage**  
-- Supporta **offline caching**, quindi puoi usare l’app senza connessione  
-- Attiva/disattiva notifiche se vuoi promemoria sui macchinari o note importanti  
+- L’app salva tutte le modifiche in locale tramite **LocalStorage**;  
+- Supporta **offline caching**, quindi puoi usare l’app senza connessione; 
 
 ---
 
 ### 📂 STRUTTURA DEI FILE
-- `index.html` / `home.html` → pagine principali  
-- `style.css` / `home.css` → stili  
-- `script.js` / `home.js` → logica JS  
-- `manifest.json` → configurazione PWA  
-- `service-worker.js` → caching offline  
-- `/img/` → icone e immagini  
+- `index.html` / `home.html` → pagine principali; 
+- `style.css` / `home.css` → stili;
+- `script.js` / `home.js` → logica JS;  
+- `manifest.json` → configurazione PWA;  
+- `service-worker.js` → caching offline;  
+- `/img/` → icone e immagini.  
 
 ---
 
 ### 🔔 NOTE FINALI
-- L’app è pensata per smartphone, con layout responsive  
-- Tutte le funzionalità principali sono accessibili in pochi tocchi  
-- Salvataggio locale e caching permettono l’uso offline completo  
+- L’app è pensata per smartphone, con layout responsive;  
+- Tutte le funzionalità principali sono accessibili in pochi tocchi;  
+- Salvataggio locale e caching permettono l’uso offline completo;
+
+---
+
+
 
