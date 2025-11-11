@@ -58,7 +58,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - Entra in una cartella --> Avvia scansione --> inquadra QR-Code;
 - Automaticamente l'app valuterà se esiste una manutenzione collegata a quel QR-Code;
 - Se esiste verrai automaticamente portato/a alla manutenzione abbinata;
-- Se non esiste ci darà la possibilità di creare l'abbinamento tra quel QR-Code e il nome della manutenzione che inseriremo;
+- Se non esiste darà la possibilità di creare l'abbinamento tra quel QR-Code e il nome della manutenzione che inseriremo;
   
 *(L'app può essere usata anche senza l'uso dei QR-Code)*.
   
