@@ -96,5 +96,5 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 
 ---
 
-<img width="300" height="500" alt="image" src="https://github.com/user-attachments/assets/d62642d2-9a8a-4c23-b6b0-c5fcdf34ce05" />
+<img width="298" height="500" alt="image" src="https://github.com/user-attachments/assets/d62642d2-9a8a-4c23-b6b0-c5fcdf34ce05" />
 
