@@ -45,7 +45,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - Ogni manutenzione può essere rinominata, espansa, chiusa ed eliminata;
 - Inserimento e registrazione di note (data e descrizione);
 - Modifica e eliminazione di note create;
-- Possibilità di copiare singolarmente o tutte, le note di una manutenzione.
+- Possibilità di copiare, singolarmente o tutte, le note di una manutenzione.
   
 5️⃣ **ORDINAMENTO**
 - Cartelle nella home ordinate con la data più recente in alto;
