@@ -69,7 +69,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 
 ---
 
-### ⚙️ IMPOSTAZIONI E NOTIFICHE
+### ⚙️ IMPOSTAZIONI 
 - L’app salva tutte le modifiche in locale tramite **LocalStorage**;  
 - Supporta **offline caching**, quindi puoi usare l’app senza connessione; 
 
