@@ -1,7 +1,7 @@
 {
-  "name": "Manutenzione",
-  "short_name": "Manutenzione",
-  "start_url": "./index.html",
+  "name": "Manutenzioni",
+  "short_name": "Manutenzioni",
+  "start_url": "./home.html",
   "display": "standalone",
   "background_color": "#d0e7ff",
   "theme_color": "#007bff",
