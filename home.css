@@ -6,11 +6,11 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f0f4ff;
   margin: 0;
-  padding: 20px;
-  padding-left: max(20px, env(safe-area-inset-left));
-  padding-right: max(20px, env(safe-area-inset-right));
-  padding-top: max(20px, env(safe-area-inset-top));
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding: 15px;
+  padding-left: max(15px, env(safe-area-inset-left));
+  padding-right: max(15px, env(safe-area-inset-right));
+  padding-top: max(15px, env(safe-area-inset-top));
+  padding-bottom: max(15px, env(safe-area-inset-bottom));
   max-width: 480px;
   width: 100%;
   margin-left: auto;
@@ -29,7 +29,7 @@ h1 {
   color: white;
   background-color: black;
   border-radius: 10px;
-  padding: 10px 0;
+  padding: 10px 5px;
   width: 100%;
   max-width: 480px;
   user-select: none;
@@ -41,10 +41,10 @@ h1 {
 /* Cartelle container */
 #folders-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 15px;
   margin-bottom: 30px;
-  padding: 0 10px; /* piccolo padding per sicurezza su mobile */
+  padding: 0 5px;
   box-sizing: border-box;
 }
 
