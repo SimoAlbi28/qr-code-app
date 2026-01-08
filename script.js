@@ -18,24 +18,10 @@ const currentAnno = urlParams.get("id");
 let folders = JSON.parse(localStorage.getItem("folders") || "{}");
 let savedManutenzioni = {};
 
-// Funzione per inizializzare l'app
-function inizializzaApp() {
-  // Se la cartella non esiste, torna alla home
-  if (!currentAnno) {
-    alert("Nessuna cartella selezionata. Torna alla home.");
-    window.location.href = "home.html";
-    return;
-  }
-
-  // Ricarica folders dal localStorage
-  folders = JSON.parse(localStorage.getItem("folders") || "{}");
-  
-  if (!folders[currentAnno]) {
-    alert("Cartella non trovata (ID: " + currentAnno + "). Potrebbe essere stata eliminata. Torna alla home.");
-    window.location.href = "home.html";
-    return;
-  }
-
+// Se la cartella non esiste, torna alla home silenziosamente
+if (!currentAnno || !folders[currentAnno]) {
+  window.location.href = "home.html";
+} else {
   savedManutenzioni = folders[currentAnno]?.manutenzioni || {};
   if (!savedManutenzioni) savedManutenzioni = {};
 
@@ -46,13 +32,6 @@ function inizializzaApp() {
 
   folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
-}
-
-// Inizializza app solo quando il DOM è pronto
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", inizializzaApp);
-} else {
-  inizializzaApp();
 }
 
 // --- MOSTRA ANNO SOTTO TITOLO ---
@@ -716,10 +695,7 @@ function gestioneScan(text) {
   renderManutenzioni(id);
 }
 
-// Aggiungo il render delle manutenzioni alla funzione di inizializzazione
-function avviaRender() {
+window.addEventListener("DOMContentLoaded", () => {
   renderManutenzioni();
   mostraAnnoCartella();
-}
-
-window.addEventListener("DOMContentLoaded", avviaRender);
+});
