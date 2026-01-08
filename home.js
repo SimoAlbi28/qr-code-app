@@ -72,7 +72,7 @@ btnAddFolder.onclick = () => {
   const nome = `Cartella ${anno}`;
   const id = anno; // id = anno
 
-  folders[id] = { nome, anno, macchinari: {} };
+  folders[id] = { nome, anno, manutenzioni: {} };
   salvaCartelle();
   renderFolders();
 };
@@ -106,21 +106,21 @@ function copiaTuttoCartella(id) {
 
   let testo = `${folder.nome.toUpperCase()}\n\n`; // Solo nome cartella
 
-  const macchinari = folder.macchinari || {};
+  const manutenzioni = folder.manutenzioni || {};
 
   function formatData(data) {
     const [yyyy, mm, dd] = data.split("-");
     return `${dd}/${mm}/${yyyy}`;
   }
 
-  if (Object.keys(macchinari).length === 0) {
+  if (Object.keys(manutenzioni).length === 0) {
     testo += "(Cartella vuota !)\n";
   } else {
-    Object.values(macchinari).forEach((macchinario, i) => {
+    Object.values(manutenzioni).forEach((manutenzione, i) => {
       if (i > 0) testo += "\n"; // Riga vuota sopra per staccare manutenzioni
-      testo += `• ${macchinario.nome}\n`; // Pallino per nome manutenzione
-      if (macchinario.note && macchinario.note.length) {
-        macchinario.note.forEach(n => {
+      testo += `• ${manutenzione.nome}\n`; // Pallino per nome manutenzione
+      if (manutenzione.note && manutenzione.note.length) {
+        manutenzione.note.forEach(n => {
           testo += `  - [${formatData(n.data)}]: ${n.desc}\n`; // Trattino per note
         });
       }

@@ -41,7 +41,7 @@ Una volta aggiunta, apparirà un’icona sulla schermata Home e l’app si aprir
 - **Mostra Tutti**: resetta ricerca.
 
 4️⃣  **REGISTRO MANUTENZIONI**
-- Sono presenti le Card con tutti i macchinari creati;
+- Sono presenti le Card con tutte le Manutenzioni / Macchinari creati;
 - Ogni manutenzione può essere rinominata, espansa, chiusa ed eliminata;
 - Inserimento e registrazione di note (data e descrizione);
 - Modifica e eliminazione di note create;

@@ -90,24 +90,6 @@ h2 {
   box-sizing: border-box;
 }
 
-#create-macchinario {
-  order: 1;
-  border: 1px solid black !important;
-  background-color: #3498db;
-  color: white;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  user-select: none;
-  min-width: 65px;
-  max-width: 90px;
-  font-size: 12px;
-  transition: background-color 0.3s ease;
-  margin: 0 auto;
-  white-space: nowrap;
-  box-sizing: border-box;
-}
-
 #start-scan {
   font-size: 12px;
   padding: 5px 8px;
@@ -146,7 +128,7 @@ h2 {
 }
 
 /* Fix visivo per centrare il bottone Crea */
-#buttons-container > #create-macchinario {
+#buttons-container > #create-manutenzione {
   order: 1;
   border: 1px solid black !important;
   background-color: #3498db;
@@ -194,8 +176,8 @@ button {
   box-sizing: border-box;
 }
 
-/* Bottone e container per i bottoni macchinario - fix overflow */
-.btns-macchinario {
+/* Bottone e container per i bottoni manutenzione - fix overflow */
+.btns-manutenzione {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -207,7 +189,7 @@ button {
   overflow-x: hidden; /* niente scroll orizzontale */
 }
 
-.btns-macchinario button {
+.btns-manutenzione button {
   flex: 0 0 auto; /* non cresce né si restringe */
   max-width: 140px; /* max larghezza bottone */
   min-width: 60px; /* min larghezza bottone */
@@ -216,7 +198,7 @@ button {
 }
 
 @media(min-width: 480px) {
-  .btns-macchinario button {
+  .btns-manutenzione button {
     width: auto; /* su desktop larghezza normale */
   }
 }
@@ -312,14 +294,14 @@ button {
   box-sizing: border-box;
 }
 
-#macchinari-list {
+#manutenzioni-list {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 30px;
   box-sizing: border-box;
 }
 
-.macchinario {
+.manutenzione {
   background-color: #cecece;
   max-width: 400px;
   border: 3px solid black;
@@ -333,12 +315,12 @@ button {
   box-sizing: border-box;
 }
 
-.macchinario.highlight {
+.manutenzione.highlight {
   box-shadow: 0 0 15px 4px #ffff0099;
   border-color: #ffff00;
 }
 
-.macchinario > h3 {
+.manutenzione > h3 {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: 700;
@@ -479,7 +461,7 @@ button {
   text-align: center;
 }
 
-.btns-macchinario {
+.btns-manutenzione {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -491,7 +473,7 @@ button {
   overflow-x: hidden;
 }
 
-.btns-macchinario button {
+.btns-manutenzione button {
   flex: 0 0 auto;
   max-width: 140px;
   min-width: 60px;
@@ -500,7 +482,7 @@ button {
 }
 
 @media(min-width: 480px) {
-  .btns-macchinario button {
+  .btns-manutenzione button {
     width: auto;
   }
 }
@@ -719,12 +701,12 @@ button {
 }
 
 /* Quando il contenitore ha classe .modalita-copia attiva: mostra checkbox e nasconde bottoni */
-.macchinario.modalita-copia li input[type="checkbox"] {
+.manutenzione.modalita-copia li input[type="checkbox"] {
   display: inline-block;
 }
 
 /* Nasconde bottoni modifica/elimina in modalità copia */
-.macchinario.modalita-copia .btns-note {
+.manutenzione.modalita-copia .btns-note {
   display: none;
 }
 
@@ -779,7 +761,7 @@ button {
 
 .btn-rinomina,
 .btn-chiudi,
-.btn-elimina-macchinario {
+.btn-elimina-manutenzione {
   padding: 2px 6px; /* meno padding orizzontale */
   min-width: auto; /* togli min-width che forza larghezza */
   max-width: none; /* togli max-width */

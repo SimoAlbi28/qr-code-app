@@ -1,11 +1,11 @@
-const listContainer = document.getElementById("macchinari-list");
+const listContainer = document.getElementById("manutenzioni-list");
 const reader = document.getElementById("reader");
 const startBtn = document.getElementById("start-scan");
 const stopBtn = document.getElementById("stop-scan");
 const searchInput = document.getElementById("search-input");
 const showAllBtn = document.getElementById("show-all-btn");
 
-const createBtn = document.getElementById("create-macchinario");
+const createBtn = document.getElementById("create-manutenzione");
 const nomeModal = document.getElementById("nomeModal");
 const nomeInput = document.getElementById("nomeInput");
 const btnConferma = document.getElementById("btnConferma");
@@ -23,15 +23,15 @@ if (!currentAnno || !folders[currentAnno]) {
   window.location.href = "home.html";
 }
 
-let savedMacchinari = folders[currentAnno]?.macchinari || {};
-if (!savedMacchinari) savedMacchinari = {};
+let savedManutenzioni = folders[currentAnno]?.manutenzioni || {};
+if (!savedManutenzioni) savedManutenzioni = {};
 
 // Reset expanded = false ogni volta che si carica pagina
-Object.entries(savedMacchinari).forEach(([id, macch]) => {
-  savedMacchinari[id].expanded = false;
+Object.entries(savedManutenzioni).forEach(([id, manut]) => {
+  savedManutenzioni[id].expanded = false;
 });
 
-folders[currentAnno].macchinari = savedMacchinari;
+folders[currentAnno].manutenzioni = savedManutenzioni;
 localStorage.setItem("folders", JSON.stringify(folders));
 
 // --- MOSTRA ANNO SOTTO TITOLO ---
@@ -148,8 +148,8 @@ function formatData(d) {
 }
 
 // Crea area per copiare note
-function creaAreaCopiaNote(macchinarioBox, id, note) {
-  const oldArea = macchinarioBox.querySelector(".copia-note-area");
+function creaAreaCopiaNote(manutenzioneBox, id, note) {
+  const oldArea = manutenzioneBox.querySelector(".copia-note-area");
   if (oldArea) oldArea.remove();
 
   const area = document.createElement("div");
@@ -198,10 +198,10 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   selezioneDiv.appendChild(btnContainer);
   area.appendChild(btnCopiaNote);
   area.appendChild(selezioneDiv);
-  macchinarioBox.appendChild(area);
+  manutenzioneBox.appendChild(area);
 
   function updateNoteButtonsAndCheckboxes(showCheckboxes) {
-    const liNotes = macchinarioBox.querySelectorAll(".note-list li");
+    const liNotes = manutenzioneBox.querySelectorAll(".note-list li");
     liNotes.forEach(li => {
       const checkbox = li.querySelector("input[type=checkbox]");
       const btns = li.querySelector(".btns-note");
@@ -223,15 +223,15 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   });
 
   btnSelezionaTutte.addEventListener("click", () => {
-    macchinarioBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = true);
+    manutenzioneBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = true);
   });
 
   btnDeselezionaTutte.addEventListener("click", () => {
-    macchinarioBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = false);
+    manutenzioneBox.querySelectorAll(".note-list input[type=checkbox]").forEach(cb => cb.checked = false);
   });
 
   btnCopiaSelezionate.addEventListener("click", () => {
-    const checkboxes = macchinarioBox.querySelectorAll(".note-list input[type=checkbox]:checked");
+    const checkboxes = manutenzioneBox.querySelectorAll(".note-list input[type=checkbox]:checked");
     const checkedIndexes = Array.from(checkboxes).map(cb => parseInt(cb.value));
 
     if (checkedIndexes.length === 0) {
@@ -239,9 +239,9 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
       return;
     }
 
-    const nomeMacchinario = savedMacchinari[id].nome;
+    const nomeManutenzione = savedManutenzioni[id].nome;
 
-    const testoDaCopiare = `${nomeMacchinario.toUpperCase()}\n\n` + 
+    const testoDaCopiare = `${nomeManutenzione.toUpperCase()}\n\n` + 
       checkedIndexes.map(i => {
         const n = note[i];
         return `- [${formatData(n.data)}]: ${n.desc};`;
@@ -258,10 +258,10 @@ function creaAreaCopiaNote(macchinarioBox, id, note) {
   });
 }
 
-function renderMacchinari(highlightId = null) {
+function renderManutenzioni(highlightId = null) {
   listContainer.innerHTML = "";
 
-  const filtered = Object.entries(savedMacchinari).filter(([_, data]) =>
+  const filtered = Object.entries(savedManutenzioni).filter(([_, data]) =>
     data.nome.toLowerCase().startsWith(searchInput.value.trim().toLowerCase())
   );
 
@@ -273,7 +273,7 @@ function renderMacchinari(highlightId = null) {
     const expanded = data.expanded;
 
     const box = document.createElement("div");
-    box.className = "macchinario";
+    box.className = "manutenzione";
     box.setAttribute("data-id", id);
     box.innerHTML = `
       <h3>${data.nome}</h3>
@@ -365,20 +365,20 @@ function renderMacchinari(highlightId = null) {
       }
 
       const btnsContainer = document.createElement("div");
-      btnsContainer.className = "btns-macchinario";
+      btnsContainer.className = "btns-manutenzione";
       btnsContainer.innerHTML = `
         <div class="nome-e-btn">
           <button class="btn-blue btn-rinomina" data-id="${id}">✏️ Rinomina</button>
           <button class="btn-orange btn-chiudi" data-id="${id}">❌ Chiudi</button>
-          <button class="btn-red btn-elimina-macchinario" data-id="${id}">🗑️ Elimina</button>
+          <button class="btn-red btn-elimina-manutenzione" data-id="${id}">🗑️ Elimina</button>
         </div>
       `;
 
       box.appendChild(btnsContainer);
 
-      btnsContainer.querySelector(".btn-rinomina").addEventListener("click", () => rinominaMacchinario(id));
+      btnsContainer.querySelector(".btn-rinomina").addEventListener("click", () => rinominaManutenzione(id));
       btnsContainer.querySelector(".btn-chiudi").addEventListener("click", () => toggleDettagli(id));
-      btnsContainer.querySelector(".btn-elimina-macchinario").addEventListener("click", () => eliminaMacchinario(id));
+      btnsContainer.querySelector(".btn-elimina-manutenzione").addEventListener("click", () => eliminaManutenzione(id));
 
       box.querySelectorAll(".btn-modifica").forEach(btn =>
         btn.addEventListener("click", (e) => {
@@ -401,7 +401,7 @@ function renderMacchinari(highlightId = null) {
   });
 
   if (highlightId) {
-    const highlightBox = document.querySelector(`.macchinario[data-id="${highlightId}"]`);
+    const highlightBox = document.querySelector(`.manutenzione[data-id="${highlightId}"]`);
     if (highlightBox) {
       highlightBox.classList.add("highlight");
       setTimeout(() => {
@@ -412,31 +412,31 @@ function renderMacchinari(highlightId = null) {
   }
 }
 
-function salvaMacchinario(id, nome) {
-  if (!savedMacchinari[id]) {
-    savedMacchinari[id] = { nome, note: [], expanded: true };
+function salvaManutenzione(id, nome) {
+  if (!savedManutenzioni[id]) {
+    savedManutenzioni[id] = { nome, note: [], expanded: true };
   } else {
-    savedMacchinari[id].nome = nome;
+    savedManutenzioni[id].nome = nome;
   }
-  folders[currentAnno].macchinari = savedMacchinari;
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
 }
 
 function toggleDettagli(id) {
-  if (!savedMacchinari[id]) return;
-  savedMacchinari[id].expanded = !savedMacchinari[id].expanded;
-  folders[currentAnno].macchinari = savedMacchinari;
+  if (!savedManutenzioni[id]) return;
+  savedManutenzioni[id].expanded = !savedManutenzioni[id].expanded;
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
-  renderMacchinari();
+  renderManutenzioni();
 }
 
-function rinominaMacchinario(id) {
-  if (!savedMacchinari[id]) return;
-  const nuovoNome = prompt("Nuovo nome:", savedMacchinari[id].nome)?.trim().toUpperCase();
+function rinominaManutenzione(id) {
+  if (!savedManutenzioni[id]) return;
+  const nuovoNome = prompt("Nuovo nome:", savedManutenzioni[id].nome)?.trim().toUpperCase();
   if (!nuovoNome) return;
 
-  const esisteGia = Object.values(savedMacchinari).some(
-    m => m.nome.toUpperCase() === nuovoNome && m !== savedMacchinari[id]
+  const esisteGia = Object.values(savedManutenzioni).some(
+    m => m.nome.toUpperCase() === nuovoNome && m !== savedManutenzioni[id]
   );
 
   if (esisteGia) {
@@ -444,22 +444,22 @@ function rinominaMacchinario(id) {
     return;
   }
 
-  savedMacchinari[id].nome = nuovoNome;
-  folders[currentAnno].macchinari = savedMacchinari;
+  savedManutenzioni[id].nome = nuovoNome;
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
-  renderMacchinari();
+  renderManutenzioni();
 }
 
-function eliminaMacchinario(id) {
-  if (!savedMacchinari[id]) return;
-  const nome = savedMacchinari[id].nome;
+function eliminaManutenzione(id) {
+  if (!savedManutenzioni[id]) return;
+  const nome = savedManutenzioni[id].nome;
   mostraModalConferma(
     `Sei sicuro di voler eliminare "${nome}"?`,
     () => {
-      delete savedMacchinari[id];
-      folders[currentAnno].macchinari = savedMacchinari;
+      delete savedManutenzioni[id];
+      folders[currentAnno].manutenzioni = savedManutenzioni;
       localStorage.setItem("folders", JSON.stringify(folders));
-      renderMacchinari();
+      renderManutenzioni();
     }
   );
 }
@@ -467,13 +467,13 @@ function eliminaMacchinario(id) {
 let notaInModifica = null;
 
 function modificaNota(id, index) {
-  if (!savedMacchinari[id]) return;
-  const nota = savedMacchinari[id].note[index];
+  if (!savedManutenzioni[id]) return;
+  const nota = savedManutenzioni[id].note[index];
   if (!nota) return;
 
   // Se stai già modificando questa nota → annulla modifica (toggle OFF)
   if (notaInModifica && notaInModifica.id === id && notaInModifica.index === index) {
-    const box = document.querySelector(`.macchinario[data-id="${id}"]`);
+    const box = document.querySelector(`.manutenzione[data-id="${id}"]`);
     if (!box) return;
 
     const dataInput = box.querySelector(`#data-${id}`);
@@ -490,7 +490,7 @@ function modificaNota(id, index) {
   // Altrimenti, attiva la modifica per questa nota (toggle ON)
   notaInModifica = { id, index };
 
-  const box = document.querySelector(`.macchinario[data-id="${id}"]`);
+  const box = document.querySelector(`.manutenzione[data-id="${id}"]`);
   if (!box) return;
 
   const dataInput = box.querySelector(`#data-${id}`);
@@ -513,26 +513,26 @@ function modificaNota(id, index) {
 }
 
 function eliminaNota(id, index) {
-  if (!savedMacchinari[id]) return;
-  const nome = savedMacchinari[id].nome;
+  if (!savedManutenzioni[id]) return;
+  const nome = savedManutenzioni[id].nome;
   mostraModalConferma(
     `Sei sicuro di voler eliminare questa nota di "${nome}"?`,
     () => {
-      savedMacchinari[id].note.splice(index, 1);
-      if (savedMacchinari[id].note.length === 0) {
-        savedMacchinari[id].expanded = false;
+      savedManutenzioni[id].note.splice(index, 1);
+      if (savedManutenzioni[id].note.length === 0) {
+        savedManutenzioni[id].expanded = false;
       }
-      folders[currentAnno].macchinari = savedMacchinari;
+      folders[currentAnno].manutenzioni = savedManutenzioni;
       localStorage.setItem("folders", JSON.stringify(folders));
-      renderMacchinari();
+      renderManutenzioni();
     }
   );
 }
 
 function aggiungiNota(id) {
-  if (!savedMacchinari[id]) return;
+  if (!savedManutenzioni[id]) return;
 
-  const box = document.querySelector(`.macchinario[data-id="${id}"]`);
+  const box = document.querySelector(`.manutenzione[data-id="${id}"]`);
   if (!box) return;
 
   const dataInput = box.querySelector(`#data-${id}`);
@@ -550,33 +550,33 @@ function aggiungiNota(id) {
     return;
   }
 
-  if (!savedMacchinari[id].note) savedMacchinari[id].note = [];
+  if (!savedManutenzioni[id].note) savedManutenzioni[id].note = [];
 
   if (notaInModifica && notaInModifica.id === id) {
-    savedMacchinari[id].note[notaInModifica.index] = { data, desc };
+    savedManutenzioni[id].note[notaInModifica.index] = { data, desc };
     notaInModifica = null;
   } else {
-    savedMacchinari[id].note.push({ data, desc });
+    savedManutenzioni[id].note.push({ data, desc });
   }
 
-  savedMacchinari[id].expanded = true;
-  folders[currentAnno].macchinari = savedMacchinari;
+  savedManutenzioni[id].expanded = true;
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
-  renderMacchinari(id);
+  renderManutenzioni(id);
 }
 
 // --- RICERCA E MOSTRA TUTTI ---
 
 searchInput.addEventListener("input", e => {
-  renderMacchinari();
+  renderManutenzioni();
 });
 
 showAllBtn.addEventListener("click", () => {
   searchInput.value = "";
-  renderMacchinari();
+  renderManutenzioni();
 });
 
-// --- CREAZIONE MACCHINARIO E MODAL ---
+// --- CREAZIONE MANUTENZIONE E MODAL ---
 
 createBtn.addEventListener("click", () => {
   nomeInput.value = "";
@@ -597,21 +597,21 @@ btnConferma.addEventListener("click", () => {
     return;
   }
 
-  const esisteGia = Object.values(savedMacchinari).some(m => m.nome === nome);
+  const esisteGia = Object.values(savedManutenzioni).some(m => m.nome === nome);
   if (esisteGia) {
     erroreNome.style.display = "block";
     return;
   }
 
   const id = Date.now().toString();
-  savedMacchinari[id] = { nome, note: [], expanded: true };
-  folders[currentAnno].macchinari = savedMacchinari;
+  savedManutenzioni[id] = { nome, note: [], expanded: true };
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
 
   nomeModal.classList.add("hidden");
   erroreNome.style.display = "none";
 
-  renderMacchinari(id);
+  renderManutenzioni(id);
 });
 
 // --- SCANSIONE QR CODE ---
@@ -682,20 +682,20 @@ function gestioneScan(text) {
   const nome = text.trim().toUpperCase();
   if (!nome) return;
 
-  const esisteGia = Object.values(savedMacchinari).some(m => m.nome === nome);
+  const esisteGia = Object.values(savedManutenzioni).some(m => m.nome === nome);
   if (esisteGia) {
-    alert(`Macchinario "${nome}" già presente.`);
+    alert(`Manutenzione "${nome}" già presente.`);
     return;
   }
 
   const id = Date.now().toString();
-  savedMacchinari[id] = { nome, note: [], expanded: false };
-  folders[currentAnno].macchinari = savedMacchinari;
+  savedManutenzioni[id] = { nome, note: [], expanded: false };
+  folders[currentAnno].manutenzioni = savedManutenzioni;
   localStorage.setItem("folders", JSON.stringify(folders));
-  renderMacchinari(id);
+  renderManutenzioni(id);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  renderMacchinari();
+  renderManutenzioni();
   mostraAnnoCartella();
 });
