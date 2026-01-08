@@ -16,23 +16,44 @@ const urlParams = new URLSearchParams(window.location.search);
 const currentAnno = urlParams.get("id");
 
 let folders = JSON.parse(localStorage.getItem("folders") || "{}");
+let savedManutenzioni = {};
 
-// Se la cartella non esiste, blocca e torna alla home
-if (!currentAnno || !folders[currentAnno]) {
-  alert("Cartella non trovata. Torna alla home.");
-  window.location.href = "home.html";
+// Funzione per inizializzare l'app
+function inizializzaApp() {
+  // Se la cartella non esiste, torna alla home
+  if (!currentAnno) {
+    alert("Nessuna cartella selezionata. Torna alla home.");
+    window.location.href = "home.html";
+    return;
+  }
+
+  // Ricarica folders dal localStorage
+  folders = JSON.parse(localStorage.getItem("folders") || "{}");
+  
+  if (!folders[currentAnno]) {
+    alert("Cartella non trovata (ID: " + currentAnno + "). Potrebbe essere stata eliminata. Torna alla home.");
+    window.location.href = "home.html";
+    return;
+  }
+
+  savedManutenzioni = folders[currentAnno]?.manutenzioni || {};
+  if (!savedManutenzioni) savedManutenzioni = {};
+
+  // Reset expanded = false ogni volta che si carica pagina
+  Object.entries(savedManutenzioni).forEach(([id, manut]) => {
+    savedManutenzioni[id].expanded = false;
+  });
+
+  folders[currentAnno].manutenzioni = savedManutenzioni;
+  localStorage.setItem("folders", JSON.stringify(folders));
 }
 
-let savedManutenzioni = folders[currentAnno]?.manutenzioni || {};
-if (!savedManutenzioni) savedManutenzioni = {};
-
-// Reset expanded = false ogni volta che si carica pagina
-Object.entries(savedManutenzioni).forEach(([id, manut]) => {
-  savedManutenzioni[id].expanded = false;
-});
-
-folders[currentAnno].manutenzioni = savedManutenzioni;
-localStorage.setItem("folders", JSON.stringify(folders));
+// Inizializza app solo quando il DOM è pronto
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", inizializzaApp);
+} else {
+  inizializzaApp();
+}
 
 // --- MOSTRA ANNO SOTTO TITOLO ---
 function mostraAnnoCartella() {
@@ -695,7 +716,10 @@ function gestioneScan(text) {
   renderManutenzioni(id);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+// Aggiungo il render delle manutenzioni alla funzione di inizializzazione
+function avviaRender() {
   renderManutenzioni();
   mostraAnnoCartella();
-});
+}
+
+window.addEventListener("DOMContentLoaded", avviaRender);
